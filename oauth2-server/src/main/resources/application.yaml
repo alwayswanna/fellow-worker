@@ -1,0 +1,38 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: oauth2-server
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/authorization
+
+oauth:
+  issue-url: http://127.0.0.1:9001
+  defaultClients:
+    -
+      default-client-id: message
+      default-client-secret: c29tZXNlY3Rlcg==
+      default-access-token-time-to-live: 30 # minutes
+      default-refreshToken-time-to-live: 90 # days
+      default-redirect-uris:
+        - "http://127.0.0.1:8081/authorized"
+  default-user:
+    username: administrator
+    password: administrator
+    email: a.gleb@yahoo.com
+  cors:
+    enabled: true
+    allowed-origins: "*"
+    allowed-origins-all: true
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
+
+logging:
+  level:
+    root: info
