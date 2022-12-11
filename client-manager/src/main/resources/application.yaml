@@ -1,0 +1,39 @@
+server:
+  port: 8090
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: message
+      client-secret: c29tZXNlY3Rlcg==
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorizationUrl: http://127.0.0.1:9001/oauth2/authorize
+    tokenUrl: http://127.0.0.1:9001/oauth2/token
+
+spring:
+  application:
+    name: client-manager
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://127.0.0.1:9001
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/authorization
+
+client-manager:
+  security-constraints:
+    - roles:
+        - COMPANY
+        - EMPLOYEE
+      security-collections:
+        - patterns:
+            - /api/v1/**
+
+logging:
+  level:
+    web: TRACE
