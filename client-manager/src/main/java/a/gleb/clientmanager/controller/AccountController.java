@@ -40,12 +40,12 @@ public class AccountController {
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "BAD REQUEST", responseCode = "400",
+                            description = "Bad request", responseCode = "400",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "INTERNAL SERVER ERROR", responseCode = "500",
+                            description = "Internal server error", responseCode = "500",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     )
@@ -57,7 +57,7 @@ public class AccountController {
     }
 
     @Operation(
-            summary = "Создать новую учетную запись.",
+            summary = "Изменить данные учетной записи.",
             tags = CLIENT_MANAGER_CONTROLLER,
             security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
     )
@@ -69,12 +69,12 @@ public class AccountController {
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "UNAUTHORIZED", responseCode = "401",
+                            description = "Bad request", responseCode = "401",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "INTERNAL SERVER ERROR", responseCode = "500",
+                            description = "Internal server error", responseCode = "500",
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     )
@@ -85,6 +85,30 @@ public class AccountController {
         return accountService.editAccount(requestModel);
     }
 
+    @Operation(
+            summary = "Изменить данные учетной записи.",
+            tags = CLIENT_MANAGER_CONTROLLER,
+            security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
+                    ),
+                    @ApiResponse(
+                            description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
+                    ),
+                    @ApiResponse(
+                            description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
+                    )
+            }
+    )
     @DeleteMapping("/delete")
     public ApiResponseModel delete() {
         return accountService.deleteAccount();
