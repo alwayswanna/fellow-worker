@@ -40,6 +40,7 @@ public class ClientManagerSecurityConfiguration {
             HttpSecurity httpSecurity
     ) throws Exception {
         httpSecurity
+                .cors().disable()
                 .csrf().disable()
                 .authorizeHttpRequests(this::configure)
                 .oauth2ResourceServer()

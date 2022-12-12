@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
@@ -31,7 +30,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.time.Duration;
 import java.util.UUID;
 
-import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.*;
 import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.*;
 import static org.springframework.security.oauth2.core.oidc.OidcScopes.OPENID;
@@ -52,11 +50,17 @@ public class OAuth2SecurityConfiguration {
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults());
-
-        http
+                .oidc(Customizer.withDefaults())
+                .and()
+                .cors(it -> {
+                    var urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+                    urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", properties.getCors());
+                    it.configurationSource(urlBasedCorsConfigurationSource);
+                })
                 .exceptionHandling(exceptions ->
-                        exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+                        exceptions.authenticationEntryPoint(
+                                new LoginUrlAuthenticationEntryPoint("/login")
+                        )
                 )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
 
@@ -137,6 +141,4 @@ public class OAuth2SecurityConfiguration {
     ) {
         return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
     }
-
-
 }
