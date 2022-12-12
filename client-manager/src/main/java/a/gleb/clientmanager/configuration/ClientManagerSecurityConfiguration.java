@@ -20,9 +20,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Configuration
 @EnableWebSecurity
 @AllArgsConstructor
+@Configuration(proxyBeanMethods = false)
 public class ClientManagerSecurityConfiguration {
 
     private static final String[] DEFAULT_UNPROTECTED_PATTERNS =
@@ -40,6 +40,7 @@ public class ClientManagerSecurityConfiguration {
             HttpSecurity httpSecurity
     ) throws Exception {
         httpSecurity
+                .anonymous().disable()
                 .cors().disable()
                 .csrf().disable()
                 .authorizeHttpRequests(this::configure)

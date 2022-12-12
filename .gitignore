@@ -3,3 +3,5 @@
 /.idea/
 /client-manager/.mvn/
 /client-manager/target/
+/oauth2-persistence/target/
+/oauth2-persistence/.mvn/

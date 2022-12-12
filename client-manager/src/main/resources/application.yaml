@@ -30,10 +30,12 @@ client-manager:
     - roles:
         - COMPANY
         - EMPLOYEE
+        - ADMIN
       security-collections:
         - patterns:
-            - /api/v1/**
+            - /api/v1/account/edit
 
 logging:
   level:
     web: TRACE
+    org.springframework.security: trace

@@ -84,4 +84,9 @@ public class AccountController {
     public ApiResponseModel edit(@RequestBody @Valid AccountRequestModel requestModel) {
         return accountService.editAccount(requestModel);
     }
+
+    @DeleteMapping("/delete")
+    public ApiResponseModel delete() {
+        return accountService.deleteAccount();
+    }
 }

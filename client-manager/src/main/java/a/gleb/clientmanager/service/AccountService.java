@@ -18,6 +18,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountModelMapper accountModelMapper;
+    private final OAuth2SecurityContextService oAuth2SecurityContextService;
 
     public ApiResponseModel createAccount(AccountRequestModel requestModel) {
         validateAccountDataInDataBase(requestModel);
@@ -38,7 +39,14 @@ public class AccountService {
 
     public ApiResponseModel editAccount(AccountRequestModel requestModel) {
         validateAccountDataInDataBase(requestModel);
+        var account = accountRepository.findAccountById(oAuth2SecurityContextService.getUserId())
+                .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Неверно введены данные."));
 
+
+        return ApiResponseModel.builder().build();
+    }
+
+    public ApiResponseModel deleteAccount() {
         return ApiResponseModel.builder().build();
     }
 
