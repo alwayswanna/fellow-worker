@@ -9,6 +9,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 import static a.gleb.oauth2persistence.db.dao.Account.builder;
 
 @Slf4j
@@ -23,22 +25,22 @@ public class OAuth2ServerStartupService implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        log.info("{}, create default user start ... ", getClass().getSimpleName());
         OAuth2ServerProperties.DefaultUser defaultUser = oAuth2ServerProperties.getDefaultUser();
 
         if (!accountService.findAccountByUsernameOrEmail(defaultUser.getUsername()).isPresent()) {
+            log.info("{}, create default user start ... ", getClass().getSimpleName());
             var defaultUserAccount = builder()
                     .username(defaultUser.getUsername())
                     .password(passwordEncoder.encode(defaultUser.getPassword()))
                     .email(defaultUser.getEmail())
                     .firstName("Администратор")
                     .middleName("(Administrator)")
+                    .birthData(LocalDate.of(1998, 2, 17))
                     .enabled(true)
                     .role(AccountRole.ADMIN)
                     .build();
             accountService.save(defaultUserAccount);
+            log.info("{}, create default user end ... ", getClass().getSimpleName());
         }
-
-        log.info("{}, create default user end ... ", getClass().getSimpleName());
     }
 }

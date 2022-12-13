@@ -19,7 +19,8 @@ oauth:
       default-access-token-time-to-live: 30 # minutes
       default-refreshToken-time-to-live: 90 # days
       default-redirect-uris:
-        - "http://127.0.0.1:8081/authorized"
+        - "http://127.0.0.1:8090/swagger-ui.html"
+        - "http://127.0.0.1:8080/swagger-ui/oauth2-redirect.html"
   default-user:
     username: administrator
     password: administrator
@@ -35,4 +36,4 @@ oauth:
 
 logging:
   level:
-    root: info
+    web: INFO

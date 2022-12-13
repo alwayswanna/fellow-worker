@@ -66,6 +66,7 @@ CREATE TABLE accounts
     middle_name varchar(30)  NOT NULL,
     last_name   varchar(30),
     email       varchar(30)  NOT NULL,
+    birth_date  date         NOT NULL,
     role        varchar(30)  NOT NULL,
     enabled     boolean      NOT NULL
 );
