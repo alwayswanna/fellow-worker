@@ -31,6 +31,7 @@ public class ClientManagerSecurityConfiguration {
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/actuator/**",
+                    "/error"
             };
 
     private final ClientManagerConfigurationProperties properties;
@@ -81,12 +82,13 @@ public class ClientManagerSecurityConfiguration {
     private static class SpringBootOAuth2Converter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
         private static final String ROLE_PREFIX = "ROLE_%s";
+        private static final String ROLE_KEY_CLAIM = "role";
 
         @Override
         public List<GrantedAuthority> convert(Jwt source) {
 
             return Arrays.stream(
-                            source.getClaims().get("role")
+                            source.getClaims().get(ROLE_KEY_CLAIM)
                                     .toString()
                                     .replace("\\[", "")
                                     .replace("\\]", "")
@@ -97,5 +99,4 @@ public class ClientManagerSecurityConfiguration {
                     .collect(Collectors.toList());
         }
     }
-
 }

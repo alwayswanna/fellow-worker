@@ -38,12 +38,14 @@ client-manager:
         - patterns:
             - /api/v1/account/edit
             - /api/v1/account/delete
-            - /api/v1/change-password
+            - /api/v1/account/change-password
     - roles:
         - ADMIN
       security-collections:
         - patterns:
-            - /api/v1/support/**
+            - /api/v1/support/disable-account
+            - /api/v1/support/accounts
+            - /api/v1/support/account-by-username
 
 logging:
   level:
