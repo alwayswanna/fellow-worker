@@ -19,10 +19,6 @@ public final class AccountChangeUtils {
             account.setUsername(accountRequestModel.getUsername());
         }
 
-        if (!isEmpty(accountRequestModel.getPassword())) {
-            account.setPassword(accountRequestModel.getPassword());
-        }
-
         if (!isEmpty(accountRequestModel.getEmail()) && !Objects.equals(accountRequestModel.getEmail(), account.getEmail())) {
             account.setEmail(accountRequestModel.getEmail());
         }

@@ -5,12 +5,15 @@ import a.gleb.clientmanager.exception.UnexpectedErrorException;
 import a.gleb.clientmanager.mapper.AccountModelMapper;
 import a.gleb.clientmanager.model.AccountRequestModel;
 import a.gleb.clientmanager.model.ApiResponseModel;
+import a.gleb.clientmanager.model.ChangePasswordModel;
 import a.gleb.oauth2persistence.db.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 import static a.gleb.clientmanager.utils.AccountChangeUtils.changeAccountData;
 
@@ -26,6 +29,7 @@ public class AccountService {
 
     /**
      * Method creates new account.
+     *
      * @param requestModel user request with data for new account.
      * @return {@link ApiResponseModel} response with message.
      */
@@ -48,6 +52,7 @@ public class AccountService {
 
     /**
      * Method edit existing account with check on unique username.
+     *
      * @param requestModel request from frontend
      * @return {@link ApiResponseModel} response for user.
      */
@@ -63,22 +68,108 @@ public class AccountService {
         try {
             accountRepository.save(account);
             return ApiResponseModel.builder()
-                    .message("Данные вашего аккаунт успешно изменены")
+                    .message("Данные вашего аккаунт успешно обновлены.")
                     .build();
         } catch (Exception e) {
-            log.error("Error while save new account to database, {}", e.getMessage());
+            log.error("Error while edit account to database, {}", e.getMessage());
             throw new UnexpectedErrorException(
                     HttpStatus.SERVICE_UNAVAILABLE,
-                    "Произошла ошибка при создании аккаунта, попробуйте повторить попытку позже"
+                    "Произошла ошибка при редактировании аккаунта, попробуйте повторить попытку позже"
             );
         }
     }
 
+    /**
+     * Method delete account by ID from user token.
+     *
+     * @return {@link ApiResponseModel} response with message.
+     */
     public ApiResponseModel deleteAccount() {
-
-        return ApiResponseModel.builder().build();
+        var userId = oAuth2SecurityContextService.getUserId();
+        try {
+            accountRepository.deleteById(userId);
+            return ApiResponseModel.builder()
+                    .message("Ваш аккаунт был успешно удален.")
+                    .build();
+        } catch (Exception e) {
+            log.error("Error while delete account to database, {}, userId: {}",
+                    e.getMessage(),
+                    userId
+            );
+            throw new UnexpectedErrorException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Произошла ошибка при удалении аккаунта, попробуйте повторить попытку позже"
+            );
+        }
     }
 
+    /**
+     * Method returns account data.
+     *
+     * @param userId id from user request.
+     * @return
+     */
+    public ApiResponseModel getAccountData(UUID userId) {
+        try {
+            var account = accountRepository.findAccountById(userId)
+                    .orElseThrow(
+                            () -> new InvalidUserDataException(
+                                    HttpStatus.BAD_REQUEST, "Пользователь с таким id не найден")
+                    );
+            return accountModelMapper.toApiResponseModel("Данные аккаунта успешно получены", account);
+        } catch (Exception e) {
+            log.error("Error while get account data from database, {}, userId: {}",
+                    e.getMessage(),
+                    userId
+            );
+            throw new UnexpectedErrorException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Произошла ошибка при получении данных аккаунта, попробуйте повторить попытку позже"
+            );
+        }
+    }
+
+    /**
+     * Method change account password, after validate password.
+     *
+     * @param changePasswordModel
+     * @return
+     */
+    public ApiResponseModel changeUserPassword(ChangePasswordModel changePasswordModel) {
+        var userId = oAuth2SecurityContextService.getUserId();
+        var account = accountRepository.findAccountById(userId).orElseThrow(
+                () -> new InvalidUserDataException(
+                        HttpStatus.BAD_REQUEST, "Пользователь с таким id не найден")
+        );
+        /* compare current password in database with password from request */
+        if (passwordEncoder.matches(changePasswordModel.getOldPassword(), account.getPassword())) {
+            account.setPassword(passwordEncoder.encode(changePasswordModel.getNewPassword()));
+        } else {
+            throw new InvalidUserDataException(
+                    HttpStatus.BAD_REQUEST,
+                    String.format(
+                            "Текущий пароль не совпадает с текущим, введенный пароль: %s",
+                            changePasswordModel.getOldPassword()
+                    )
+            );
+        }
+
+        try {
+            accountRepository.save(account);
+            return ApiResponseModel.builder()
+                    .message("Ваш пароль успешно изменен")
+                    .build();
+        } catch (Exception e) {
+            log.error("Error while change password, error: {}, userId: {}",
+                    e.getMessage(),
+                    userId
+            );
+            throw new UnexpectedErrorException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Произошла ошибка при при смене пароля, попробуйте повторить попытку позже"
+            );
+        }
+    }
 
     private void validateAccountDataInDataBase(AccountRequestModel accountRequestModel) {
         var userFromDatabase = accountRepository

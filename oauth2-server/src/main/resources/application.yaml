@@ -36,4 +36,4 @@ oauth:
 
 logging:
   level:
-    root: info
+    web: INFO

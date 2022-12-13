@@ -1,5 +1,8 @@
 server:
   port: 8090
+  error:
+    include-message: always
+    include-binding-errors: always
 
 springdoc:
   swagger-ui:
@@ -34,8 +37,14 @@ client-manager:
       security-collections:
         - patterns:
             - /api/v1/account/edit
+            - /api/v1/account/delete
+            - /api/v1/change-password
+    - roles:
+        - ADMIN
+      security-collections:
+        - patterns:
+            - /api/v1/support/**
 
 logging:
   level:
-    web: TRACE
-    org.springframework.security: trace
+    web: INFO

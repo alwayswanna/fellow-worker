@@ -2,6 +2,7 @@ package a.gleb.clientmanager.controller;
 
 import a.gleb.clientmanager.model.AccountRequestModel;
 import a.gleb.clientmanager.model.ApiResponseModel;
+import a.gleb.clientmanager.model.ChangePasswordModel;
 import a.gleb.clientmanager.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,9 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 import static a.gleb.clientmanager.configuration.OpenApiConfiguration.OAUTH2_SECURITY_SCHEMA;
 import static a.gleb.clientmanager.controller.AccountController.CLIENT_MANAGER_CONTROLLER;
@@ -52,7 +56,7 @@ public class AccountController {
             }
     )
     @PostMapping("/create")
-    public ApiResponseModel create(@RequestBody @Valid AccountRequestModel requestModel) {
+    public ApiResponseModel create(@RequestBody AccountRequestModel requestModel) {
         return accountService.createAccount(requestModel);
     }
 
@@ -68,16 +72,8 @@ public class AccountController {
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
-                    @ApiResponse(
-                            description = "Bad request", responseCode = "401",
-                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ApiResponseModel.class))
-                    ),
-                    @ApiResponse(
-                            description = "Internal server error", responseCode = "500",
-                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ApiResponseModel.class))
-                    )
+                    @ApiResponse(description = "Bad request", responseCode = "401"),
+                    @ApiResponse(description = "Internal server error", responseCode = "500")
             }
     )
     @PutMapping("/edit")
@@ -97,20 +93,53 @@ public class AccountController {
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
-                    @ApiResponse(
-                            description = "Bad request", responseCode = "401",
-                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ApiResponseModel.class))
-                    ),
-                    @ApiResponse(
-                            description = "Internal server error", responseCode = "500",
-                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = ApiResponseModel.class))
-                    )
+                    @ApiResponse(description = "Bad request", responseCode = "401"),
+                    @ApiResponse(description = "Internal server error", responseCode = "500")
             }
     )
     @DeleteMapping("/delete")
     public ApiResponseModel delete() {
         return accountService.deleteAccount();
+    }
+
+    @Operation(
+            summary = "Получить данные аккаунта.",
+            tags = CLIENT_MANAGER_CONTROLLER
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
+                    ),
+                    @ApiResponse(description = "Bad request", responseCode = "401"),
+                    @ApiResponse(description = "Internal server error", responseCode = "500")
+            }
+    )
+    @GetMapping("/data")
+    public ApiResponseModel getAccountInfo(@RequestParam @NotNull UUID userId) {
+        return accountService.getAccountData(userId);
+    }
+
+    @Operation(
+            summary = "Сменить пароль пользователя.",
+            tags = CLIENT_MANAGER_CONTROLLER,
+            security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
+                    ),
+                    @ApiResponse(description = "Bad request", responseCode = "401"),
+                    @ApiResponse(description = "Internal server error", responseCode = "500")
+            }
+    )
+    @PutMapping("/change-password")
+    public ApiResponseModel changePassword(@RequestBody @Valid ChangePasswordModel changePasswordModel) {
+        return accountService.changeUserPassword(changePasswordModel);
     }
 }

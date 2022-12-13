@@ -3,6 +3,7 @@ package a.gleb.oauth2persistence.db.dao;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static jakarta.persistence.GenerationType.AUTO;
@@ -44,4 +45,7 @@ public class Account {
 
     @Column(name = "enabled")
     private boolean enabled = false;
+
+    @Column(name = "birth_date")
+    private LocalDate birthData;
 }

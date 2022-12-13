@@ -8,28 +8,28 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class AccountRequestModel {
+@AllArgsConstructor
+public class AccountDataModel {
 
     @Schema(description = "Имя пользователя", example = "username")
     private String username;
 
-    @Schema(description = "Электронный адрес", example = "olegIv@mail.ru")
-    private String email;
-
     @Schema(description = "Имя", example = "Олег")
     private String firstName;
-
-    @Schema(description = "Фамилия", example = "Иванов")
-    private String middleName;
 
     @Schema(description = "Отчество", example = "Игоревич")
     private String lastName;
 
-    @Schema(description = "Тип аккаунта", example = "COMPANY")
-    private AccountType accountType;
+    @Schema(description = "Фамилия", example = "Иванов")
+    private String middleName;
+
+    @Schema(description = "Тип аккаунта", example = "EMPLOYEE")
+    private String role;
+
+    @Schema(description = "Электронный адрес", example = "olegIv@mail.ru")
+    private String email;
 
     @Schema(description = "Дата рождения", example = "22.03.1995")
-    private LocalDate localDate;
+    private LocalDate birthData;
 }
