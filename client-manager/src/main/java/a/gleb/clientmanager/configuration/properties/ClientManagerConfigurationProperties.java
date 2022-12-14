@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 12/28/22, 7:57 PM.
+ * Created by https://github.com/alwayswanna
+ *
+ */
+
 package a.gleb.clientmanager.configuration.properties;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -11,7 +18,10 @@ import java.util.List;
 @ConfigurationProperties("client-manager")
 public class ClientManagerConfigurationProperties {
 
+    @NotNull
     private List<SecurityConstraints> securityConstraints;
+    @NotNull
+    private List<String> unprotectedPatterns;
 
     @Getter
     @Setter

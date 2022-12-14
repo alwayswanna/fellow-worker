@@ -46,6 +46,9 @@ client-manager:
             - /api/v1/support/disable-account
             - /api/v1/support/accounts
             - /api/v1/support/account-by-username
+  unprotected-patterns:
+    - /api/v1/account/create
+    - /api/v1/account/data
 
 logging:
   level:

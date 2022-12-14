@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 12/28/22, 7:57 PM.
+ * Created by https://github.com/alwayswanna
+ *
+ */
+
 package a.gleb.clientmanager.configuration;
 
 import a.gleb.clientmanager.configuration.properties.ClientManagerConfigurationProperties;
@@ -15,6 +21,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -25,14 +32,13 @@ import java.util.stream.Collectors;
 @Configuration(proxyBeanMethods = false)
 public class ClientManagerSecurityConfiguration {
 
-    private static final String[] DEFAULT_UNPROTECTED_PATTERNS =
-            {
-                    "/swagger-ui.html",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/actuator/**",
-                    "/error"
-            };
+    private static final List<String> DEFAULT_UNPROTECTED_PATTERNS = new ArrayList<>(Arrays.asList(
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/actuator/**",
+            "/error"
+    ));
 
     private final ClientManagerConfigurationProperties properties;
 
@@ -76,7 +82,8 @@ public class ClientManagerSecurityConfiguration {
                 }
         );
 
-        auth.requestMatchers(DEFAULT_UNPROTECTED_PATTERNS).permitAll();
+        DEFAULT_UNPROTECTED_PATTERNS.addAll(properties.getUnprotectedPatterns());
+        auth.requestMatchers(DEFAULT_UNPROTECTED_PATTERNS.toArray(String[]::new)).permitAll();
     }
 
     private static class SpringBootOAuth2Converter implements Converter<Jwt, Collection<GrantedAuthority>> {

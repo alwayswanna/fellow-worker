@@ -1,4 +1,10 @@
-package a.gleb.clientmanager.model;
+/*
+ * Copyright (c) 12/28/22, 6:32 PM.
+ * Created by https://github.com/alwayswanna
+ *
+ */
+
+package a.gleb.apicommon.clientmanager.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -10,6 +16,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Схема описания аккаунта.")
 public class AccountDataModel {
 
     @Schema(description = "Имя пользователя", example = "username")
@@ -31,5 +38,5 @@ public class AccountDataModel {
     private String email;
 
     @Schema(description = "Дата рождения", example = "22.03.1995")
-    private LocalDate birthData;
+    private LocalDate birthDate;
 }

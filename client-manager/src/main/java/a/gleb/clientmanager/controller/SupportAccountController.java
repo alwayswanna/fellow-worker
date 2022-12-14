@@ -1,6 +1,6 @@
 package a.gleb.clientmanager.controller;
 
-import a.gleb.clientmanager.model.ApiResponseModel;
+import a.gleb.apicommon.clientmanager.model.ApiResponseModel;
 import a.gleb.clientmanager.service.SupportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,8 +45,10 @@ public class SupportAccountController {
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
-                    @ApiResponse(description = "Bad request", responseCode = "401"),
-                    @ApiResponse(description = "Internal server error", responseCode = "500")
+                    @ApiResponse(description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
     )
     @GetMapping("/disable-account")
@@ -66,8 +68,10 @@ public class SupportAccountController {
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
-                    @ApiResponse(description = "Bad request", responseCode = "401"),
-                    @ApiResponse(description = "Internal server error", responseCode = "500")
+                    @ApiResponse(description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
     )
     @GetMapping("/accounts")
@@ -87,8 +91,10 @@ public class SupportAccountController {
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
-                    @ApiResponse(description = "Bad request", responseCode = "401"),
-                    @ApiResponse(description = "Internal server error", responseCode = "500")
+                    @ApiResponse(description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
     )
     @GetMapping("/account-by-username")

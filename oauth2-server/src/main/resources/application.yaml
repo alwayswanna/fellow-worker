@@ -21,6 +21,8 @@ oauth:
       default-redirect-uris:
         - "http://127.0.0.1:8090/swagger-ui.html"
         - "http://127.0.0.1:8080/swagger-ui/oauth2-redirect.html"
+        - "http://127.0.0.1:4334/webjars/swagger-ui.html"
+        - "http://127.0.0.1:4334/webjars/swagger-ui/oauth2-redirect.html"
   default-user:
     username: administrator
     password: administrator
