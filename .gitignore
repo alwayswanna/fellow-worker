@@ -5,3 +5,7 @@
 /client-manager/target/
 /oauth2-persistence/target/
 /oauth2-persistence/.mvn/
+/fellow-worker-service/target/
+/fellow-worker-service/.mvn/
+/api-common/.mvn/
+/api-common/target/

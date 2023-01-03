@@ -1,9 +1,9 @@
 package a.gleb.clientmanager.service;
 
+import a.gleb.apicommon.clientmanager.model.ApiResponseModel;
 import a.gleb.clientmanager.exception.InvalidUserDataException;
 import a.gleb.clientmanager.exception.UnexpectedErrorException;
 import a.gleb.clientmanager.mapper.AccountModelMapper;
-import a.gleb.clientmanager.model.ApiResponseModel;
 import a.gleb.oauth2persistence.db.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

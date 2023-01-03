@@ -37,7 +37,17 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Inner -->
+        <dependency>
+            <groupId>a.gleb</groupId>
+            <artifactId>api-common</artifactId>
+        </dependency>
+
         <!-- Other -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -47,10 +57,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
         <!-- Inner -->

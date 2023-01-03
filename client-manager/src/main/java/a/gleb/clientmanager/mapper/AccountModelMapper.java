@@ -1,17 +1,27 @@
+/*
+ * Copyright (c) 12-12/28/22, 7:57 PM.
+ * Created by https://github.com/alwayswanna
+ *
+ */
+
 package a.gleb.clientmanager.mapper;
 
-import a.gleb.clientmanager.model.AccountDataModel;
-import a.gleb.clientmanager.model.AccountRequestModel;
-import a.gleb.clientmanager.model.AccountType;
-import a.gleb.clientmanager.model.ApiResponseModel;
+
+import a.gleb.apicommon.clientmanager.model.AccountDataModel;
+import a.gleb.apicommon.clientmanager.model.AccountRequestModel;
+import a.gleb.apicommon.clientmanager.model.AccountType;
+import a.gleb.apicommon.clientmanager.model.ApiResponseModel;
 import a.gleb.oauth2persistence.db.dao.Account;
 import a.gleb.oauth2persistence.db.dao.AccountRole;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
 public class AccountModelMapper {
+
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Convert {@link AccountRequestModel} to {@link Account}
@@ -22,10 +32,12 @@ public class AccountModelMapper {
     public Account mapToAccount(AccountRequestModel requestModel) {
         return Account.builder()
                 .username(requestModel.getUsername())
+                .password(passwordEncoder.encode(requestModel.getPassword()))
                 .email(requestModel.getEmail())
                 .firstName(requestModel.getFirstName())
                 .middleName(requestModel.getMiddleName())
                 .lastName(requestModel.getLastName())
+                .birthData(requestModel.getBirthDate())
                 .role(AccountType.EMPLOYEE == requestModel.getAccountType() ?
                         AccountRole.COMPANY : AccountRole.EMPLOYEE
                 )
@@ -61,7 +73,7 @@ public class AccountModelMapper {
                 .middleName(account.getMiddleName())
                 .role(account.getRole().name())
                 .email(account.getEmail())
-                .birthData(account.getBirthData())
+                .birthDate(account.getBirthData())
                 .build();
     }
 }

@@ -1,8 +1,8 @@
 package a.gleb.clientmanager.controller;
 
-import a.gleb.clientmanager.model.AccountRequestModel;
-import a.gleb.clientmanager.model.ApiResponseModel;
-import a.gleb.clientmanager.model.ChangePasswordModel;
+import a.gleb.apicommon.clientmanager.model.AccountRequestModel;
+import a.gleb.apicommon.clientmanager.model.ApiResponseModel;
+import a.gleb.apicommon.clientmanager.model.ChangePasswordModel;
 import a.gleb.clientmanager.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -73,7 +73,10 @@ public class AccountController {
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(description = "Bad request", responseCode = "401"),
-                    @ApiResponse(description = "Internal server error", responseCode = "500")
+                    @ApiResponse(description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
     )
     @PutMapping("/edit")
@@ -93,8 +96,10 @@ public class AccountController {
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
-                    @ApiResponse(description = "Bad request", responseCode = "401"),
-                    @ApiResponse(description = "Internal server error", responseCode = "500")
+                    @ApiResponse(description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
     )
     @DeleteMapping("/delete")
@@ -113,8 +118,10 @@ public class AccountController {
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
-                    @ApiResponse(description = "Bad request", responseCode = "401"),
-                    @ApiResponse(description = "Internal server error", responseCode = "500")
+                    @ApiResponse(description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
     )
     @GetMapping("/data")
@@ -134,8 +141,10 @@ public class AccountController {
                             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = ApiResponseModel.class))
                     ),
-                    @ApiResponse(description = "Bad request", responseCode = "401"),
-                    @ApiResponse(description = "Internal server error", responseCode = "500")
+                    @ApiResponse(description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
     )
     @PutMapping("/change-password")

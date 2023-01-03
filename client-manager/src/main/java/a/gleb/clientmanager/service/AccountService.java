@@ -1,11 +1,17 @@
+/*
+ * Copyright (c) 12/28/22, 7:57 PM.
+ * Created by https://github.com/alwayswanna
+ *
+ */
+
 package a.gleb.clientmanager.service;
 
+import a.gleb.apicommon.clientmanager.model.AccountRequestModel;
+import a.gleb.apicommon.clientmanager.model.ApiResponseModel;
+import a.gleb.apicommon.clientmanager.model.ChangePasswordModel;
 import a.gleb.clientmanager.exception.InvalidUserDataException;
 import a.gleb.clientmanager.exception.UnexpectedErrorException;
 import a.gleb.clientmanager.mapper.AccountModelMapper;
-import a.gleb.clientmanager.model.AccountRequestModel;
-import a.gleb.clientmanager.model.ApiResponseModel;
-import a.gleb.clientmanager.model.ChangePasswordModel;
 import a.gleb.oauth2persistence.db.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +40,10 @@ public class AccountService {
      * @return {@link ApiResponseModel} response with message.
      */
     public ApiResponseModel createAccount(AccountRequestModel requestModel) {
+        if (requestModel.getPassword().isEmpty()){
+            throw new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Невозможно создать пользователя без пароля.");
+        }
+
         validateAccountDataInDataBase(requestModel);
 
         try {

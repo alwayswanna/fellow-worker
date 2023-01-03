@@ -1,7 +1,7 @@
 package a.gleb.clientmanager.utils;
 
-import a.gleb.clientmanager.model.AccountRequestModel;
-import a.gleb.clientmanager.model.AccountType;
+import a.gleb.apicommon.clientmanager.model.AccountRequestModel;
+import a.gleb.apicommon.clientmanager.model.AccountType;
 import a.gleb.oauth2persistence.db.dao.Account;
 import a.gleb.oauth2persistence.db.dao.AccountRole;
 
