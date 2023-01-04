@@ -37,6 +37,7 @@
         <kotlin-logging-jvm.version>2.1.23</kotlin-logging-jvm.version>
         <fellowworker.version>1.0.0-RELEASE</fellowworker.version>
         <springdoc-openapi-starter.version>2.0.2</springdoc-openapi-starter.version>
+        <testcontainers-postgresql.version>1.17.3</testcontainers-postgresql.version>
     </properties>
 
     <dependencyManagement>
@@ -98,6 +99,12 @@
                 <groupId>io.github.microutils</groupId>
                 <artifactId>kotlin-logging-jvm</artifactId>
                 <version>${kotlin-logging-jvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${testcontainers-postgresql.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

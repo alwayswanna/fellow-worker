@@ -40,8 +40,16 @@ public class AccountService {
      * @return {@link ApiResponseModel} response with message.
      */
     public ApiResponseModel createAccount(AccountRequestModel requestModel) {
-        if (requestModel.getPassword().isEmpty()){
+        if (requestModel.getPassword().isEmpty()) {
             throw new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Невозможно создать пользователя без пароля.");
+        }
+        if (requestModel.getUsername().isEmpty() || requestModel.getFirstName().isEmpty() ||
+                requestModel.getMiddleName().isEmpty() || requestModel.getBirthDate() == null ||
+                requestModel.getEmail().isEmpty()) {
+            throw new InvalidUserDataException(
+                    HttpStatus.BAD_REQUEST,
+                    "Невозможно создать пользователя, недостаточно данных."
+            );
         }
 
         validateAccountDataInDataBase(requestModel);
@@ -72,8 +80,6 @@ public class AccountService {
                 .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Неверно введены данные."));
         /* fill data from request in the account fields  */
         changeAccountData(account, requestModel);
-        /* encode password */
-        account.setPassword(passwordEncoder.encode(account.getPassword()));
 
         try {
             accountRepository.save(account);
@@ -120,23 +126,12 @@ public class AccountService {
      * @return
      */
     public ApiResponseModel getAccountData(UUID userId) {
-        try {
             var account = accountRepository.findAccountById(userId)
                     .orElseThrow(
                             () -> new InvalidUserDataException(
                                     HttpStatus.BAD_REQUEST, "Пользователь с таким id не найден")
                     );
             return accountModelMapper.toApiResponseModel("Данные аккаунта успешно получены", account);
-        } catch (Exception e) {
-            log.error("Error while get account data from database, {}, userId: {}",
-                    e.getMessage(),
-                    userId
-            );
-            throw new UnexpectedErrorException(
-                    HttpStatus.SERVICE_UNAVAILABLE,
-                    "Произошла ошибка при получении данных аккаунта, попробуйте повторить попытку позже"
-            );
-        }
     }
 
     /**

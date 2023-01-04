@@ -1,0 +1,41 @@
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: client-manager
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: must-be-unused
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+
+client-manager:
+  security-constraints:
+    - roles:
+        - COMPANY
+        - EMPLOYEE
+        - ADMIN
+      security-collections:
+        - patterns:
+            - /api/v1/account/edit
+            - /api/v1/account/delete
+            - /api/v1/account/change-password
+    - roles:
+        - ADMIN
+      security-collections:
+        - patterns:
+            - /api/v1/support/**
+  unprotected-patterns:
+    - /api/v1/account/create
+    - /api/v1/account/data
+
+logging:
+  level:
+    web: INFO
