@@ -80,7 +80,7 @@ public class AccountController {
             }
     )
     @PutMapping("/edit")
-    public ApiResponseModel edit(@RequestBody @Valid AccountRequestModel requestModel) {
+    public ApiResponseModel edit(@RequestBody AccountRequestModel requestModel) {
         return accountService.editAccount(requestModel);
     }
 

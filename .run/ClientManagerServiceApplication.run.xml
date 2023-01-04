@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ClientManagerServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="client-manager" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.clientmanager.ClientManagerApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
