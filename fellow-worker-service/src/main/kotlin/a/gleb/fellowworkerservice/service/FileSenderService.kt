@@ -1,18 +1,17 @@
 /*
- * Copyright (c) 12-12/28/22, 10:37 PM.
+ * Copyright (c) 12-07.01.2023, 20:21
  * Created by https://github.com/alwayswanna
- *
  */
 
 package a.gleb.fellowworkerservice.service
 
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
+import org.springframework.cloud.stream.function.StreamBridge
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Sinks
 
 @Service
 class FileSenderService(
-    private val publisher: Sinks.Many<ResumeApiModel>
+    private val streamBridge: StreamBridge
 ) {
 
     /**
@@ -20,6 +19,6 @@ class FileSenderService(
      * @param request user data from web API.
      */
     suspend fun sendMessage(request: ResumeApiModel) {
-        publisher.tryEmitNext(request).orThrow()
+        streamBridge.send("fileSender-out-0", request)
     }
 }

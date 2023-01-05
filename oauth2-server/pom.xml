@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 07-07.01.2023, 20:28
+  ~ Created by https://github.com/alwayswanna
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>a.gleb</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0-RELEASE</version>
         <artifactId>fellow-worker</artifactId>
     </parent>
 
-    <version>${fellowworker.version}</version>
+    <version>${services.version}</version>
     <artifactId>oauth2-server</artifactId>
     <name>oauth2-server</name>
     <description>oauth2-server</description>

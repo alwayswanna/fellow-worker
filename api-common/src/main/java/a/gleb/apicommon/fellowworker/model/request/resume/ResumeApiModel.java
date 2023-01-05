@@ -1,7 +1,6 @@
 /*
- * Copyright (c) 12/28/22, 10:37 PM.
+ * Copyright (c) 12-07.01.2023, 20:21
  * Created by https://github.com/alwayswanna
- *
  */
 
 package a.gleb.apicommon.fellowworker.model.request.resume;
@@ -74,4 +73,6 @@ public class ResumeApiModel {
     private List<WorkExperienceApiModel> workingHistory;
 
     private String base64Image;
+
+    private String extensionPostfix;
 }

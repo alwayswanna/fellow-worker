@@ -1,0 +1,60 @@
+server:
+  port: 7044
+  error:
+    include-binding-errors: always
+    include-message: always
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: message
+      client-secret: c29tZXNlY3Rlcg==
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorizationUrl: http://127.0.0.1:9001/oauth2/authorize
+    tokenUrl: http://127.0.0.1:9001/oauth2/token
+
+spring:
+  application:
+    name: cv-generator
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://127.0.0.1:9001
+  cloud:
+    stream:
+      default-binder: rabbit
+      binders:
+        rabbit:
+          type: rabbit
+      rabbit:
+        bindings:
+          receiveCvData-in-0:
+            consumer:
+              binding-routing-key: generation
+              exchange-type: direct
+              auto-bind-dlq: true
+              republish-to-dlq: true
+              requeue-rejected: true
+              dead-letter-queue-name: "cv.generation.dlq"
+      bindings:
+        receiveCvData-in-0:
+          group: generation
+          destination: cv
+          consumer:
+            max-attempts: 10
+
+cv-generator:
+  unprotected-paths:
+    - /api/v2/**
+  security-constraints:
+    - roles:
+        - EMPLOYEE
+      security-collections:
+        - patterns:
+            - /api/v1/**
+
+logging:
+  level:
+    web: INFO

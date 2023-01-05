@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 07-07.01.2023, 21:19
+ * Created by https://github.com/alwayswanna
+ */
+
 package a.gleb.fellowworkerservice.controller
 
 import a.gleb.fellowworkerservice.BaseFellowWorkerServiceTest
@@ -35,7 +40,7 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
               "firstName": "Аркадий",
               "middleName": "Нахимов",
               "lastName": "Олегович",
-              "birthDate": "1985-11-03",
+              "birthDate": "1982-11-02",
               "job": "Начальник склада",
               "expectedSalary": "40000",
               "about": "Увлекаюсь ... Хобби",
@@ -89,7 +94,7 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             {
               "firstName": "Аркадий",
               "middleName": "Нахимов",
-              "birthDate": "1985-11-03",
+              "birthDate": "1982-11-02",
               "job": "Начальник склада",
               "professionalSkills": [
                 "string"
@@ -114,8 +119,9 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully get all resume`() {
+        /* prepare data */
         saveResume(createDefaultResume())
-        saveResume(createDefaultResume())
+        TimeUnit.SECONDS.sleep(2)
 
         webTestClient.get()
             .uri(EMPLOYEE_PATH.plus("/get-all-resume"))
@@ -123,14 +129,16 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             .expectStatus()
             .isOk
 
-        assertEquals(2, resumeRepository.findAll().asFlux().toStream().toList().size)
+        assertEquals(1, resumeRepository.findAll().asFlux().toStream().toList().size)
     }
 
     @Test
     fun `successfully get resume for current user`() {
+        /* prepare data */
         val resume = createDefaultResume()
-        resume.ownerRecordId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
+        resume.ownerRecordId = UUID.fromString("d0280c29-1fce-4900-820d-74762c46e28e")
         saveResume(resume)
+        TimeUnit.SECONDS.sleep(2)
 
         webTestClient.get()
             .uri(EMPLOYEE_PATH.plus("/current-user-resume"))
@@ -143,8 +151,10 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully get resume by id`() {
+        /* prepare data */
         val resume = createDefaultResume()
         saveResume(resume)
+        TimeUnit.SECONDS.sleep(2)
 
         webTestClient.get()
             .uri {
@@ -162,10 +172,11 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully delete resume by id`() {
+        /* prepare data */
         val resume = createDefaultResume()
         resume.ownerRecordId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
         saveResume(resume)
-        TimeUnit.SECONDS.sleep(5);
+        TimeUnit.SECONDS.sleep(2)
 
         webTestClient.delete()
             .uri {
@@ -183,9 +194,11 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully edit user resume`() {
+        /* prepare data */
         val resume = createDefaultResume()
         resume.ownerRecordId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
         saveResume(resume)
+        TimeUnit.SECONDS.sleep(2)
 
         val request = """
             {
@@ -193,7 +206,7 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
               "firstName": "Аркадий",
               "middleName": "Нахимов",
               "lastName": "Олегович",
-              "birthDate": "1985-11-03",
+              "birthDate": "1982-11-02",
               "job": "Начальник склада",
               "expectedSalary": "40000",
               "about": "Увлекаюсь ... Хобби",
@@ -257,11 +270,11 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             null,
             LocalDate.now(),
             "Worker",
-            "5000$",
+            "2000$",
             "About me",
             listOf(
                 Education(
-                    LocalDate.now().minusYears(3),
+                    LocalDate.now().minusYears(2),
                     LocalDate.now(),
                     "BashGU",
                     ""
@@ -270,7 +283,7 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             listOf("Clever", "Soft", "etc"),
             listOf(
                 WorkExperience(
-                    LocalDate.now().minusYears(3),
+                    LocalDate.now().minusYears(2),
                     LocalDate.now(),
                     "Company",
                     "Worker",

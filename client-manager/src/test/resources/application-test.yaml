@@ -6,6 +6,8 @@ server:
 spring:
   application:
     name: client-manager
+  flyway:
+    enabled: false
   security:
     oauth2:
       resource-server:

@@ -1,7 +1,6 @@
 /*
- * Copyright (c) 12-12/28/22, 10:37 PM.
+ * Copyright (c) 12-07.01.2023, 20:21
  * Created by https://github.com/alwayswanna
- *
  */
 
 package a.gleb.fellowworkerservice.service
@@ -48,6 +47,7 @@ class ResumeService(
         val resume = resumeModelMapper.toResumeDtoModel(UUID.fromString(userId), request)
 
         try {
+            request.resumeId = resume.id
             fileSenderService.sendMessage(request)
             return resumeModelMapper.toFellowWorkerResponseModel(
                 resumeRepository.save(resume),
@@ -83,6 +83,7 @@ class ResumeService(
         resumeToSave.id = resumeModel.id
 
         try {
+            request.resumeId = resumeToSave.id
             fileSenderService.sendMessage(request)
             return resumeModelMapper.toFellowWorkerResponseModel(
                 resumeRepository.save(resumeToSave),
