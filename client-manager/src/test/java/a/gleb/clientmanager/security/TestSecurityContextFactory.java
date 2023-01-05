@@ -13,11 +13,6 @@ import java.util.stream.Collectors;
 
 public class TestSecurityContextFactory implements WithSecurityContextFactory<WithJwt> {
 
-    private static final String MUST_BE_UNUSED = "must-be-unused";
-    private static final String CLAIM_PREFERRED_USERNAME = "preferred_username";
-    private static final String NAME = "name";
-    private static final String ROLE_PREFIX = "ROLE_";
-
     @Override
     public SecurityContext createSecurityContext(WithJwt user) {
         Jwt jwt = Jwt.withTokenValue("must-be-unused")

@@ -72,7 +72,7 @@ class ResumeService(
         val resumeModel = resumeRepository.findResumeById(request.resumeId)
             ?: throw InvalidUserDataException(HttpStatus.BAD_REQUEST, NOT_FOUND_RESUME)
 
-        if (!oauth2SecurityService.extractOauth2UserId().equals(resumeModel.ownerRecordId)) {
+        if (oauth2SecurityService.extractOauth2UserId() != resumeModel.ownerRecordId.toString()) {
             throw InvalidUserDataException(
                 HttpStatus.FORBIDDEN,
                 "Вы не можете редактировать резюме другого пользователя"
@@ -104,10 +104,10 @@ class ResumeService(
 
         val resume = resumeRepository.findResumeById(id) ?: throw InvalidUserDataException(
             HttpStatus.BAD_REQUEST,
-            "Данного резюме не существует."
+            NOT_FOUND_RESUME
         )
 
-        if (!userId.equals(resume.ownerRecordId)) {
+        if (userId != resume.ownerRecordId.toString()) {
             throw InvalidUserDataException(
                 HttpStatus.FORBIDDEN,
                 "Вы не можете удалить резюме другого пользователя"
@@ -133,7 +133,7 @@ class ResumeService(
     suspend fun findResumeModelById(id: UUID): FellowWorkerResponseModel {
         val resume = resumeRepository.findResumeById(id) ?: throw InvalidUserDataException(
             HttpStatus.BAD_REQUEST,
-            "Данного резюме не существует."
+            NOT_FOUND_RESUME
         )
 
         try {

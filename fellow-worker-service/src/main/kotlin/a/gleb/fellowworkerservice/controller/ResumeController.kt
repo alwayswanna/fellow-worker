@@ -96,8 +96,8 @@ class ResumeController(
             ApiResponse(description = "Internal server error", responseCode = "500")
         ]
     )
-    @DeleteMapping("/delete-resume/{id}")
-    suspend fun deleteResume(@NotNull @PathVariable id: UUID): FellowWorkerResponseModel {
+    @DeleteMapping("/delete-resume")
+    suspend fun deleteResume(@NotNull @RequestParam id: UUID): FellowWorkerResponseModel {
         return resumeService.deleteResume(id)
     }
 
@@ -163,8 +163,8 @@ class ResumeController(
             ApiResponse(description = "Internal server error", responseCode = "500")
         ]
     )
-    @GetMapping("/get-resume-id/{id}")
-    suspend fun getSingleResume(@NotNull @PathVariable id: UUID): FellowWorkerResponseModel {
+    @GetMapping("/get-resume-id")
+    suspend fun getSingleResume(@NotNull @RequestParam id: UUID): FellowWorkerResponseModel {
         return resumeService.findResumeModelById(id)
     }
 }

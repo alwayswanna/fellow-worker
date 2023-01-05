@@ -126,7 +126,7 @@ class ResumeModelMapper {
             birthDate = request.birthDate,
             job = request.job,
             expectedSalary = request.expectedSalary,
-            about = request.about,
+            about = request.about?: "",
             education = toEducationDtoModel(request),
             professionalSkills = request.professionalSkills,
             workHistory = toWorkHistoryDto(request),

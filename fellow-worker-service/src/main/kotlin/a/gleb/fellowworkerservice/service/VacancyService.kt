@@ -69,7 +69,7 @@ class VacancyService(
             NOT_FOUND_VACANCY
         )
 
-        if (!oauth2SecurityService.extractOauth2UserId().equals(entityModel.ownerId)) {
+        if (oauth2SecurityService.extractOauth2UserId() != entityModel.ownerId.toString()) {
             throw InvalidUserDataException(
                 HttpStatus.FORBIDDEN,
                 "Вы не можете редактировать вакансию другого пользователя"
@@ -124,7 +124,7 @@ class VacancyService(
             NOT_FOUND_VACANCY
         )
 
-        if (!userId.equals(vacancy.ownerId)) {
+        if (userId != vacancy.ownerId.toString()) {
             throw InvalidUserDataException(
                 HttpStatus.FORBIDDEN,
                 "Вы не можете удалить вакансию другого пользователя."
