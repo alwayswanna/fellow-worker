@@ -37,7 +37,7 @@
         <kotlin-logging-jvm.version>2.1.23</kotlin-logging-jvm.version>
         <fellowworker.version>1.0.0-RELEASE</fellowworker.version>
         <springdoc-openapi-starter.version>2.0.2</springdoc-openapi-starter.version>
-        <testcontainers-postgresql.version>1.17.3</testcontainers-postgresql.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
     </properties>
 
     <dependencyManagement>
@@ -103,7 +103,13 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>${testcontainers-postgresql.version}</version>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>mongodb</artifactId>
+                <version>${testcontainers.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

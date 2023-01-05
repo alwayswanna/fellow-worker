@@ -96,8 +96,8 @@ class VacancyController(
             ApiResponse(description = "Internal server error", responseCode = "500")
         ]
     )
-    @DeleteMapping("/delete-id/{vacancyId}")
-    suspend fun removeById(@PathVariable @NotNull vacancyId: UUID): FellowWorkerResponseModel {
+    @DeleteMapping("/delete-id")
+    suspend fun removeById(@RequestParam @NotNull vacancyId: UUID): FellowWorkerResponseModel {
         return vacancyService.deleteVacancy(vacancyId)
     }
 
@@ -140,8 +140,8 @@ class VacancyController(
             ApiResponse(description = "Internal server error", responseCode = "500")
         ]
     )
-    @GetMapping("/id/{vacancyId}")
-    suspend fun getVacancyById(@PathVariable @NotNull vacancyId: UUID): FellowWorkerResponseModel {
+    @GetMapping("/id")
+    suspend fun getVacancyById(@RequestParam @NotNull vacancyId: UUID): FellowWorkerResponseModel {
         return vacancyService.getVacancyById(vacancyId)
     }
 
@@ -162,8 +162,8 @@ class VacancyController(
             ApiResponse(description = "Internal server error", responseCode = "500")
         ]
     )
-    @GetMapping("/vacancies-by-skills/{skill}")
-    suspend fun getVacanciesBySkill(@PathVariable @NotNull skill: String): FellowWorkerResponseModel {
+    @GetMapping("/vacancies-by-skills")
+    suspend fun getVacanciesBySkill(@RequestParam @NotNull skill: String): FellowWorkerResponseModel {
         return vacancyService.findVacancyByKeySkills(skill)
     }
 
@@ -184,8 +184,8 @@ class VacancyController(
             ApiResponse(description = "Internal server error", responseCode = "500")
         ]
     )
-    @GetMapping("/vacancies-by-type/{type}")
-    suspend fun getVacanciesByTypePlacement(@PathVariable @NotNull type: String): FellowWorkerResponseModel {
+    @GetMapping("/vacancies-by-type")
+    suspend fun getVacanciesByTypePlacement(@RequestParam @NotNull type: String): FellowWorkerResponseModel {
         return vacancyService.findVacancyByTypePlacement(type)
     }
 
@@ -206,8 +206,8 @@ class VacancyController(
             ApiResponse(description = "Internal server error", responseCode = "500")
         ]
     )
-    @GetMapping("/vacancies-by-city/{city}")
-    suspend fun getVacanciesByCity(@PathVariable @NotNull city: String): FellowWorkerResponseModel {
+    @GetMapping("/vacancies-by-city")
+    suspend fun getVacanciesByCity(@RequestParam @NotNull city: String): FellowWorkerResponseModel {
         return vacancyService.findVacancyByCity(city)
     }
 
@@ -228,8 +228,8 @@ class VacancyController(
             ApiResponse(description = "Internal server error", responseCode = "500")
         ]
     )
-    @GetMapping("/vacancies-by-type-time/{type}")
-    suspend fun getVacanciesByTypeWorkTime(@PathVariable @NotNull type: String): FellowWorkerResponseModel {
+    @GetMapping("/vacancies-by-type-time")
+    suspend fun getVacanciesByTypeWorkTime(@RequestParam @NotNull type: String): FellowWorkerResponseModel {
         return vacancyService.findVacancyByType(type)
     }
 }

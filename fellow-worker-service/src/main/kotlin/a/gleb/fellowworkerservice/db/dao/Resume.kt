@@ -13,59 +13,59 @@ data class Resume(
     @field:Id
     var id: UUID,
 
-    val ownerRecordId: UUID,
+    var ownerRecordId: UUID,
 
-    val firstName: String,
+    var firstName: String,
 
-    val middleName: String,
+    var middleName: String,
 
-    val lastName: String?,
+    var lastName: String?,
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    val birthDate: LocalDate,
+    var birthDate: LocalDate,
 
-    val job: String,
+    var job: String,
 
-    val expectedSalary: String?,
+    var expectedSalary: String?,
 
-    val about: String,
+    var about: String,
 
-    val education: List<Education>,
+    var education: List<Education>,
 
-    val professionalSkills: List<String>,
+    var professionalSkills: List<String>,
 
-    val workHistory: List<WorkExperience>,
+    var workHistory: List<WorkExperience>,
 
-    val lastUpdate: LocalDateTime
+    var lastUpdate: LocalDateTime
 )
 
 data class Education(
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    val startTime: LocalDate,
+    var startTime: LocalDate,
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    val endTime: LocalDate,
+    var endTime: LocalDate,
 
-    val educationalInstitution: String,
+    var educationalInstitution: String,
 
-    val educationLevel: String
+    var educationLevel: String
 )
 
 class WorkExperience(
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    val startTime: LocalDate,
+    var startTime: LocalDate,
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    val endTime: LocalDate,
+    var endTime: LocalDate,
 
-    val companyName: String,
+    var companyName: String,
 
-    val workingSpecialty: String,
+    var workingSpecialty: String,
 
-    val responsibilities: List<String>,
+    var responsibilities: List<String>,
 
-    val tags: List<String>,
+    var tags: List<String>,
 )
 
