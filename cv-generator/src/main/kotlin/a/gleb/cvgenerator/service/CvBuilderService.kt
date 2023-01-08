@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/8/23, 8:41 PM
+ * Copyright (c) 07-1/9/23, 12:45 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -17,7 +17,9 @@ import java.util.*
 private val logger = KotlinLogging.logger { }
 
 @Service
-class CvBuilderService {
+class CvBuilderService(
+    private val messageService: MessageService
+) {
 
     fun buildCvFile(resumeApiModel: ResumeApiModel) {
         logger.info { "Start create resume: ${resumeApiModel.resumeId}" }
@@ -34,7 +36,11 @@ class CvBuilderService {
         try {
             document = PDDocument.load(template)
             val cvDocument = CvDocumentModel(document, resumeApiModel)
-
+            cvDocument.addInfo(
+                null,
+                null,
+                messageService.getMessage("firstname.text", resumeApiModel.firstName)
+            )
 
             document.save(out)
             document.close()
