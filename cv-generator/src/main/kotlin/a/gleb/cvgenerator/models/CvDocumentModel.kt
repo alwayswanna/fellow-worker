@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/9/23, 11:01 PM
+ * Copyright (c) 1-1/9/23, 11:48 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -22,6 +22,7 @@ import javax.imageio.ImageIO
 
 
 const val PAGE_SIZE = 880
+const val LEFT_BORDER_X_COORDINATE = 20
 /* DEFAULT AVATAR IF IMAGE FROM REQUEST IS NULL */
 const val AVATAR_TEMPLATE_DEFAULT_PATH = "templates/default-avatar.png"
 
@@ -32,6 +33,7 @@ const val FONT_PATH = "templates/Nunito-Regular.ttf"
 class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiModel: ResumeApiModel) {
 
     private val countHeight: Int = 20
+    private var leftBorderStartYCoordinate = 550
 
     init {
         addImageToDocument(resumeApiModel)
@@ -90,7 +92,7 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
     /**
      * Method adds resume title to resume.
      */
-    fun addResumeTitle(){
+    fun addResumeTitle(message: String){
         val page = pdDocument.getPage(0)
         val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
         val fondPd = PDType0Font.load(
@@ -101,14 +103,15 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
                 ))
         )
 
-        addText(contentStream, Color.BLACK, 16, 30, 600, resumeApiModel.job, fondPd)
+        addText(contentStream, LEFT_BORDER_X_COORDINATE, leftBorderStartYCoordinate, message, fondPd)
 
         contentStream.stroke()
         contentStream.close()
+        leftBorderStartYCoordinate = leftBorderStartYCoordinate.minus(15)
     }
 
 
-    fun addInfo(height: Int?, width: Int?, message: String) {
+    fun addInfoLeftBorder(message: String) {
         val page = if (countHeight < 870) {
             pdDocument.getPage(0)
         } else {
@@ -124,15 +127,14 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
         )
 
          val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
-        addText(contentStream, Color.BLACK, 16, 300, 250, message, fondPd)
+        addText(contentStream, LEFT_BORDER_X_COORDINATE, leftBorderStartYCoordinate, message, fondPd)
         contentStream.stroke()
         contentStream.close()
+        leftBorderStartYCoordinate = leftBorderStartYCoordinate.minus(15)
     }
 
     private fun addText(
         contentStream: PDPageContentStream,
-        textColor: Color,
-        fontSize: Int,
         xCoordinate: Int,
         yCoordinate: Int,
         targetText: String,
@@ -143,8 +145,8 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
         }
 
         contentStream.beginText()
-        contentStream.setFont(font, fontSize.toFloat())
-        contentStream.setNonStrokingColor(textColor)
+        contentStream.setFont(font, 13.toFloat())
+        contentStream.setNonStrokingColor(Color.BLACK)
         contentStream.newLineAtOffset(xCoordinate.toFloat(), yCoordinate.toFloat())
         contentStream.showText(targetText)
         contentStream.endText()

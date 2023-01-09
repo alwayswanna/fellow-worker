@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/9/23, 11:01 PM
+ * Copyright (c) 07-1/9/23, 11:48 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -37,13 +37,18 @@ class CvBuilderService(
             document = PDDocument.load(template)
             val cvDocument = CvDocumentModel(document, resumeApiModel)
 
-            cvDocument.addResumeTitle()
-
-            cvDocument.addInfo(
-                null,
-                null,
-                messageService.getMessage("firstname.text", resumeApiModel.firstName)
-            )
+            // добавляем должность
+            cvDocument.addResumeTitle(messageService.getMessage("job.title.text", resumeApiModel.job))
+            // добавляем имя
+            cvDocument.addInfoLeftBorder(messageService.getMessage("firstname.text", resumeApiModel.firstName))
+            // добавляем фамилию
+            cvDocument.addInfoLeftBorder(messageService.getMessage("surname.text", resumeApiModel.middleName))
+            // добавляем отчество
+            if(!resumeApiModel.lastName.isNullOrEmpty()) {
+                cvDocument.addInfoLeftBorder(messageService.getMessage("patronymic.text", resumeApiModel.lastName))
+            }
+            // добавляем дату рождения
+            cvDocument.addInfoLeftBorder(messageService.getMessage("date.birth.text", resumeApiModel.birthDate))
 
             document.save(out)
             document.close()
