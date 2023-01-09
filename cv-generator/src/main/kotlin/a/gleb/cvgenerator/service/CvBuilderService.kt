@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/9/23, 12:45 AM
+ * Copyright (c) 07-1/9/23, 11:01 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -36,6 +36,9 @@ class CvBuilderService(
         try {
             document = PDDocument.load(template)
             val cvDocument = CvDocumentModel(document, resumeApiModel)
+
+            cvDocument.addResumeTitle()
+
             cvDocument.addInfo(
                 null,
                 null,

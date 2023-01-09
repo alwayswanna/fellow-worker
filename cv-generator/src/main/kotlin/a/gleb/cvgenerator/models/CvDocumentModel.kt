@@ -1,19 +1,17 @@
 /*
- * Copyright (c) 1-1/9/23, 12:45 AM
+ * Copyright (c) 1-1/9/23, 11:01 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.cvgenerator.models
 
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
-import org.apache.pdfbox.cos.COSName.STANDARD_ENCODING
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode.APPEND
 import org.apache.pdfbox.pdmodel.font.PDFont
-import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont
-import org.apache.pdfbox.pdmodel.font.encoding.Encoding
+import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.imgscalr.Scalr
 import java.awt.Color
@@ -24,10 +22,15 @@ import javax.imageio.ImageIO
 
 
 const val PAGE_SIZE = 880
+/* DEFAULT AVATAR IF IMAGE FROM REQUEST IS NULL */
 const val AVATAR_TEMPLATE_DEFAULT_PATH = "templates/default-avatar.png"
-const val FONT_PATH = "templates/CraftworkGroteskGX.ttf"
+
+/* PATH TO FONTS */
+const val BOLD_FONT_PATH = "templates/Nunito-Bold.ttf"
+const val FONT_PATH = "templates/Nunito-Regular.ttf"
 
 class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiModel: ResumeApiModel) {
+
     private val countHeight: Int = 20
 
     init {
@@ -84,6 +87,26 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
         contentStream.close()
     }
 
+    /**
+     * Method adds resume title to resume.
+     */
+    fun addResumeTitle(){
+        val page = pdDocument.getPage(0)
+        val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
+        val fondPd = PDType0Font.load(
+            pdDocument,
+            File(
+                Objects.requireNonNull(
+                    javaClass.classLoader.getResource(BOLD_FONT_PATH)!!.file
+                ))
+        )
+
+        addText(contentStream, Color.BLACK, 16, 30, 600, resumeApiModel.job, fondPd)
+
+        contentStream.stroke()
+        contentStream.close()
+    }
+
 
     fun addInfo(height: Int?, width: Int?, message: String) {
         val page = if (countHeight < 870) {
@@ -93,19 +116,15 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
             pdDocument.getPage(1)
         }
 
-        val font: PDFont = PDTrueTypeFont.load(
-            pdDocument,
+        val fondPd = PDType0Font.load(pdDocument,
             File(
                 Objects.requireNonNull(
                     javaClass.classLoader.getResource(FONT_PATH)!!.file
-                )
-            ),
-            Encoding.getInstance(STANDARD_ENCODING)
+                ))
         )
 
-
-        val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
-        addText(contentStream, Color.BLACK, 16, 300, 250, message, font)
+         val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
+        addText(contentStream, Color.BLACK, 16, 300, 250, message, fondPd)
         contentStream.stroke()
         contentStream.close()
     }
