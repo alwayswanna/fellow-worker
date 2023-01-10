@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/10/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -71,6 +71,10 @@ public class ResumeApiModel {
     @Valid
     @Schema(description = "История работы")
     private List<WorkExperienceApiModel> workingHistory;
+
+    @Valid
+    @Schema(description = "Контактная информация соискателя")
+    private ContactResumeApiModel contact;
 
     private String base64Image;
 

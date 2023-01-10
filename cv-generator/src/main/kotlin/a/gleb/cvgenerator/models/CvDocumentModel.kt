@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 1-1/9/23, 11:48 PM
+ * Copyright (c) 1-1/10/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.cvgenerator.models
 
+import a.gleb.apicommon.fellowworker.model.request.resume.EducationApiModel
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
@@ -23,6 +24,9 @@ import javax.imageio.ImageIO
 
 const val PAGE_SIZE = 880
 const val LEFT_BORDER_X_COORDINATE = 20
+const val RIGHT_BORDER_X_COORDINATE = 260
+const val RIGHT_BORDER_X_COORDINATE_MAX = 400
+
 /* DEFAULT AVATAR IF IMAGE FROM REQUEST IS NULL */
 const val AVATAR_TEMPLATE_DEFAULT_PATH = "templates/default-avatar.png"
 
@@ -34,7 +38,11 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
 
     private val countHeight: Int = 20
     private var leftBorderStartYCoordinate = 550
+    private var rightBorderStartYCoordinate = 800
 
+    /**
+     * On init this class adding image to .pdf document.
+     */
     init {
         addImageToDocument(resumeApiModel)
     }
@@ -92,7 +100,7 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
     /**
      * Method adds resume title to resume.
      */
-    fun addResumeTitle(message: String){
+    fun addResumeTitle(message: String) {
         val page = pdDocument.getPage(0)
         val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
         val fondPd = PDType0Font.load(
@@ -100,17 +108,36 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
             File(
                 Objects.requireNonNull(
                     javaClass.classLoader.getResource(BOLD_FONT_PATH)!!.file
-                ))
+                )
+            )
         )
 
-        addText(contentStream, LEFT_BORDER_X_COORDINATE, leftBorderStartYCoordinate, message, fondPd)
+        addText(
+            contentStream,
+            LEFT_BORDER_X_COORDINATE,
+            leftBorderStartYCoordinate,
+            message,
+            fondPd,
+            null,
+            null
+        )
 
         contentStream.stroke()
         contentStream.close()
         leftBorderStartYCoordinate = leftBorderStartYCoordinate.minus(15)
     }
 
+    /**
+     * Add empty line by left border.
+     */
+    fun addSpacerByLeftBorder() {
+        leftBorderStartYCoordinate = leftBorderStartYCoordinate.minus(15)
+    }
 
+    /**
+     * Method which add user info by left border. LEFT to CENTER.
+     * @param message user info.
+     */
     fun addInfoLeftBorder(message: String) {
         val page = if (countHeight < 870) {
             pdDocument.getPage(0)
@@ -119,18 +146,111 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
             pdDocument.getPage(1)
         }
 
-        val fondPd = PDType0Font.load(pdDocument,
+        val fondPd = PDType0Font.load(
+            pdDocument,
             File(
                 Objects.requireNonNull(
                     javaClass.classLoader.getResource(FONT_PATH)!!.file
-                ))
+                )
+            )
         )
 
-         val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
-        addText(contentStream, LEFT_BORDER_X_COORDINATE, leftBorderStartYCoordinate, message, fondPd)
+        val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
+        addText(
+            contentStream,
+            LEFT_BORDER_X_COORDINATE,
+            leftBorderStartYCoordinate,
+            message,
+            fondPd,
+            null,
+            null
+        )
         contentStream.stroke()
         contentStream.close()
         leftBorderStartYCoordinate = leftBorderStartYCoordinate.minus(15)
+    }
+
+    /**
+     * Method which add by right border. CENTER to RIGHT.
+     * @param message user info.
+     */
+    fun addInfoRightBorder(message: String) {
+        val page = pdDocument.getPage(0)
+        val fondPd = PDType0Font.load(
+            pdDocument,
+            File(
+                Objects.requireNonNull(
+                    javaClass.classLoader.getResource(FONT_PATH)!!.file
+                )
+            )
+        )
+
+        val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
+        addText(
+            contentStream,
+            RIGHT_BORDER_X_COORDINATE,
+            rightBorderStartYCoordinate,
+            message,
+            fondPd,
+            null,
+            null
+        )
+        contentStream.stroke()
+        contentStream.close()
+        rightBorderStartYCoordinate = rightBorderStartYCoordinate.minus(15)
+    }
+
+    /**
+     * Add empty line by right border.
+     */
+    fun addSpacerByRightBorder() {
+        rightBorderStartYCoordinate = rightBorderStartYCoordinate.minus(15)
+    }
+
+    fun addEducationInformation(educationApiModel: EducationApiModel) {
+        val page = pdDocument.getPage(0)
+        val fondPd = PDType0Font.load(
+            pdDocument,
+            File(
+                Objects.requireNonNull(
+                    javaClass.classLoader.getResource(FONT_PATH)!!.file
+                )
+            )
+        )
+
+        val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
+        addText(
+            contentStream,
+            RIGHT_BORDER_X_COORDINATE,
+            rightBorderStartYCoordinate,
+            educationApiModel.educationalInstitution,
+            fondPd,
+            null,
+            null
+        )
+
+        rightBorderStartYCoordinate = rightBorderStartYCoordinate.minus(15)
+        addText(
+            contentStream,
+            RIGHT_BORDER_X_COORDINATE,
+            rightBorderStartYCoordinate,
+            "${educationApiModel.startTime} - ${educationApiModel.endTime}",
+            fondPd,
+            8,
+            Color.DARK_GRAY
+        )
+        addText(
+            contentStream,
+            RIGHT_BORDER_X_COORDINATE_MAX,
+            rightBorderStartYCoordinate,
+            educationApiModel.educationLevel.name,
+            fondPd,
+            8,
+            Color.DARK_GRAY
+        )
+        contentStream.stroke()
+        contentStream.close()
+        rightBorderStartYCoordinate = rightBorderStartYCoordinate.minus(15)
     }
 
     private fun addText(
@@ -138,15 +258,17 @@ class CvDocumentModel(private val pdDocument: PDDocument, private val resumeApiM
         xCoordinate: Int,
         yCoordinate: Int,
         targetText: String,
-        font: PDFont
+        font: PDFont,
+        fontSize: Int?,
+        fontColor: Color?
     ) {
         if (yCoordinate < 20) {
             throw IllegalStateException("Invalid y-Coordinate for write text, y: $yCoordinate")
         }
 
         contentStream.beginText()
-        contentStream.setFont(font, 13.toFloat())
-        contentStream.setNonStrokingColor(Color.BLACK)
+        contentStream.setFont(font, fontSize?.toFloat()?: 13.toFloat())
+        contentStream.setNonStrokingColor(fontColor?: Color.BLACK)
         contentStream.newLineAtOffset(xCoordinate.toFloat(), yCoordinate.toFloat())
         contentStream.showText(targetText)
         contentStream.endText()

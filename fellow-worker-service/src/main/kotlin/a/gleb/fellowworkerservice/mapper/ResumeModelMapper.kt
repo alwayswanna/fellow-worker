@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/10/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,9 +7,11 @@ package a.gleb.fellowworkerservice.mapper
 
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
+import a.gleb.apicommon.fellowworker.model.response.resume.ContactResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.ResumeResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.WorkExperienceResponseModel
+import a.gleb.fellowworkerservice.db.dao.ContactModel
 import a.gleb.fellowworkerservice.db.dao.Education
 import a.gleb.fellowworkerservice.db.dao.Resume
 import a.gleb.fellowworkerservice.db.dao.WorkExperience
@@ -94,6 +96,10 @@ class ResumeModelMapper {
                             }
                     }
                     .toList()
+                contact = ContactResponseModel().apply {
+                    phone = resume.contact.phone
+                    email = resume.contact.email
+                }
                 lastUpdate = resume.lastUpdate
             }
     }
@@ -129,6 +135,7 @@ class ResumeModelMapper {
             education = toEducationDtoModel(request),
             professionalSkills = request.professionalSkills,
             workHistory = toWorkHistoryDto(request),
+            contact = ContactModel(request.contact.phone, request.contact.email),
             lastUpdate = LocalDateTime.now()
         )
     }

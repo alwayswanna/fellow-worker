@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 07-07.01.2023, 21:19
+ * Copyright (c) 07-1/10/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.fellowworkerservice.controller
 
 import a.gleb.fellowworkerservice.BaseFellowWorkerServiceTest
+import a.gleb.fellowworkerservice.db.dao.ContactModel
 import a.gleb.fellowworkerservice.db.dao.Education
 import a.gleb.fellowworkerservice.db.dao.Resume
 import a.gleb.fellowworkerservice.db.dao.WorkExperience
@@ -291,6 +292,7 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
                     listOf("tags", "tags")
                 )
             ),
+            ContactModel("89008008888", "test_resume@yandex.ru"),
             LocalDateTime.now()
         )
     }

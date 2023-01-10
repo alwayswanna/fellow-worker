@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-1/10/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -41,6 +41,8 @@ data class Resume(
 
     var workHistory: List<WorkExperience>,
 
+    var contact: ContactModel,
+
     var lastUpdate: LocalDateTime
 )
 
@@ -72,5 +74,12 @@ class WorkExperience(
     var responsibilities: List<String>,
 
     var tags: List<String>,
+)
+
+class ContactModel(
+
+    var phone: String,
+
+    var email: String
 )
 

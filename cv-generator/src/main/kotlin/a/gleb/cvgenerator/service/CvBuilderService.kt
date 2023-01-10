@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/9/23, 11:48 PM
+ * Copyright (c) 07-1/10/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -44,11 +44,45 @@ class CvBuilderService(
             // добавляем фамилию
             cvDocument.addInfoLeftBorder(messageService.getMessage("surname.text", resumeApiModel.middleName))
             // добавляем отчество
-            if(!resumeApiModel.lastName.isNullOrEmpty()) {
+            if (!resumeApiModel.lastName.isNullOrEmpty()) {
                 cvDocument.addInfoLeftBorder(messageService.getMessage("patronymic.text", resumeApiModel.lastName))
             }
             // добавляем дату рождения
             cvDocument.addInfoLeftBorder(messageService.getMessage("date.birth.text", resumeApiModel.birthDate))
+            // добавляем дату о себе
+            cvDocument.addSpacerByLeftBorder()
+            cvDocument.addInfoLeftBorder(messageService.getMessage("about.text"))
+            val listAbout = resumeApiModel.about.split(" ").asSequence().chunked(4).toList()
+            listAbout.forEach {
+                cvDocument.addInfoLeftBorder(it.joinToString(separator = " "))
+            }
+            // добавляем ожидаемую зарплату
+            cvDocument.addSpacerByLeftBorder()
+            cvDocument.addInfoLeftBorder(
+                messageService.getMessage(
+                    "expected.salary.text",
+                    resumeApiModel.expectedSalary
+                )
+            )
+            // добавляем основные навыки
+            cvDocument.addSpacerByLeftBorder()
+            cvDocument.addInfoLeftBorder(messageService.getMessage("main.skills.text"))
+            resumeApiModel.professionalSkills.forEach {
+                cvDocument.addInfoLeftBorder(" - $it")
+            }
+            // добавляем контактную информацию
+            cvDocument.addInfoRightBorder(messageService.getMessage("contact.info.text"))
+            cvDocument.addInfoRightBorder(messageService.getMessage("phone.number.text", resumeApiModel.contact.phone))
+            cvDocument.addInfoRightBorder(messageService.getMessage("email.text", resumeApiModel.contact.email))
+
+            // добавляем данные об образовании
+            cvDocument.addSpacerByRightBorder()
+            cvDocument.addInfoRightBorder(messageService.getMessage("education.label.text"))
+            resumeApiModel.education.forEach {
+                cvDocument.addEducationInformation(it)
+            }
+
+
 
             document.save(out)
             document.close()
