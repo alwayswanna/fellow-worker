@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/10/23, 11:08 PM
+ * Copyright (c) 07-1/10/23, 11:15 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -70,6 +70,10 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
                   ]
                 }
               ],
+              "contact": {
+                    "phone": "+79008005544",
+                    "email": "worker_mail@yandex.ru"
+              },
               "base64Image": "string"
             }
         """.trimIndent()
@@ -99,7 +103,11 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
               "job": "Начальник склада",
               "professionalSkills": [
                 "string"
-              ]
+              ],
+              "contact": {
+                    "phone": "+79008005544",
+                    "email": "worker_mail@yandex.ru"
+              }
             }
         """.trimIndent()
 
@@ -236,6 +244,10 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
                   ]
                 }
               ],
+              "contact": {
+                    "phone": "+79008005544",
+                    "email": "worker_mail@yandex.ru"
+              },
               "base64Image": "string"
             }
         """.trimIndent()
