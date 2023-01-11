@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/11/23, 11:29 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,6 +7,7 @@ package a.gleb.fellowworkerservice.service
 
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
+import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageBusModel
 import a.gleb.fellowworkerservice.db.repository.ResumeRepository
 import a.gleb.fellowworkerservice.exception.InvalidUserDataException
 import a.gleb.fellowworkerservice.exception.UnexpectedErrorException
@@ -25,7 +26,7 @@ class ResumeService(
     private val resumeRepository: ResumeRepository,
     private val oauth2SecurityService: Oauth2SecurityService,
     private val resumeModelMapper: ResumeModelMapper,
-    private val fileSenderService: FileSenderService
+    private val resumeSenderService: ResumeSenderService
 ) {
 
     /**
@@ -47,12 +48,19 @@ class ResumeService(
         val resume = resumeModelMapper.toResumeDtoModel(UUID.fromString(userId), request)
 
         try {
-            request.resumeId = resume.id
-            fileSenderService.sendMessage(request)
-            return resumeModelMapper.toFellowWorkerResponseModel(
-                resumeRepository.save(resume),
+            val savedResume = resumeRepository.save(resume)
+            val response = resumeModelMapper.toFellowWorkerResponseModel(
+                savedResume,
                 "Ваше резюме успешно опубликовано. PDF версия станет доступна чуть позже."
             )
+            resumeSenderService.sendMessageCreateOrEdit(
+                ResumeMessageBusModel(
+                    response.resumeResponse,
+                    request.base64Image,
+                    request.extensionPostfix
+                )
+            )
+            return response
         } catch (e: Exception) {
             throw UnexpectedErrorException(
                 BAD_GATEWAY,
@@ -80,15 +88,20 @@ class ResumeService(
         }
 
         val resumeToSave = resumeModelMapper.toResumeDtoModel(resumeModel.ownerRecordId, request)
-        resumeToSave.id = resumeModel.id
 
         try {
-            request.resumeId = resumeToSave.id
-            fileSenderService.sendMessage(request)
-            return resumeModelMapper.toFellowWorkerResponseModel(
+            val response = resumeModelMapper.toFellowWorkerResponseModel(
                 resumeRepository.save(resumeToSave),
                 "Ваше резюме успешно обновлено. PDF версия станет доступна чуть позже."
             )
+            resumeSenderService.sendMessageCreateOrEdit(
+                ResumeMessageBusModel(
+                    response.resumeResponse,
+                    request.base64Image,
+                    request.extensionPostfix
+                )
+            )
+            return response
         } catch (e: Exception) {
             throw UnexpectedErrorException(
                 BAD_GATEWAY,

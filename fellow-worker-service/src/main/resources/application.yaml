@@ -48,8 +48,16 @@ spring:
               binding-routing-key: generation
               routing-key-expression: '''generation'''
               transacted: true
+          deleteSender-out-0:
+            producer:
+              exchange-type: direct
+              binding-routing-key: delete
+              routing-key-expression: '''delete'''
+              transacted: true
       bindings:
         fileSender-out-0:
+          destination: cv
+        deleteSender-out-0:
           destination: cv
 
 fellow-worker:

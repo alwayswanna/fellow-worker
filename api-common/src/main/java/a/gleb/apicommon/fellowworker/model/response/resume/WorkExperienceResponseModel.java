@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-1/11/23, 10:31 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -12,8 +12,6 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
-import java.util.List;
-
 
 @Getter
 @Setter
@@ -40,9 +38,6 @@ public class WorkExperienceResponseModel {
     @Schema(description = "Занимаемая должность", example = "Заведующий хоз. учета")
     private String workingSpecialty;
 
-    @Schema(description = "Трудовые обязанности")
-    private List<String> responsibilities;
-
-    @Schema(description = "Горячие слова для поиска")
-    private List<String> tags;
+    @Schema(description = "Трудовые обязанности", example = "Выход из границ.")
+    private String responsibilities;
 }

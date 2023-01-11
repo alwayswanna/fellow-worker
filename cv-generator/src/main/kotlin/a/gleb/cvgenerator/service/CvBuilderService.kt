@@ -1,14 +1,16 @@
 /*
- * Copyright (c) 07-1/10/23, 11:08 PM
+ * Copyright (c) 07-1/11/23, 11:29 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.cvgenerator.service
 
-import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
+import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageBusModel
 import a.gleb.cvgenerator.models.CvDocumentModel
+import a.gleb.cvgenerator.models.FONT_PATH
 import mu.KotlinLogging
 import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.springframework.stereotype.Service
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -21,8 +23,9 @@ class CvBuilderService(
     private val messageService: MessageService
 ) {
 
-    fun buildCvFile(resumeApiModel: ResumeApiModel) {
-        logger.info { "Start create resume: ${resumeApiModel.resumeId}" }
+    fun buildCvFile(resumeResponseModel: ResumeMessageBusModel) {
+        logger.info { "Start create resume: ${resumeResponseModel.resume.resumeId}" }
+        val resume = resumeResponseModel.resume
 
 
         val template = File(
@@ -35,54 +38,70 @@ class CvBuilderService(
         val out = ByteArrayOutputStream()
         try {
             document = PDDocument.load(template)
-            val cvDocument = CvDocumentModel(document, resumeApiModel)
+            val pdFont = PDType0Font.load(
+                document,
+                File(
+                    Objects.requireNonNull(
+                        javaClass.classLoader.getResource(FONT_PATH)!!.file
+                    )
+                )
+            )
+            val cvDocument = CvDocumentModel(document, resumeResponseModel, pdFont)
 
             // добавляем должность
-            cvDocument.addResumeTitle(messageService.getMessage("job.title.text", resumeApiModel.job))
+            cvDocument.addResumeTitle(messageService.getMessage("job.title.text", resume.job))
             // добавляем имя
-            cvDocument.addInfoLeftBorder(messageService.getMessage("firstname.text", resumeApiModel.firstName))
+            cvDocument.addInfoLeftBorder(messageService.getMessage("firstname.text", resume.firstName))
             // добавляем фамилию
-            cvDocument.addInfoLeftBorder(messageService.getMessage("surname.text", resumeApiModel.middleName))
+            cvDocument.addInfoLeftBorder(messageService.getMessage("surname.text", resume.middleName))
             // добавляем отчество
-            if (!resumeApiModel.lastName.isNullOrEmpty()) {
-                cvDocument.addInfoLeftBorder(messageService.getMessage("patronymic.text", resumeApiModel.lastName))
+            if (!resume.lastName.isNullOrEmpty()) {
+                cvDocument.addInfoLeftBorder(messageService.getMessage("patronymic.text", resume.lastName))
             }
             // добавляем дату рождения
-            cvDocument.addInfoLeftBorder(messageService.getMessage("date.birth.text", resumeApiModel.birthDate))
+            cvDocument.addInfoLeftBorder(messageService.getMessage("date.birth.text", resume.birthDate))
             // добавляем дату о себе
             cvDocument.addSpacerByLeftBorder()
             cvDocument.addInfoLeftBorder(messageService.getMessage("about.text"))
-            val listAbout = resumeApiModel.about.split(" ").asSequence().chunked(4).toList()
+            val listAbout = resume.about.split(" ").asSequence().chunked(4).toList()
             listAbout.forEach {
                 cvDocument.addInfoLeftBorder(it.joinToString(separator = " "))
             }
+
             // добавляем ожидаемую зарплату
             cvDocument.addSpacerByLeftBorder()
             cvDocument.addInfoLeftBorder(
                 messageService.getMessage(
                     "expected.salary.text",
-                    resumeApiModel.expectedSalary
+                    resume.expectedSalary
                 )
             )
+
             // добавляем основные навыки
             cvDocument.addSpacerByLeftBorder()
             cvDocument.addInfoLeftBorder(messageService.getMessage("main.skills.text"))
-            resumeApiModel.professionalSkills.forEach {
+            resume.professionalSkills.forEach {
                 cvDocument.addInfoLeftBorder(" - $it")
             }
+
             // добавляем контактную информацию
             cvDocument.addInfoRightBorder(messageService.getMessage("contact.info.text"))
-            cvDocument.addInfoRightBorder(messageService.getMessage("phone.number.text", resumeApiModel.contact.phone))
-            cvDocument.addInfoRightBorder(messageService.getMessage("email.text", resumeApiModel.contact.email))
+            cvDocument.addInfoRightBorder(messageService.getMessage("phone.number.text", resume.contact.phone))
+            cvDocument.addInfoRightBorder(messageService.getMessage("email.text", resume.contact.email))
 
             // добавляем данные об образовании
             cvDocument.addSpacerByRightBorder()
             cvDocument.addInfoRightBorder(messageService.getMessage("education.label.text"))
-            resumeApiModel.education.forEach {
+            resume.education.forEach {
                 cvDocument.addEducationInformation(it)
             }
 
-
+            // добавляем данные об опыте работы
+            cvDocument.addSpacerByRightBorder()
+            cvDocument.addInfoRightBorder(messageService.getMessage("work.experience.title.text"))
+            resume.workingHistory.forEach {
+                cvDocument.addWorkExperienceInformation(it)
+            }
 
             document.save(out)
             document.close()
@@ -92,6 +111,6 @@ class CvBuilderService(
             document?.close()
         }
 
-        File("/tmp/resume/${resumeApiModel.resumeId}.pdf").writeBytes(out.toByteArray())
+        File("/tmp/resume/${resumeResponseModel.resume.resumeId}.pdf").writeBytes(out.toByteArray())
     }
 }

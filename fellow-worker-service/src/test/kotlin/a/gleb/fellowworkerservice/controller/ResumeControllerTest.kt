@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/10/23, 11:15 PM
+ * Copyright (c) 07-1/11/23, 10:19 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -300,8 +300,7 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
                     LocalDate.now(),
                     "Company",
                     "Worker",
-                    listOf("list", "list"),
-                    listOf("tags", "tags")
+                    "list"
                 )
             ),
             ContactModel("89008008888", "test_resume@yandex.ru"),

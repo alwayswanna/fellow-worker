@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/10/23, 11:08 PM
+ * Copyright (c) 07-1/11/23, 10:19 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -71,9 +71,7 @@ class WorkExperience(
 
     var workingSpecialty: String,
 
-    var responsibilities: List<String>,
-
-    var tags: List<String>,
+    var responsibilities: String,
 )
 
 class ContactModel(

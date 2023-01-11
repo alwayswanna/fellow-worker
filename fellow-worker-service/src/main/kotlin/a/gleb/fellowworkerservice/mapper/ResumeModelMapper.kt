@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/10/23, 11:08 PM
+ * Copyright (c) 12-1/11/23, 10:19 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -92,7 +92,6 @@ class ResumeModelMapper {
                                 companyName = it.companyName
                                 workingSpecialty = it.workingSpecialty
                                 responsibilities = it.responsibilities
-                                tags = it.tags
                             }
                     }
                     .toList()
@@ -181,7 +180,6 @@ class ResumeModelMapper {
                     companyName = it.companyName,
                     workingSpecialty = it.workingSpecialty,
                     responsibilities = it.responsibilities,
-                    tags = it.tags ?: listOf()
                 )
             }
             .toList()
