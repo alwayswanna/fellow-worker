@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 07-1/11/23, 10:19 PM
+ * Created by https://github.com/alwayswanna
+ */
+
 package a.gleb.apicommon.fellowworker.model.request.resume;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,7 +12,6 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
@@ -27,16 +31,13 @@ public class WorkExperienceApiModel {
     private LocalDate endTime;
 
     @NotEmpty
-    @Schema(description = "Наименование компании")
+    @Schema(description = "Наименование компании", example = "Уфимский промышленный корпус")
     private String companyName;
 
     @NotEmpty
     @Schema(description = "Занимаемая должность", example = "Заведующий хоз. учета")
     private String workingSpecialty;
 
-    @Schema(description = "Трудовые обязанности")
-    private List<String> responsibilities;
-
-    @Schema(description = "Горячие слова для поиска")
-    private List<String> tags;
+    @Schema(description = "Трудовые обязанности", example = "Выход за границы дозволенного.")
+    private String responsibilities;
 }

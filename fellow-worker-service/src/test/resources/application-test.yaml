@@ -17,19 +17,17 @@ spring:
       binders:
         rabbit:
           type: rabbit
-      function:
-        definition: fileSender
       rabbit:
         bindings:
           fileSender-out-0:
             producer:
               exchange-type: direct
-              binding-routing-key: file-sender
-              routing-key-expression: '''file-sender'''
+              binding-routing-key: generation
+              routing-key-expression: '''generation'''
               transacted: true
       bindings:
         fileSender-out-0:
-          destination: message
+          destination: cv
 
 fellow-worker:
   unprotected-paths:

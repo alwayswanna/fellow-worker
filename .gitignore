@@ -9,3 +9,5 @@
 /fellow-worker-service/.mvn/
 /api-common/.mvn/
 /api-common/target/
+/cv-generator/.mvn/
+/cv-generator/target/

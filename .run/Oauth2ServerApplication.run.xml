@@ -1,7 +1,13 @@
+<!--
+  ~ Copyright (c) 07.01.2023, 21:08
+  ~ Created by https://github.com/alwayswanna
+  -->
+
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Oauth2ServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="oauth2-server" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.oauth2server.Oauth2ServerApplication" />
+    <option name="VM_PARAMETERS" value="-Xms128m -Xmx256m" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

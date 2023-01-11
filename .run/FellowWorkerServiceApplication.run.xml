@@ -1,7 +1,13 @@
+<!--
+  ~ Copyright (c) 07.01.2023, 21:08
+  ~ Created by https://github.com/alwayswanna
+  -->
+
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="FellowWorkerServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <module name="fellow-worker-service" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.fellowworkerservice.FellowWorkerServiceApplication" />
+    <option name="VM_PARAMETERS" value="-Xms128m -Xmx256m" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

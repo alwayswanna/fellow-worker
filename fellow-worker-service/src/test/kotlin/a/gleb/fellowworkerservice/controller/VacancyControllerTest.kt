@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 07-1/8/23, 8:41 PM
+ * Created by https://github.com/alwayswanna
+ */
+
 package a.gleb.fellowworkerservice.controller
 
 import a.gleb.fellowworkerservice.BaseFellowWorkerServiceTest
@@ -71,9 +76,11 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully edit vacancy`() {
+        /* prepare data */
         val vacancy = createDefaultVacancy()
         vacancy.ownerId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
         saveVacancy(vacancy)
+        TimeUnit.SECONDS.sleep(3)
 
         val request = """
             {
@@ -117,9 +124,11 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully get all vacancies`() {
+        /* prepare data */
         saveVacancy(createDefaultVacancy())
         saveVacancy(createDefaultVacancy())
         saveVacancy(createDefaultVacancy())
+        TimeUnit.SECONDS.sleep(3)
 
         webTestClient.get()
             .uri(VACANCY_PATH.plus("/vacancy-all"))
@@ -132,8 +141,10 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully get vacancy by id`() {
+        /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
+        TimeUnit.SECONDS.sleep(3)
 
         webTestClient.get()
             .uri {
@@ -151,10 +162,11 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully delete vacancy by id`() {
+        /* prepare data */
         val vacancy = createDefaultVacancy()
         vacancy.ownerId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
         saveVacancy(vacancy)
-        TimeUnit.SECONDS.sleep(5);
+        TimeUnit.SECONDS.sleep(3)
 
         webTestClient.delete()
             .uri {
@@ -172,8 +184,10 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully find vacancies by type placement`(){
+        /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
+        TimeUnit.SECONDS.sleep(3)
 
         webTestClient.get()
             .uri {
@@ -194,8 +208,10 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully find vacancies by type time`(){
+        /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
+        TimeUnit.SECONDS.sleep(3)
 
         webTestClient.get()
             .uri {
@@ -216,8 +232,10 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully find vacancies by city`(){
+        /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
+        TimeUnit.SECONDS.sleep(5)
 
         webTestClient.get()
             .uri {
@@ -238,8 +256,10 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully find vacancies by key skill`(){
+        /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
+        TimeUnit.SECONDS.sleep(3)
 
         webTestClient.get()
             .uri {

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 07-1/8/23, 3:36 PM
+ * Created by https://github.com/alwayswanna
+ */
+
 package a.gleb.fellowworkerservice
 
 import a.gleb.fellowworkerservice.db.repository.ResumeRepository
@@ -13,6 +18,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.testcontainers.containers.MongoDBContainer
+import org.testcontainers.containers.RabbitMQContainer
 import org.testcontainers.utility.DockerImageName
 
 @SpringBootTest
@@ -24,23 +30,29 @@ abstract class BaseFellowWorkerServiceTest {
 
     @Autowired
     protected lateinit var webTestClient: WebTestClient
+
     @Autowired
     protected lateinit var resumeRepository: ResumeRepository
+
     @Autowired
     protected lateinit var vacancyRepository: VacancyRepository
 
     companion object {
 
+        private val RABBITMQ_CONTAINER = RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"))
         private val MONGO_DB_CONTAINER = MongoDBContainer(DockerImageName.parse("mongo:latest"))
 
         init {
+            RABBITMQ_CONTAINER.start()
             MONGO_DB_CONTAINER.start()
         }
 
         @JvmStatic
         @DynamicPropertySource
-        fun properties(dynamicPropertyRegistry: DynamicPropertyRegistry) {
-            dynamicPropertyRegistry.add("spring.data.mongodb.uri", MONGO_DB_CONTAINER::getConnectionString)
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.data.mongodb.uri") { MONGO_DB_CONTAINER.connectionString }
+            registry.add("spring.rabbitmq.host") { RABBITMQ_CONTAINER.host }
+            registry.add("spring.rabbitmq.port") { RABBITMQ_CONTAINER.firstMappedPort }
         }
     }
 }

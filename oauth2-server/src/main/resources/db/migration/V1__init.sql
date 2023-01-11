@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 07-07.01.2023, 20:21
+ * Created by https://github.com/alwayswanna
+ */
+
 CREATE TABLE oauth2_authorization_consent
 (
     registered_client_id varchar(100)  NOT NULL,

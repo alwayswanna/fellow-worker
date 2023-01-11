@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 07-1/8/23, 8:41 PM
+  ~ Created by https://github.com/alwayswanna
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -6,15 +11,7 @@
 
     <groupId>a.gleb</groupId>
     <artifactId>fellow-worker</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-
-    <modules>
-        <module>client-manager</module>
-        <module>fellow-worker-service</module>
-        <module>oauth2-server</module>
-        <module>oauth2-persistence</module>
-        <module>api-common</module>
-    </modules>
+    <version>1.0.0-RELEASE</version>
 
     <packaging>pom</packaging>
 
@@ -25,19 +22,30 @@
         <relativePath/>
     </parent>
 
+    <modules>
+        <module>client-manager</module>
+        <module>fellow-worker-service</module>
+        <module>oauth2-server</module>
+        <module>oauth2-persistence</module>
+        <module>api-common</module>
+        <module>cv-generator</module>
+    </modules>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <kotlin.version>1.7.20</kotlin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Library version -->
-        <spring-cloud.version>2021.0.5</spring-cloud.version>
+        <spring-cloud.version>2022.0.0</spring-cloud.version>
         <kotlinx-coroutines.version>1.6.4</kotlinx-coroutines.version>
         <spring-security-oauth2-authorization-server.version>1.0.0</spring-security-oauth2-authorization-server.version>
         <kotlin-logging-jvm.version>2.1.23</kotlin-logging-jvm.version>
-        <fellowworker.version>1.0.0-RELEASE</fellowworker.version>
+        <services.version>1.0.0-RELEASE</services.version>
         <springdoc-openapi-starter.version>2.0.2</springdoc-openapi-starter.version>
         <testcontainers.version>1.17.6</testcontainers.version>
+        <pdfbox.version>2.0.22</pdfbox.version>
+        <imgscalr-lib.version>4.2</imgscalr-lib.version>
     </properties>
 
     <dependencyManagement>
@@ -59,12 +67,12 @@
             <dependency>
                 <groupId>a.gleb</groupId>
                 <artifactId>oauth2-persistence</artifactId>
-                <version>${fellowworker.version}</version>
+                <version>${services.version}</version>
             </dependency>
             <dependency>
                 <groupId>a.gleb</groupId>
                 <artifactId>api-common</artifactId>
-                <version>${fellowworker.version}</version>
+                <version>${services.version}</version>
             </dependency>
 
             <!-- Kotlin -->
@@ -77,6 +85,11 @@
                 <groupId>org.jetbrains.kotlinx</groupId>
                 <artifactId>kotlinx-coroutines-reactor</artifactId>
                 <version>${kotlinx-coroutines.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.microutils</groupId>
+                <artifactId>kotlin-logging-jvm</artifactId>
+                <version>${kotlin-logging-jvm.version}</version>
             </dependency>
 
             <!-- Other -->
@@ -96,10 +109,17 @@
                 <version>${springdoc-openapi-starter.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.microutils</groupId>
-                <artifactId>kotlin-logging-jvm</artifactId>
-                <version>${kotlin-logging-jvm.version}</version>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>${pdfbox.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.imgscalr</groupId>
+                <artifactId>imgscalr-lib</artifactId>
+                <version>${imgscalr-lib.version}</version>
+            </dependency>
+
+            <!-- Tests -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>postgresql</artifactId>
@@ -109,6 +129,12 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>mongodb</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>rabbitmq</artifactId>
                 <version>${testcontainers.version}</version>
                 <scope>test</scope>
             </dependency>

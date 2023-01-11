@@ -1,7 +1,6 @@
 /*
- * Copyright (c) 12/26/22, 11:56 PM.
+ * Copyright (c) 12-07.01.2023, 20:21
  * Created by https://github.com/alwayswanna
- *
  */
 
 package a.gleb.fellowworkerservice.configuration.properties

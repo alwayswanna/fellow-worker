@@ -1,16 +1,17 @@
 /*
- * Copyright (c) 12-12/24/22, 10:24 PM.
+ * Copyright (c) 12-1/11/23, 10:19 PM
  * Created by https://github.com/alwayswanna
- *
  */
 
 package a.gleb.fellowworkerservice.mapper
 
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
+import a.gleb.apicommon.fellowworker.model.response.resume.ContactResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.ResumeResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.WorkExperienceResponseModel
+import a.gleb.fellowworkerservice.db.dao.ContactModel
 import a.gleb.fellowworkerservice.db.dao.Education
 import a.gleb.fellowworkerservice.db.dao.Resume
 import a.gleb.fellowworkerservice.db.dao.WorkExperience
@@ -91,10 +92,13 @@ class ResumeModelMapper {
                                 companyName = it.companyName
                                 workingSpecialty = it.workingSpecialty
                                 responsibilities = it.responsibilities
-                                tags = it.tags
                             }
                     }
                     .toList()
+                contact = ContactResponseModel().apply {
+                    phone = resume.contact.phone
+                    email = resume.contact.email
+                }
                 lastUpdate = resume.lastUpdate
             }
     }
@@ -130,6 +134,7 @@ class ResumeModelMapper {
             education = toEducationDtoModel(request),
             professionalSkills = request.professionalSkills,
             workHistory = toWorkHistoryDto(request),
+            contact = ContactModel(request.contact.phone, request.contact.email),
             lastUpdate = LocalDateTime.now()
         )
     }
@@ -175,7 +180,6 @@ class ResumeModelMapper {
                     companyName = it.companyName,
                     workingSpecialty = it.workingSpecialty,
                     responsibilities = it.responsibilities,
-                    tags = it.tags ?: listOf()
                 )
             }
             .toList()
