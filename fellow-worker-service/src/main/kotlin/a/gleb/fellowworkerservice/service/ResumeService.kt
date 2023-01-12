@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/11/23, 11:29 PM
+ * Copyright (c) 12-1/12/23, 11:58 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,7 +7,8 @@ package a.gleb.fellowworkerservice.service
 
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
-import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageBusModel
+import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageCreate
+import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageDelete
 import a.gleb.fellowworkerservice.db.repository.ResumeRepository
 import a.gleb.fellowworkerservice.exception.InvalidUserDataException
 import a.gleb.fellowworkerservice.exception.UnexpectedErrorException
@@ -42,6 +43,7 @@ class ResumeService(
             }
             existingResume.forEach {
                 resumeRepository.delete(it)
+                resumeSenderService.sendMessageRemove(ResumeMessageDelete(it.id))
             }
         }
 
@@ -53,8 +55,8 @@ class ResumeService(
                 savedResume,
                 "Ваше резюме успешно опубликовано. PDF версия станет доступна чуть позже."
             )
-            resumeSenderService.sendMessageCreateOrEdit(
-                ResumeMessageBusModel(
+            resumeSenderService.sendMessageCreate(
+                ResumeMessageCreate(
                     response.resumeResponse,
                     request.base64Image,
                     request.extensionPostfix
@@ -90,12 +92,13 @@ class ResumeService(
         val resumeToSave = resumeModelMapper.toResumeDtoModel(resumeModel.ownerRecordId, request)
 
         try {
+            resumeSenderService.sendMessageRemove(ResumeMessageDelete(request.resumeId))
             val response = resumeModelMapper.toFellowWorkerResponseModel(
                 resumeRepository.save(resumeToSave),
                 "Ваше резюме успешно обновлено. PDF версия станет доступна чуть позже."
             )
-            resumeSenderService.sendMessageCreateOrEdit(
-                ResumeMessageBusModel(
+            resumeSenderService.sendMessageCreate(
+                ResumeMessageCreate(
                     response.resumeResponse,
                     request.base64Image,
                     request.extensionPostfix
@@ -129,6 +132,7 @@ class ResumeService(
         }
 
         try {
+            resumeSenderService.sendMessageRemove(ResumeMessageDelete(id))
             resumeRepository.delete(resume)
             return FellowWorkerResponseModel().apply {
                 message = "Ваше резюме успешно удалено"

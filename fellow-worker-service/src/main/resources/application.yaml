@@ -51,8 +51,8 @@ spring:
           deleteSender-out-0:
             producer:
               exchange-type: direct
-              binding-routing-key: delete
-              routing-key-expression: '''delete'''
+              binding-routing-key: remove
+              routing-key-expression: '''remove'''
               transacted: true
       bindings:
         fileSender-out-0:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/9/23, 11:01 PM
+ * Copyright (c) 1-1/12/23, 11:58 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -15,5 +15,4 @@ class MessageService(private val messageSource: MessageSource) {
     fun getMessage(key: String, vararg params: Any?): String {
         return messageSource.getMessage(key, params, LocaleContextHolder.getLocale())
     }
-
 }

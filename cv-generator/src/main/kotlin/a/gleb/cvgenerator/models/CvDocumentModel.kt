@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/11/23, 11:29 PM
+ * Copyright (c) 1-1/12/23, 11:58 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,7 +7,7 @@ package a.gleb.cvgenerator.models
 
 import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.WorkExperienceResponseModel
-import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageBusModel
+import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageCreate
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
@@ -37,7 +37,7 @@ const val FONT_PATH = "templates/Nunito-Regular.ttf"
 
 class CvDocumentModel(
     private val pdDocument: PDDocument,
-    private val resumeResponseModel: ResumeMessageBusModel,
+    private val resumeResponseModel: ResumeMessageCreate,
     private val pdFont: PDFont
 
 ) {
@@ -57,7 +57,7 @@ class CvDocumentModel(
      * Method adds to resume user image.
      * @param resumeResponseModel data from request.
      */
-    private fun addImageToDocument(resumeResponseModel: ResumeMessageBusModel) {
+    private fun addImageToDocument(resumeResponseModel: ResumeMessageCreate) {
         val avatar: File = if (resumeResponseModel.base64Image.isNullOrEmpty()) {
             File(
                 Objects.requireNonNull(

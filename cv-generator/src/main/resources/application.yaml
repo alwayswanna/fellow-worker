@@ -23,6 +23,8 @@ spring:
         jwt:
           issuer-uri: http://127.0.0.1:9001
   cloud:
+    function:
+      definition: receiveCreate;receiveRemove
     stream:
       default-binder: rabbit
       binders:
@@ -30,20 +32,29 @@ spring:
           type: rabbit
       rabbit:
         bindings:
-          receiveCvData-in-0:
+          receiveCreate-in-0:
             consumer:
-              binding-routing-key: generation
-              exchange-type: direct
+              binding-routing-key: "generation"
               auto-bind-dlq: true
-              republish-to-dlq: true
               requeue-rejected: true
               dead-letter-queue-name: "cv.generation.dlq"
+          receiveRemove-in-0:
+            consumer:
+              binding-routing-key: "remove"
+              auto-bind-dlq: true
+              republish-to-dlq: true
+              dead-letter-queue-name: "cv.remove.dlq"
       bindings:
-        receiveCvData-in-0:
+        receiveCreate-in-0:
           group: generation
           destination: cv
           consumer:
-            max-attempts: 10
+            max-attempts: 5
+        receiveRemove-in-0:
+          group: remove
+          destination: cv
+          consumer:
+            max-attempts: 5
 
 cv-generator:
   unprotected-paths:

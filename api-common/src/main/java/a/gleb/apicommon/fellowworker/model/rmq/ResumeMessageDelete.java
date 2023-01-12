@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/11/23, 11:29 PM
+ * Copyright (c) 1-1/12/23, 11:58 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResumeMessageBusDeleteModel {
+public class ResumeMessageDelete {
 
     private UUID deleteResumeId;
 }

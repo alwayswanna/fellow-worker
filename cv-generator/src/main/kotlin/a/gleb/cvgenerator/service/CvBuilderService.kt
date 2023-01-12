@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 07-1/11/23, 11:29 PM
+ * Copyright (c) 07-1/12/23, 11:58 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.cvgenerator.service
 
-import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageBusModel
+import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageCreate
 import a.gleb.cvgenerator.models.CvDocumentModel
 import a.gleb.cvgenerator.models.FONT_PATH
 import mu.KotlinLogging
@@ -23,7 +23,7 @@ class CvBuilderService(
     private val messageService: MessageService
 ) {
 
-    fun buildCvFile(resumeResponseModel: ResumeMessageBusModel) {
+    fun buildCvFile(resumeResponseModel: ResumeMessageCreate) {
         logger.info { "Start create resume: ${resumeResponseModel.resume.resumeId}" }
         val resume = resumeResponseModel.resume
 

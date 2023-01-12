@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/11/23, 11:29 PM
+ * Copyright (c) 1-1/12/23, 11:58 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResumeMessageBusModel {
+public class ResumeMessageCreate {
 
     private ResumeResponseModel resume;
 
