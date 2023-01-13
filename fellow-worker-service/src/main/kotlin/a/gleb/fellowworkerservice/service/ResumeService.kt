@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/12/23, 11:58 PM
+ * Copyright (c) 12-1/13/23, 9:17 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -47,7 +47,7 @@ class ResumeService(
             }
         }
 
-        val resume = resumeModelMapper.toResumeDtoModel(UUID.fromString(userId), request)
+        val resume = resumeModelMapper.toResumeDtoModel(UUID.fromString(userId), request, null)
 
         try {
             val savedResume = resumeRepository.save(resume)
@@ -89,7 +89,7 @@ class ResumeService(
             )
         }
 
-        val resumeToSave = resumeModelMapper.toResumeDtoModel(resumeModel.ownerRecordId, request)
+        val resumeToSave = resumeModelMapper.toResumeDtoModel(resumeModel.ownerRecordId, request, request.resumeId)
 
         try {
             resumeSenderService.sendMessageRemove(ResumeMessageDelete(request.resumeId))

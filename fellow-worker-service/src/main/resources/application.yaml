@@ -29,6 +29,7 @@ spring:
       port: 27017
       username: mongo
       password: mongo
+      uuid-representation: standard
   rabbitmq:
     host: localhost
     port: 5672

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/11/23, 10:19 PM
+ * Copyright (c) 12-1/13/23, 9:17 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -120,9 +120,9 @@ class ResumeModelMapper {
      * @param request request which send authorized user.
      * @param userId from JWT token.
      */
-    suspend fun toResumeDtoModel(userId: UUID, request: ResumeApiModel): Resume {
+    suspend fun toResumeDtoModel(userId: UUID, request: ResumeApiModel, resumeId: UUID?): Resume {
         return Resume(
-            id = UUID.randomUUID(),
+            id = resumeId?: UUID.randomUUID(),
             ownerRecordId = userId,
             firstName = request.firstName,
             middleName = request.middleName,
