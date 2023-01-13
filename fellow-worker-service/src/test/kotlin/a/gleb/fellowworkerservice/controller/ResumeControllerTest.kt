@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/11/23, 10:19 PM
+ * Copyright (c) 07-1/13/23, 9:20 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -38,44 +38,41 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
     fun `successfully create resume`() {
         val request = """
             {
-              "firstName": "Аркадий",
-              "middleName": "Нахимов",
-              "lastName": "Олегович",
-              "birthDate": "1982-11-02",
-              "job": "Начальник склада",
-              "expectedSalary": "40000",
-              "about": "Увлекаюсь ... Хобби",
-              "education": [
-                {
-                  "startTime": "2016-09-01",
-                  "endTime": "2021-06-01",
-                  "educationalInstitution": "Башкирский государственный университет",
-                  "educationLevel": "MAGISTRACY"
+                    "resumeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "firstName": "Аркадий",
+                    "middleName": "Нахимов",
+                    "lastName": "Олегович",
+                    "birthDate": "1985-11-03",
+                    "job": "Начальник склада",
+                    "expectedSalary": "40000",
+                    "about": "Увлекаюсь ... Хобби",
+                    "education": [
+                      {
+                        "startTime": "2016-09-01",
+                        "endTime": "2021-06-01",
+                        "educationalInstitution": "Башкирский государственный университет",
+                        "educationLevel": "MAGISTRACY"
+                      }
+                    ],
+                    "professionalSkills": [
+                      "string"
+                    ],
+                    "workingHistory": [
+                      {
+                        "startTime": "2021-09-01",
+                        "endTime": "2022-06-01",
+                        "companyName": "Уфимский промышленный корпус",
+                        "workingSpecialty": "Заведующий хоз. учета",
+                        "responsibilities": "Выход за границы дозволенного."
+                      }
+                    ],
+                    "contact": {
+                      "phone": "+79008005544",
+                      "email": "worker_mail@yandex.ru"
+                    },
+                    "base64Image": "string",
+                    "extensionPostfix": "string"
                 }
-              ],
-              "professionalSkills": [
-                "string"
-              ],
-              "workingHistory": [
-                {
-                  "startTime": "2021-09-01",
-                  "endTime": "2022-06-01",
-                  "companyName": "string",
-                  "workingSpecialty": "Заведующий хоз. учета",
-                  "responsibilities": [
-                    "string"
-                  ],
-                  "tags": [
-                    "string"
-                  ]
-                }
-              ],
-              "contact": {
-                    "phone": "+79008005544",
-                    "email": "worker_mail@yandex.ru"
-              },
-              "base64Image": "string"
-            }
         """.trimIndent()
 
         webTestClient.post()
@@ -211,45 +208,39 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
         val request = """
             {
-              "resumeId": "${resume.id}",
-              "firstName": "Аркадий",
-              "middleName": "Нахимов",
-              "lastName": "Олегович",
-              "birthDate": "1982-11-02",
-              "job": "Начальник склада",
-              "expectedSalary": "40000",
-              "about": "Увлекаюсь ... Хобби",
-              "education": [
-                {
-                  "startTime": "2016-09-01",
-                  "endTime": "2021-06-01",
-                  "educationalInstitution": "Башкирский государственный университет",
-                  "educationLevel": "MAGISTRACY"
+                "resumeId": "${resume.id}",
+                "firstName": "Аркадий",
+                "middleName": "Нахимов",
+                "lastName": "Олегович",
+                "birthDate": "1985-11-03",
+                "job": "Начальник склада",
+                "expectedSalary": "40000",
+                "about": "Увлекаюсь ... Хобби",
+                "education": [
+                  {
+                    "startTime": "2016-09-01",
+                    "endTime": "2021-06-01",
+                    "educationalInstitution": "Башкирский государственный университет",
+                    "educationLevel": "MAGISTRACY"
+                  }
+                ],
+                "professionalSkills": [
+                  "string"
+                ],
+                "workingHistory": [
+                  {
+                    "startTime": "2021-09-01",
+                    "endTime": "2022-06-01",
+                    "companyName": "Уфимский промышленный корпус",
+                    "workingSpecialty": "Заведующий хоз. учета",
+                    "responsibilities": "Выход за границы дозволенного."
+                  }
+                ],
+                "contact": {
+                  "phone": "+79008005544",
+                  "email": "worker_mail@yandex.ru"
                 }
-              ],
-              "professionalSkills": [
-                "string"
-              ],
-              "workingHistory": [
-                {
-                  "startTime": "2021-09-01",
-                  "endTime": "2022-06-01",
-                  "companyName": "string",
-                  "workingSpecialty": "Заведующий хоз. учета",
-                  "responsibilities": [
-                    "string"
-                  ],
-                  "tags": [
-                    "string"
-                  ]
-                }
-              ],
-              "contact": {
-                    "phone": "+79008005544",
-                    "email": "worker_mail@yandex.ru"
-              },
-              "base64Image": "string"
-            }
+        }
         """.trimIndent()
 
         webTestClient.put()
