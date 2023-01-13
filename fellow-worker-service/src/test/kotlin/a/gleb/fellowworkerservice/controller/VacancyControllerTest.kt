@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/8/23, 8:41 PM
+ * Copyright (c) 07-1/13/23, 9:55 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -183,7 +183,7 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
     }
 
     @Test
-    fun `successfully find vacancies by type placement`(){
+    fun `successfully find vacancies by type placement`() {
         /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
@@ -207,7 +207,7 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
     }
 
     @Test
-    fun `successfully find vacancies by type time`(){
+    fun `successfully find vacancies by type time`() {
         /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
@@ -231,7 +231,7 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
     }
 
     @Test
-    fun `successfully find vacancies by city`(){
+    fun `successfully find vacancies by city`() {
         /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
@@ -255,7 +255,7 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
     }
 
     @Test
-    fun `successfully find vacancies by key skill`(){
+    fun `successfully find vacancies by key skill`() {
         /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
