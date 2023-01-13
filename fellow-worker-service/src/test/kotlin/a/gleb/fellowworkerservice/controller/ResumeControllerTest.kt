@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 07-1/13/23, 9:20 PM
+ * Created by https://github.com/alwayswanna
+ */
+
 package a.gleb.fellowworkerservice.controller
 
 import a.gleb.fellowworkerservice.BaseFellowWorkerServiceTest
+import a.gleb.fellowworkerservice.db.dao.ContactModel
 import a.gleb.fellowworkerservice.db.dao.Education
 import a.gleb.fellowworkerservice.db.dao.Resume
 import a.gleb.fellowworkerservice.db.dao.WorkExperience
@@ -32,40 +38,41 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
     fun `successfully create resume`() {
         val request = """
             {
-              "firstName": "Аркадий",
-              "middleName": "Нахимов",
-              "lastName": "Олегович",
-              "birthDate": "1985-11-03",
-              "job": "Начальник склада",
-              "expectedSalary": "40000",
-              "about": "Увлекаюсь ... Хобби",
-              "education": [
-                {
-                  "startTime": "2016-09-01",
-                  "endTime": "2021-06-01",
-                  "educationalInstitution": "Башкирский государственный университет",
-                  "educationLevel": "MAGISTRACY"
+                    "resumeId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    "firstName": "Аркадий",
+                    "middleName": "Нахимов",
+                    "lastName": "Олегович",
+                    "birthDate": "1985-11-03",
+                    "job": "Начальник склада",
+                    "expectedSalary": "40000",
+                    "about": "Увлекаюсь ... Хобби",
+                    "education": [
+                      {
+                        "startTime": "2016-09-01",
+                        "endTime": "2021-06-01",
+                        "educationalInstitution": "Башкирский государственный университет",
+                        "educationLevel": "MAGISTRACY"
+                      }
+                    ],
+                    "professionalSkills": [
+                      "string"
+                    ],
+                    "workingHistory": [
+                      {
+                        "startTime": "2021-09-01",
+                        "endTime": "2022-06-01",
+                        "companyName": "Уфимский промышленный корпус",
+                        "workingSpecialty": "Заведующий хоз. учета",
+                        "responsibilities": "Выход за границы дозволенного."
+                      }
+                    ],
+                    "contact": {
+                      "phone": "+79008005544",
+                      "email": "worker_mail@yandex.ru"
+                    },
+                    "base64Image": "string",
+                    "extensionPostfix": "string"
                 }
-              ],
-              "professionalSkills": [
-                "string"
-              ],
-              "workingHistory": [
-                {
-                  "startTime": "2021-09-01",
-                  "endTime": "2022-06-01",
-                  "companyName": "string",
-                  "workingSpecialty": "Заведующий хоз. учета",
-                  "responsibilities": [
-                    "string"
-                  ],
-                  "tags": [
-                    "string"
-                  ]
-                }
-              ],
-              "base64Image": "string"
-            }
         """.trimIndent()
 
         webTestClient.post()
@@ -89,11 +96,15 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             {
               "firstName": "Аркадий",
               "middleName": "Нахимов",
-              "birthDate": "1985-11-03",
+              "birthDate": "1982-11-02",
               "job": "Начальник склада",
               "professionalSkills": [
                 "string"
-              ]
+              ],
+              "contact": {
+                    "phone": "+79008005544",
+                    "email": "worker_mail@yandex.ru"
+              }
             }
         """.trimIndent()
 
@@ -114,8 +125,9 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully get all resume`() {
+        /* prepare data */
         saveResume(createDefaultResume())
-        saveResume(createDefaultResume())
+        TimeUnit.SECONDS.sleep(2)
 
         webTestClient.get()
             .uri(EMPLOYEE_PATH.plus("/get-all-resume"))
@@ -123,14 +135,16 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             .expectStatus()
             .isOk
 
-        assertEquals(2, resumeRepository.findAll().asFlux().toStream().toList().size)
+        assertEquals(1, resumeRepository.findAll().asFlux().toStream().toList().size)
     }
 
     @Test
     fun `successfully get resume for current user`() {
+        /* prepare data */
         val resume = createDefaultResume()
-        resume.ownerRecordId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
+        resume.ownerRecordId = UUID.fromString("d0280c29-1fce-4900-820d-74762c46e28e")
         saveResume(resume)
+        TimeUnit.SECONDS.sleep(2)
 
         webTestClient.get()
             .uri(EMPLOYEE_PATH.plus("/current-user-resume"))
@@ -143,8 +157,10 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully get resume by id`() {
+        /* prepare data */
         val resume = createDefaultResume()
         saveResume(resume)
+        TimeUnit.SECONDS.sleep(2)
 
         webTestClient.get()
             .uri {
@@ -162,10 +178,11 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully delete resume by id`() {
+        /* prepare data */
         val resume = createDefaultResume()
         resume.ownerRecordId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
         saveResume(resume)
-        TimeUnit.SECONDS.sleep(5);
+        TimeUnit.SECONDS.sleep(2)
 
         webTestClient.delete()
             .uri {
@@ -183,47 +200,47 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
 
     @Test
     fun `successfully edit user resume`() {
+        /* prepare data */
         val resume = createDefaultResume()
         resume.ownerRecordId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
         saveResume(resume)
+        TimeUnit.SECONDS.sleep(2)
 
         val request = """
             {
-              "resumeId": "${resume.id}",
-              "firstName": "Аркадий",
-              "middleName": "Нахимов",
-              "lastName": "Олегович",
-              "birthDate": "1985-11-03",
-              "job": "Начальник склада",
-              "expectedSalary": "40000",
-              "about": "Увлекаюсь ... Хобби",
-              "education": [
-                {
-                  "startTime": "2016-09-01",
-                  "endTime": "2021-06-01",
-                  "educationalInstitution": "Башкирский государственный университет",
-                  "educationLevel": "MAGISTRACY"
+                "resumeId": "${resume.id}",
+                "firstName": "Аркадий",
+                "middleName": "Нахимов",
+                "lastName": "Олегович",
+                "birthDate": "1985-11-03",
+                "job": "Начальник склада",
+                "expectedSalary": "40000",
+                "about": "Увлекаюсь ... Хобби",
+                "education": [
+                  {
+                    "startTime": "2016-09-01",
+                    "endTime": "2021-06-01",
+                    "educationalInstitution": "Башкирский государственный университет",
+                    "educationLevel": "MAGISTRACY"
+                  }
+                ],
+                "professionalSkills": [
+                  "string"
+                ],
+                "workingHistory": [
+                  {
+                    "startTime": "2021-09-01",
+                    "endTime": "2022-06-01",
+                    "companyName": "Уфимский промышленный корпус",
+                    "workingSpecialty": "Заведующий хоз. учета",
+                    "responsibilities": "Выход за границы дозволенного."
+                  }
+                ],
+                "contact": {
+                  "phone": "+79008005544",
+                  "email": "worker_mail@yandex.ru"
                 }
-              ],
-              "professionalSkills": [
-                "string"
-              ],
-              "workingHistory": [
-                {
-                  "startTime": "2021-09-01",
-                  "endTime": "2022-06-01",
-                  "companyName": "string",
-                  "workingSpecialty": "Заведующий хоз. учета",
-                  "responsibilities": [
-                    "string"
-                  ],
-                  "tags": [
-                    "string"
-                  ]
-                }
-              ],
-              "base64Image": "string"
-            }
+        }
         """.trimIndent()
 
         webTestClient.put()
@@ -257,11 +274,11 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             null,
             LocalDate.now(),
             "Worker",
-            "5000$",
+            "2000$",
             "About me",
             listOf(
                 Education(
-                    LocalDate.now().minusYears(3),
+                    LocalDate.now().minusYears(2),
                     LocalDate.now(),
                     "BashGU",
                     ""
@@ -270,14 +287,14 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             listOf("Clever", "Soft", "etc"),
             listOf(
                 WorkExperience(
-                    LocalDate.now().minusYears(3),
+                    LocalDate.now().minusYears(2),
                     LocalDate.now(),
                     "Company",
                     "Worker",
-                    listOf("list", "list"),
-                    listOf("tags", "tags")
+                    "list"
                 )
             ),
+            ContactModel("89008008888", "test_resume@yandex.ru"),
             LocalDateTime.now()
         )
     }

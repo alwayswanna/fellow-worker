@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 07-1/11/23, 10:19 PM
+ * Created by https://github.com/alwayswanna
+ */
+
 package a.gleb.fellowworkerservice.db.dao
 
 import org.springframework.data.annotation.Id
@@ -36,6 +41,8 @@ data class Resume(
 
     var workHistory: List<WorkExperience>,
 
+    var contact: ContactModel,
+
     var lastUpdate: LocalDateTime
 )
 
@@ -64,8 +71,13 @@ class WorkExperience(
 
     var workingSpecialty: String,
 
-    var responsibilities: List<String>,
+    var responsibilities: String,
+)
 
-    var tags: List<String>,
+class ContactModel(
+
+    var phone: String,
+
+    var email: String
 )
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 07-07.01.2023, 20:21
+ * Created by https://github.com/alwayswanna
+ */
+
 package a.gleb.apicommon.clientmanager.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 07-1/10/23, 11:08 PM
+ * Created by https://github.com/alwayswanna
+ */
+
 package a.gleb.apicommon.fellowworker.model.response.resume;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -66,6 +71,10 @@ public class ResumeResponseModel {
     @Valid
     @Schema(description = "История работы")
     private List<WorkExperienceResponseModel> workingHistory;
+
+    @Valid
+    @Schema(description = "Контактная информация")
+    private ContactResponseModel contact;
 
     @Schema(description = "Время последнего обновления")
     private LocalDateTime lastUpdate;

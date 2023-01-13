@@ -29,25 +29,35 @@ spring:
       port: 27017
       username: mongo
       password: mongo
+      uuid-representation: standard
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   cloud:
     stream:
       default-binder: rabbit
       binders:
         rabbit:
           type: rabbit
-      function:
-        definition: fileSender
       rabbit:
         bindings:
           fileSender-out-0:
             producer:
-              exchange-type: direct
-              binding-routing-key: file-sender
-              routing-key-expression: '''file-sender'''
+              binding-routing-key: generation
+              routing-key-expression: '''generation'''
+              transacted: true
+          deleteSender-out-0:
+            producer:
+              binding-routing-key: remove
+              routing-key-expression: '''remove'''
               transacted: true
       bindings:
         fileSender-out-0:
-          destination: message
+          destination: cv
+        deleteSender-out-0:
+          destination: cv
 
 fellow-worker:
   unprotected-paths:

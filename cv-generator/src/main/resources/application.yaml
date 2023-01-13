@@ -1,0 +1,71 @@
+server:
+  port: 7044
+  error:
+    include-binding-errors: always
+    include-message: always
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: message
+      client-secret: c29tZXNlY3Rlcg==
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorizationUrl: http://127.0.0.1:9001/oauth2/authorize
+    tokenUrl: http://127.0.0.1:9001/oauth2/token
+
+spring:
+  application:
+    name: cv-generator
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://127.0.0.1:9001
+  cloud:
+    function:
+      definition: receiveCreate;receiveRemove
+    stream:
+      default-binder: rabbit
+      binders:
+        rabbit:
+          type: rabbit
+      rabbit:
+        bindings:
+          receiveCreate-in-0:
+            consumer:
+              binding-routing-key: "generation"
+              auto-bind-dlq: true
+              requeue-rejected: true
+              dead-letter-queue-name: "cv.generation.dlq"
+          receiveRemove-in-0:
+            consumer:
+              binding-routing-key: "remove"
+              auto-bind-dlq: true
+              republish-to-dlq: true
+              dead-letter-queue-name: "cv.remove.dlq"
+      bindings:
+        receiveCreate-in-0:
+          group: generation
+          destination: cv
+          consumer:
+            max-attempts: 5
+        receiveRemove-in-0:
+          group: remove
+          destination: cv
+          consumer:
+            max-attempts: 5
+
+cv-generator:
+  unprotected-paths:
+    - /api/v2/**
+  security-constraints:
+    - roles:
+        - EMPLOYEE
+      security-collections:
+        - patterns:
+            - /api/v1/**
+
+logging:
+  level:
+    web: INFO

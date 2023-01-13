@@ -1,7 +1,6 @@
 /*
- * Copyright (c) 12/26/22, 11:56 PM.
+ * Copyright (c) 12-07.01.2023, 20:21
  * Created by https://github.com/alwayswanna
- *
  */
 
 package a.gleb.fellowworkerservice.configuration
@@ -20,7 +19,10 @@ import org.springframework.security.oauth2.server.resource.authentication.Reacti
 import org.springframework.security.web.server.SecurityWebFilterChain
 import reactor.core.publisher.Flux
 
-val UNAUTHORIZED_PATTERNS = listOf(
+const val ROLE_PREFIX: String = "ROLE_"
+const val ROLE_KEY_CLAIM: String = "role"
+
+val unauthorizedPatterns = listOf(
     "/swagger-ui.html",
     "/webjars/swagger-ui/index.html",
     "/webjars/swagger-ui/**",
@@ -45,7 +47,7 @@ class FellowWorkerSecurityConfiguration(
             .authorizeExchange { restrictApiMethods(it) }
             .oauth2ResourceServer()
             .jwt {
-                var reactiveJwtConverter = ReactiveJwtAuthenticationConverter()
+                val reactiveJwtConverter = ReactiveJwtAuthenticationConverter()
                 reactiveJwtConverter.setJwtGrantedAuthoritiesConverter(SpringBootReactiveJwtConverter())
 
                 it.jwtAuthenticationConverter(reactiveJwtConverter)
@@ -66,7 +68,7 @@ class FellowWorkerSecurityConfiguration(
         }
 
         val unprotectedPaths = properties.unprotectedPaths
-        val permitAllMappings = (unprotectedPaths + UNAUTHORIZED_PATTERNS).toTypedArray()
+        val permitAllMappings = (unprotectedPaths + unauthorizedPatterns).toTypedArray()
 
         authorizeExchangeSpec.pathMatchers(*permitAllMappings).permitAll()
     }
@@ -74,15 +76,12 @@ class FellowWorkerSecurityConfiguration(
 
 class SpringBootReactiveJwtConverter : Converter<Jwt, Flux<GrantedAuthority>> {
 
-    private val rolePrefix: String = "ROLE_"
-    private val roleKeyClaim: String = "role"
-
     override fun convert(source: Jwt): Flux<GrantedAuthority> {
         return Flux.fromIterable(
             sequenceOf(
-                replaceUnnecessarySymbols(source.claims[roleKeyClaim].toString()).split(",")
+                replaceUnnecessarySymbols(source.claims[ROLE_KEY_CLAIM].toString()).split(",")
             )
-                .map { "$rolePrefix$it" }
+                .map { "$ROLE_PREFIX$it" }
                 .map { replaceUnnecessarySymbols(it) }
                 .map { SimpleGrantedAuthority(it) }
                 .toList()
