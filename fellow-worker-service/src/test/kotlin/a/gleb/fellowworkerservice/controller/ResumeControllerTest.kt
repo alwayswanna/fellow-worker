@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/13/23, 9:20 PM
+ * Copyright (c) 07-1/14/23, 7:54 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -182,7 +182,7 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
         val resume = createDefaultResume()
         resume.ownerRecordId = UUID.fromString("d0580c29-1fce-4900-820d-74765c46e28e")
         saveResume(resume)
-        TimeUnit.SECONDS.sleep(2)
+        TimeUnit.SECONDS.sleep(3)
 
         webTestClient.delete()
             .uri {
