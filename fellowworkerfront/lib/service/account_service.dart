@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1/17/23, 11:26 PM
+ * Copyright (c) 1-1/17/23, 11:29 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -24,12 +24,10 @@ class AccountService {
         accountType: "COMPANY",
         birthDate: "1985-02-03"));
 
-    print(bodyMessage);
     final response = await http.post(
         Uri.parse(clientManagerHost + resumeCreate),
         headers: {"Content-Type": "application/json"},
         body: bodyMessage);
-    print("status: ${response.statusCode}");
     if (response.statusCode == 200) {
       return ApiResponseModel.fromJson(jsonDecode(response.body));
     } else {
