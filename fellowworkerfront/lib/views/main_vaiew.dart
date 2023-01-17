@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/17/23, 12:42 AM
+ * Copyright (c) 1-1/17/23, 11:26 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -36,7 +36,7 @@ class FullScreenWidget extends StatelessWidget {
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20)),
-                        hintText: 'Найти работу мечты',
+                        hintText: '🔎 Найти работу мечты',
                       ),
                     ),
                     Padding(
