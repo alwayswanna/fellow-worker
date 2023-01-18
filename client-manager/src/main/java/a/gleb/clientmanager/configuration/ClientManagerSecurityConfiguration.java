@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/18/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -14,11 +14,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,9 +49,12 @@ public class ClientManagerSecurityConfiguration {
             HttpSecurity httpSecurity
     ) throws Exception {
         httpSecurity
-                .anonymous().disable()
-                .cors().disable()
-                .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().cors()
+                .and()
+                .csrf()
+                .disable()
                 .authorizeHttpRequests(this::configure)
                 .oauth2ResourceServer()
                 .jwt(jwtConfigurer -> {
@@ -58,6 +64,13 @@ public class ClientManagerSecurityConfiguration {
                 });
 
         return httpSecurity.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(ClientManagerConfigurationProperties properties) {
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", properties.getCors());
+        return source;
     }
 
     private void configure(

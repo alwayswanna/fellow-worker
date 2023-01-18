@@ -29,6 +29,16 @@ spring:
     url: jdbc:postgresql://localhost:5432/authorization
 
 client-manager:
+  cors:
+    enabled: true
+    allowed-origins:
+      - "*"
+    allowed-origins-all: true
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
+
   security-constraints:
     - roles:
         - COMPANY

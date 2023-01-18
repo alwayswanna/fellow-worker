@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 1-1/17/23, 11:26 PM
+ * Copyright (c) 1-1/18/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/service/account_service.dart';
+import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
@@ -29,7 +30,7 @@ class _RegistrationList extends State<Registration>
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
+        firstDate: DateTime(1900, 8),
         lastDate: DateTime(2101));
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -81,7 +82,7 @@ class _RegistrationList extends State<Registration>
                           padding: padding,
                           child: const Text("Создать аккаунт",
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontSize: 35,
                                 fontWeight: FontWeight.bold,
                                 shadows: <Shadow>[
@@ -121,16 +122,16 @@ class _RegistrationList extends State<Registration>
                         ),
                       ))),
               ResponsiveGridCol(
-                  md: 6, child: buildTextField(controllerFirstName, "Имя:")),
+                  md: 6, child: UtilityWidgets.buildTextField(controllerFirstName, "Имя:")),
               ResponsiveGridCol(
                   md: 6,
-                  child: buildTextField(controllerMiddleName, "Фамилия:")),
+                  child: UtilityWidgets.buildTextField(controllerMiddleName, "Фамилия:")),
               ResponsiveGridCol(
                   md: 6,
-                  child: buildTextField(controllerLastName, "Отчество:")),
+                  child: UtilityWidgets.buildTextField(controllerLastName, "Отчество:")),
               ResponsiveGridCol(
                   md: 6,
-                  child: buildTextField(emailController, "Адрес эл. почты:")),
+                  child: UtilityWidgets.buildTextField(emailController, "Адрес эл. почты:")),
               ResponsiveGridCol(
                   md: 6,
                   child: Container(
@@ -208,24 +209,26 @@ class _RegistrationList extends State<Registration>
     )));
   }
 
-  String sendRequestCreateAccount() {
-    var response = accountService.createAccount();
-    print(response);
-    return "";
-  }
+  Future<void> sendRequestCreateAccount() async {
+    var type = "COMPANY";
+    if (typeAccount == accountTypes.first) {
+      type = "EMPLOYEE";
+    } else if (typeAccount == accountTypes.last) {
+      type = "COMPANY";
+    } else {
+      type = "EMPLOYEE";
+    }
 
-  static Padding buildTextField(TextEditingController controller, String hint) {
-    return Padding(
-        padding: const EdgeInsets.all(10),
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-            hintText: hint,
-          ),
-        ));
+    var response = accountService.createAccount(
+        usernameController.text,
+        passwordController.text,
+        emailController.text,
+        controllerFirstName.text,
+        controllerMiddleName.text,
+        controllerLastName.text,
+        type,
+        selectedDate.toIso8601String());
+    UtilityWidgets.dialogBuilder(context, response);
   }
 }
 

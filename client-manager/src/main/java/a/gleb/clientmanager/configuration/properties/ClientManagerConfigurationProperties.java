@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/18/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class ClientManagerConfigurationProperties {
     private List<SecurityConstraints> securityConstraints;
     @NotNull
     private List<String> unprotectedPatterns;
+    @NotNull
+    private Cors cors;
 
     @Getter
     @Setter
@@ -36,6 +39,14 @@ public class ClientManagerConfigurationProperties {
 
         private List<String> patterns;
         private List<String> methods;
+    }
+
+    @Getter
+    @Setter
+    public static class Cors extends CorsConfiguration {
+
+        /* отвечает за конфигурацию CORS, по умолчанию false */
+        private boolean enabled = false;
     }
 }
 
