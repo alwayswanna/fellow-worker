@@ -1,8 +1,9 @@
 /*
- * Copyright (c) 1-1/17/23, 12:42 AM
+ * Copyright (c) 1-1/19/23, 11:07 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:fellowworkerfront/security/oauth2.dart';
 import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/views/main_vaiew.dart';
 import 'package:fellowworkerfront/views/registration_view.dart';
@@ -69,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage>
               child: const Text("Профиль")),
           TextButton(
               onPressed: () {
-                print("message");
+                Oauth2Service().login();
               },
               style: style,
               child: const Text("Войти")),

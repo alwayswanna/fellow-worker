@@ -10,10 +10,13 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  oauth2: ^2.0.1
   animate_gradient: ^0.0.2
   responsive_grid: ^2.1.0
   http: ^0.13.5
+  flutter_web_auth: ^0.5.0
+#  oauth2: ^2.0.1
+#  url_launcher: ^6.1.7
+#  uni_links: ^0.5.1
 
 dev_dependencies:
   flutter_test:

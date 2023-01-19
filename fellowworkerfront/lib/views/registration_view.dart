@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/18/23, 11:08 PM
+ * Copyright (c) 1-1/19/23, 11:07 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -10,13 +10,15 @@ import 'package:responsive_grid/responsive_grid.dart';
 
 import '../styles/gradient_color.dart';
 
+const padding = EdgeInsets.all(10);
+const accountTypes = ["  Соискатель", "  Работодатель"];
+
 class _RegistrationList extends State<Registration>
     with SingleTickerProviderStateMixin {
+
   final AccountService accountService = AccountService();
   late AnimationController _animationController;
   late String? typeAccount;
-  var accountTypes = ["  Соискатель", "  Работодатель"];
-  var padding = const EdgeInsets.all(10);
   var controllerFirstName = TextEditingController();
   var controllerMiddleName = TextEditingController();
   var controllerLastName = TextEditingController();
@@ -122,16 +124,21 @@ class _RegistrationList extends State<Registration>
                         ),
                       ))),
               ResponsiveGridCol(
-                  md: 6, child: UtilityWidgets.buildTextField(controllerFirstName, "Имя:")),
+                  md: 6,
+                  child: UtilityWidgets.buildTextField(
+                      controllerFirstName, "Имя:")),
               ResponsiveGridCol(
                   md: 6,
-                  child: UtilityWidgets.buildTextField(controllerMiddleName, "Фамилия:")),
+                  child: UtilityWidgets.buildTextField(
+                      controllerMiddleName, "Фамилия:")),
               ResponsiveGridCol(
                   md: 6,
-                  child: UtilityWidgets.buildTextField(controllerLastName, "Отчество:")),
+                  child: UtilityWidgets.buildTextField(
+                      controllerLastName, "Отчество:")),
               ResponsiveGridCol(
                   md: 6,
-                  child: UtilityWidgets.buildTextField(emailController, "Адрес эл. почты:")),
+                  child: UtilityWidgets.buildTextField(
+                      emailController, "Адрес эл. почты:")),
               ResponsiveGridCol(
                   md: 6,
                   child: Container(

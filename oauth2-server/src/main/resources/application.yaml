@@ -25,6 +25,7 @@ oauth:
         - "http://127.0.0.1:7044/swagger-ui/oauth2-redirect.html"
         - "http://127.0.0.1:4334/webjars/swagger-ui.html"
         - "http://127.0.0.1:4334/webjars/swagger-ui/oauth2-redirect.html"
+        - "http://127.0.0.1:8888/oauth2-redirect.html"
   default-user:
     username: administrator
     password: administrator
