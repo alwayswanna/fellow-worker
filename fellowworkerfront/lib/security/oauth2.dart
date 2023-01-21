@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/21/23, 11:59 PM
+ * Copyright (c) 1-1/22/23, 12:22 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,6 +11,7 @@ import '../main.dart';
 
 const identifier = 'message';
 const secret = 'c29tZXNlY3Rlcg==';
+const oath2ServerAddress = '127.0.0.1:9001';
 
 class Oauth2Service {
 
@@ -24,7 +25,7 @@ class Oauth2Service {
     );
 
 
-    final url = Uri.http('127.0.0.1:9001', 'oauth2/authorize', {
+    final url = Uri.http(oath2ServerAddress, 'oauth2/authorize', {
       'response_type': 'code',
       'client_id': identifier,
       'redirect_uri': redirectUri.toString(),
@@ -36,7 +37,7 @@ class Oauth2Service {
 
     final code = Uri.parse(result).queryParameters['code'];
 
-    final urlPost = Uri.http('127.0.0.1:9001', 'oauth2/token');
+    final urlPost = Uri.http(oath2ServerAddress, 'oauth2/token');
 
     final response = await http.post(urlPost, body: {
       'redirect_uri': redirectUri.toString(),

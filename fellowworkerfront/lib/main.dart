@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/21/23, 11:59 PM
+ * Copyright (c) 1-1/22/23, 12:22 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -27,7 +27,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fellow worker',
-      routes: {'/registration': (context) => const Registration()},
+      routes: {
+        '/registration': (context) => const Registration()
+      },
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,
       ),
@@ -64,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage>
     if (await securityStorage.containsKey(key: jwtTokenKey)) {
       return TextButton(
           onPressed: () {
-             print('Profile');
+            print('Profile');
           },
           style: style,
           child: const Text("Профиль"));
@@ -72,9 +74,6 @@ class _MyHomePageState extends State<MyHomePage>
       return TextButton(
           onPressed: () {
             Oauth2Service().login(securityStorage);
-            setState(() {
-              super.initState();
-            });
           },
           style: style,
           child: const Text("Войти"));
@@ -91,19 +90,20 @@ class _MyHomePageState extends State<MyHomePage>
         title: Text(widget.title),
         actions: [
           FutureBuilder(
-               future: buildButtonProfile(style),
-              builder: (context, snapshot){
-                 if(snapshot.hasData){
-                   return snapshot.data!;
-                 }else{
-                   return TextButton(
-                       onPressed: () {
-                         UtilityWidgets.dialogBuilderMessage(context, "Вы не вошли в аккаунт.");
-                       },
-                       style: style,
-                       child: const Text("Профиль"));
-                 }
-          }),
+              future: buildButtonProfile(style),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data!;
+                } else {
+                  return TextButton(
+                      onPressed: () {
+                        UtilityWidgets.dialogBuilderMessage(
+                            context, "Вы не вошли в аккаунт.");
+                      },
+                      style: style,
+                      child: const Text("Профиль"));
+                }
+              }),
           TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, "/registration");
