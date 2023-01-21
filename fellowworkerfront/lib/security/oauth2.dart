@@ -1,60 +1,51 @@
 /*
- * Copyright (c) 1-1/19/23, 11:07 PM
+ * Copyright (c) 1-1/21/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:http/http.dart' as http;
+
+import '../main.dart';
 
 const identifier = 'message';
 const secret = 'c29tZXNlY3Rlcg==';
 
 class Oauth2Service {
 
-  void login() async{
-    final result = await FlutterWebAuth.authenticate(url: "http://127.0.0.1:9001/oauth2/authorize", callbackUrlScheme: "my-custom-app");
+  void login(FlutterSecureStorage securityStorage) async {
+    final currentUri = Uri.base;
+    final redirectUri = Uri(
+      host: currentUri.host,
+      scheme: currentUri.scheme,
+      port: currentUri.port,
+      path: '/auth.html',
+    );
 
-// Extract token from resulting url
-    print(Uri.parse(result));
-    final token = Uri.parse(result).queryParameters['token'];
 
+    final url = Uri.http('127.0.0.1:9001', 'oauth2/authorize', {
+      'response_type': 'code',
+      'client_id': identifier,
+      'redirect_uri': redirectUri.toString(),
+      'scope': 'openid',
+    });
+
+    final result = await FlutterWebAuth.authenticate(
+        url: url.toString(), callbackUrlScheme: currentUri.scheme);
+
+    final code = Uri.parse(result).queryParameters['code'];
+
+    final urlPost = Uri.http('127.0.0.1:9001', 'oauth2/token');
+
+    final response = await http.post(urlPost, body: {
+      'redirect_uri': redirectUri.toString(),
+      'grant_type': 'authorization_code',
+      'client_secret': secret,
+      'client_id': identifier,
+      'code': code,
+    });
+
+    securityStorage.write(key: jwtTokenKey, value: response.body);
   }
-  // final authorizationEndpoint =
-  //     Uri.parse('http://127.0.0.1:9001/oauth2/authorize');
-  // final tokenEndpoint = Uri.parse('http://127.0.0.1:9001/oauth2/token');
-  // final redirectUrl = Uri.parse('http://127.0.0.1:8888/oauth2-redirect');
-  //
-  // final credentialsFile = File('/Users/g.abakshin/Documents');
-  //
-  // Future<oauth2.Client> createClient() async {
-  //   var exists = await credentialsFile.exists();
-  //
-  //   if (exists) {
-  //     var credentials =
-  //         oauth2.Credentials.fromJson(await credentialsFile.readAsString());
-  //     return oauth2.Client(credentials, identifier: identifier, secret: secret);
-  //   }
-  //   var grant = oauth2.AuthorizationCodeGrant(
-  //       identifier, authorizationEndpoint, tokenEndpoint,
-  //       secret: secret);
-  //   var authorizationUrl = grant.getAuthorizationUrl(redirectUrl);
-  //
-  //   await redirect(authorizationUrl);
-  //   var responseUrl = await listen(redirectUrl);
-  //   return await grant.handleAuthorizationResponse(responseUrl.queryParameters);
-  // }
-  //
-  // redirect(Uri authorizationUrl) async {
-  //   if (await canLaunchUrl(Uri.parse(authorizationUrl.toString()))) {
-  //   await launchUrl(Uri.parse(authorizationUrl.toString()));
-  //   }
-  // }
-  //
-  // listen(Uri redirectUrl) async {
-  //   print(redirectUrl.toString());
-  // }
-  //
-  // void makeRequest() async {
-  //   var client = await createClient();
-  //   await credentialsFile.writeAsString(client.credentials.toJson());
-  // }
 }

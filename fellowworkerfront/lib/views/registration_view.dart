@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/19/23, 11:07 PM
+ * Copyright (c) 1-1/21/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -235,7 +235,7 @@ class _RegistrationList extends State<Registration>
         controllerLastName.text,
         type,
         selectedDate.toIso8601String());
-    UtilityWidgets.dialogBuilder(context, response);
+    UtilityWidgets.dialogBuilderApi(context, response);
   }
 }
 

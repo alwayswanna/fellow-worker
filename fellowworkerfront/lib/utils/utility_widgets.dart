@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/18/23, 11:08 PM
+ * Copyright (c) 1-1/21/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 class UtilityWidgets{
 
-  static Future<void> dialogBuilder(BuildContext context, Future<String> response) {
+  static Future<void> dialogBuilderApi(BuildContext context, Future<String> response) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -34,6 +34,29 @@ class UtilityWidgets{
                 Navigator.pushNamed(context, "/");
               },
             ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Закрыть'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  static Future<void> dialogBuilderMessage(BuildContext context, String message) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Ошибка'),
+          content: Text(message),
+          actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
