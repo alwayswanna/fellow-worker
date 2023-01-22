@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 1-1/22/23, 12:09 PM
+ * Copyright (c) 1-1/22/23, 8:37 PM
  * Created by https://github.com/alwayswanna
  */
+import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
@@ -47,5 +48,10 @@ class Oauth2Service {
 
     securityStorage.write(key: jwtTokenKey, value: response.body);
     return response.body;
+  }
+
+  static Map<dynamic, dynamic> convertTokenToMap(String token) {
+    Map jsonMap = jsonDecode(token);
+    return jsonMap;
   }
 }

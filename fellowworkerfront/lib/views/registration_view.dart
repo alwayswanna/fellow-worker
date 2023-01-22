@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/21/23, 11:59 PM
+ * Copyright (c) 1-1/22/23, 8:37 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -13,7 +13,7 @@ import '../styles/gradient_color.dart';
 const padding = EdgeInsets.all(10);
 const accountTypes = ["  Соискатель", "  Работодатель"];
 
-class _RegistrationList extends State<Registration>
+class _Registration extends State<Registration>
     with SingleTickerProviderStateMixin {
 
   final AccountService accountService = AccountService();
@@ -244,6 +244,6 @@ class Registration extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _RegistrationList();
+    return _Registration();
   }
 }

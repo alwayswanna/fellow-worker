@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 12:09 PM
+ * Copyright (c) 1-1/22/23, 8:37 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,6 +7,7 @@ import 'package:fellowworkerfront/security/oauth2.dart';
 import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/main_vaiew.dart';
+import 'package:fellowworkerfront/views/profile_view.dart';
 import 'package:fellowworkerfront/views/registration_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,40 +16,53 @@ import 'package:url_strategy/url_strategy.dart';
 const jwtTokenKey = "jwtToken";
 
 void main() {
+  var securityStorage = const FlutterSecureStorage();
   setPathUrlStrategy();
-  runApp(const MyApp());
+  runApp(MyApp(sS: securityStorage));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  late FlutterSecureStorage flutterSecureStorage;
+
+  MyApp({required FlutterSecureStorage sS, super.key}) {
+    flutterSecureStorage = sS;
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fellow worker',
-      routes: {'/registration': (context) => const Registration()},
+      routes: {
+        '/registration': (context) => const Registration(),
+        '/profile': (context) => Profile(sS: flutterSecureStorage)
+      },
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,
       ),
-      home: const MyHomePage(title: 'Fellow worker'),
+      home: MyHomePage(title: 'Fellow worker', flutterSS: flutterSecureStorage),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title, required this.flutterSS});
 
   final String title;
+  final FlutterSecureStorage flutterSS;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState(flutterSS);
 }
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  final securityStorage = const FlutterSecureStorage();
+  late FlutterSecureStorage securityStorage;
+
+  _MyHomePageState(FlutterSecureStorage flutterSS) {
+    securityStorage = flutterSS;
+  }
 
   @override
   void initState() {
@@ -64,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage>
     if (await securityStorage.containsKey(key: jwtTokenKey)) {
       return TextButton(
           onPressed: () {
-            print('Profile');
+            Navigator.pushNamed(context, '/profile');
           },
           style: style,
           child: const Text("Профиль"));
@@ -79,14 +93,14 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void loginAction() {
-    Oauth2Service().login(securityStorage).then((value) =>
-        Future.delayed(const Duration(seconds: 3), () => {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => super.widget))
-        })
-    );
+    Oauth2Service().login(securityStorage).then((value) => Future.delayed(
+        const Duration(seconds: 1),
+        () => {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => super.widget))
+            }));
   }
 
   @override
@@ -95,6 +109,12 @@ class _MyHomePageState extends State<MyHomePage>
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
     );
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          logout();
+        },
+        child: const Icon(Icons.exit_to_app),
+      ),
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
@@ -124,6 +144,21 @@ class _MyHomePageState extends State<MyHomePage>
       body: GradientEnchanted.buildGradient(
           const FullScreenWidget(), _animationController),
     );
+  }
+
+  void logout() async {
+    if (await securityStorage.containsKey(key: jwtTokenKey)) {
+      securityStorage.delete(key: jwtTokenKey);
+    }
+
+    Future.delayed(
+        const Duration(seconds: 1),
+            () => {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => super.widget))
+        });
   }
 
   @override

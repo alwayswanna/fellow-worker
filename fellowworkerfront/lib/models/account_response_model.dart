@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 1-1/17/23, 11:26 PM
+ * Copyright (c) 1-1/22/23, 8:37 PM
  * Created by https://github.com/alwayswanna
  */
 
 class ApiResponseModel {
   final String message;
   final AccountDataModel? accountDataModel;
-  final List<AccountDataModel>? accounts;
+  final List<AccountDataModel?>? accounts;
 
   const ApiResponseModel({
     required this.message,
@@ -15,12 +15,17 @@ class ApiResponseModel {
   });
 
   factory ApiResponseModel.fromJson(Map<String, dynamic> json) {
+    List<AccountDataModel> accounts = List.empty();
+    if (json['accounts'] != null) {
+      accounts = (json['accounts'] as List)
+          .map((e) => AccountDataModel.fromJson(e))
+          .toList();
+    }
+
     return ApiResponseModel(
         message: json['message'],
         accountDataModel: AccountDataModel.fromJson(json['accountDataModel']),
-        accounts: (json['accounts'] as List)
-            .map((e) => AccountDataModel.fromJson(e))
-            .toList());
+        accounts: accounts);
   }
 }
 
@@ -28,7 +33,7 @@ class AccountDataModel {
   final String username;
   final String firstName;
   final String middleName;
-  final String lastName;
+  final String? lastName;
   final String role;
   final String email;
   final String birthDate;

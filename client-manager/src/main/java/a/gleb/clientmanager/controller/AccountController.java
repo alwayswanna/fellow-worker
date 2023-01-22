@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-1/22/23, 8:37 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -155,5 +155,28 @@ public class AccountController {
     @PutMapping("/change-password")
     public ApiResponseModel changePassword(@RequestBody @Valid ChangePasswordModel changePasswordModel) {
         return accountService.changeUserPassword(changePasswordModel);
+    }
+
+    @Operation(
+            summary = "Получить данные текущего аккаунта.",
+            tags = CLIENT_MANAGER_CONTROLLER,
+            security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
+                    ),
+                    @ApiResponse(description = "Bad request", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(description = "Internal server error", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            }
+    )
+    @GetMapping("/current")
+    public ApiResponseModel getCurrentAccountData(){
+        return accountService.getCurrentAccountData();
     }
 }

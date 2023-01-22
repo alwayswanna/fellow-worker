@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/22/23, 8:37 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,6 +11,7 @@ import a.gleb.apicommon.clientmanager.model.ChangePasswordModel;
 import a.gleb.clientmanager.exception.InvalidUserDataException;
 import a.gleb.clientmanager.exception.UnexpectedErrorException;
 import a.gleb.clientmanager.mapper.AccountModelMapper;
+import a.gleb.oauth2persistence.db.dao.Account;
 import a.gleb.oauth2persistence.db.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -122,22 +123,22 @@ public class AccountService {
      * Method returns account data.
      *
      * @param userId id from user request.
-     * @return
+     * @return {@link ApiResponseModel} with data for user by id.
      */
     public ApiResponseModel getAccountData(UUID userId) {
-            var account = accountRepository.findAccountById(userId)
-                    .orElseThrow(
-                            () -> new InvalidUserDataException(
-                                    HttpStatus.BAD_REQUEST, "Пользователь с таким id не найден")
-                    );
-            return accountModelMapper.toApiResponseModel("Данные аккаунта успешно получены", account);
+        var account = accountRepository.findAccountById(userId)
+                .orElseThrow(
+                        () -> new InvalidUserDataException(
+                                HttpStatus.BAD_REQUEST, "Пользователь с таким id не найден")
+                );
+        return accountModelMapper.toApiResponseModel("Данные аккаунта успешно получены", account);
     }
 
     /**
      * Method change account password, after validate password.
      *
-     * @param changePasswordModel
-     * @return
+     * @param changePasswordModel model with old and new password.
+     * @return {@link ApiResponseModel} with message.
      */
     public ApiResponseModel changeUserPassword(ChangePasswordModel changePasswordModel) {
         var userId = oAuth2SecurityContextService.getUserId();
@@ -183,5 +184,16 @@ public class AccountService {
                     "Пользователь с данным username существует." : "Пользователь с данным email существует.";
             throw new InvalidUserDataException(HttpStatus.BAD_REQUEST, reason);
         }
+    }
+
+    /**
+     * Method extract from request JWT token {@link Account#getId()} and return current account data.
+     *
+     * @return {@link ApiResponseModel}
+     */
+    public ApiResponseModel getCurrentAccountData() {
+        var account = accountRepository.findAccountById(oAuth2SecurityContextService.getUserId())
+                .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Неверно введены данные."));
+        return accountModelMapper.toApiResponseModel("Аккаунт успешно получен.", account);
     }
 }
