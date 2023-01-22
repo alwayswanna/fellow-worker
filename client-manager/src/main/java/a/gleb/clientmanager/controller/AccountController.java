@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/22/23, 8:37 PM
+ * Copyright (c) 07-1/22/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -90,7 +90,7 @@ public class AccountController {
     }
 
     @Operation(
-            summary = "Изменить данные учетной записи.",
+            summary = "Удалить данные учетной записи.",
             tags = CLIENT_MANAGER_CONTROLLER,
             security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
     )
