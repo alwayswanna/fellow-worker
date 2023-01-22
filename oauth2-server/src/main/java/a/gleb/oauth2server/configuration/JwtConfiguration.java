@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-1/22/23, 12:09 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -54,12 +54,10 @@ public class JwtConfiguration {
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            var jwtContext = (JwtEncodingContext) context;
-
-            jwtContext.getClaims().claim(ROLE_CLAIM, userRoles);
+            context.getClaims().claim(ROLE_CLAIM, userRoles);
 
             tokenService.enrichJwtToken(principal.getName())
-                    .forEach((key, value) -> jwtContext.getClaims().claim(key, value));
+                    .forEach((key, value) -> context.getClaims().claim(key, value));
 
         };
     }

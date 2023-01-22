@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 12:22 AM
+ * Copyright (c) 1-1/22/23, 12:09 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -14,8 +14,7 @@ const secret = 'c29tZXNlY3Rlcg==';
 const oath2ServerAddress = '127.0.0.1:9001';
 
 class Oauth2Service {
-
-  void login(FlutterSecureStorage securityStorage) async {
+  Future<String> login(FlutterSecureStorage securityStorage) async {
     final currentUri = Uri.base;
     final redirectUri = Uri(
       host: currentUri.host,
@@ -23,7 +22,6 @@ class Oauth2Service {
       port: currentUri.port,
       path: '/auth.html',
     );
-
 
     final url = Uri.http(oath2ServerAddress, 'oauth2/authorize', {
       'response_type': 'code',
@@ -48,5 +46,6 @@ class Oauth2Service {
     });
 
     securityStorage.write(key: jwtTokenKey, value: response.body);
+    return response.body;
   }
 }

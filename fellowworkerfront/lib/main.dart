@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 12:22 AM
+ * Copyright (c) 1-1/22/23, 12:09 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -27,9 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fellow worker',
-      routes: {
-        '/registration': (context) => const Registration()
-      },
+      routes: {'/registration': (context) => const Registration()},
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,
       ),
@@ -73,11 +71,22 @@ class _MyHomePageState extends State<MyHomePage>
     } else {
       return TextButton(
           onPressed: () {
-            Oauth2Service().login(securityStorage);
+            loginAction();
           },
           style: style,
           child: const Text("Войти"));
     }
+  }
+
+  void loginAction() {
+    Oauth2Service().login(securityStorage).then((value) =>
+        Future.delayed(const Duration(seconds: 3), () => {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => super.widget))
+        })
+    );
   }
 
   @override
