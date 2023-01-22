@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 8:37 PM
+ * Copyright (c) 1-1/22/23, 8:38 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -65,11 +65,9 @@ class AccountService {
     final response = await http.get(requestUri, headers: defaultHeaders);
 
     if (response.statusCode == 200) {
-      print("response: ${utf8.decode(response.bodyBytes)}");
       return ApiResponseModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
-      print("response: ${utf8.decode(response.bodyBytes)}");
       return jsonDecode(utf8.decode(response.bodyBytes))['message'];
     }
   }
