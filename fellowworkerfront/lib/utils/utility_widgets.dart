@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 1-1/21/23, 11:59 PM
+ * Copyright (c) 1-1/22/23, 11:57 PM
  * Created by https://github.com/alwayswanna
  */
 
-
 import 'package:flutter/material.dart';
 
-class UtilityWidgets{
+class UtilityWidgets {
 
-  static Future<void> dialogBuilderApi(BuildContext context, Future<String> response) {
+  static Future<void> dialogBuilderApi(
+      BuildContext context, Future<String> response) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -16,10 +16,10 @@ class UtilityWidgets{
           title: const Text('Создание аккаунта.'),
           content: FutureBuilder<String>(
             future: response,
-            builder: (context, snapshot){
+            builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Text(snapshot.data!);
-              }else{
+              } else {
                 return const CircularProgressIndicator();
               }
             },
@@ -49,12 +49,13 @@ class UtilityWidgets{
     );
   }
 
-  static Future<void> dialogBuilderMessage(BuildContext context, String message) {
+  static Future<void> dialogBuilderMessage(
+      BuildContext context, String message) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Ошибка'),
+          title: const Text('Оповещение'),
           content: Text(message),
           actions: <Widget>[
             TextButton(
@@ -84,5 +85,53 @@ class UtilityWidgets{
             hintText: hint,
           ),
         ));
+  }
+
+  static TextStyle pageTitleStyle() {
+    return const TextStyle(
+      color: Colors.white,
+      fontSize: 35,
+      fontWeight: FontWeight.bold,
+      shadows: <Shadow>[
+        Shadow(
+          offset: Offset(10.0, 10.0),
+          blurRadius: 20.0,
+          color: Color.fromARGB(255, 0, 0, 0),
+        )
+      ],
+    );
+  }
+
+  static TextStyle cardTextStyle(Color color, double fontSize) {
+    return TextStyle(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: FontWeight.bold,
+    );
+  }
+
+  static Widget buildCardButton(
+      VoidCallback voidCallback, String message, double fontSize) {
+    return ElevatedButton(
+      onPressed: () {
+        voidCallback();
+      },
+      child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Text(
+            message,
+            style: TextStyle(color: Colors.white, fontSize: fontSize),
+          )),
+    );
+  }
+
+  static RoundedRectangleBorder buildCardShapes() {
+    return RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      side: const BorderSide(
+        width: 2.0,
+        color: Colors.black,
+      ),
+    );
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 8:37 PM
+ * Copyright (c) 1-1/22/23, 11:57 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -15,7 +15,6 @@ const accountTypes = ["  Соискатель", "  Работодатель"];
 
 class _Registration extends State<Registration>
     with SingleTickerProviderStateMixin {
-
   final AccountService accountService = AccountService();
   late AnimationController _animationController;
   late String? typeAccount;
@@ -82,19 +81,8 @@ class _Registration extends State<Registration>
                   child: Center(
                       child: Padding(
                           padding: padding,
-                          child: const Text("Создать аккаунт",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 35,
-                                fontWeight: FontWeight.bold,
-                                shadows: <Shadow>[
-                                  Shadow(
-                                    offset: Offset(10.0, 10.0),
-                                    blurRadius: 20.0,
-                                    color: Color.fromARGB(255, 0, 0, 0),
-                                  )
-                                ],
-                              ))))),
+                          child: Text("Создать аккаунт",
+                              style: UtilityWidgets.pageTitleStyle())))),
               ResponsiveGridCol(
                   child: Container(
                       width: 400,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 8:38 PM
+ * Copyright (c) 1-1/22/23, 11:57 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -54,6 +54,26 @@ class AccountService {
 
   /// Method get info by current account with Oauth2.
   Future<ApiResponseModel> getCurrentAccountData(
+      FlutterSecureStorage secureStorage) async {
+    String? userToken = await secureStorage.read(key: jwtTokenKey);
+
+    Map<dynamic, dynamic> tokenMap =
+        Oauth2Service.convertTokenToMap(userToken!);
+    String accessToken = tokenMap["access_token"]!;
+    defaultHeaders["Authorization"] = "Bearer $accessToken";
+    final requestUri = Uri.parse(clientManagerHost + currentResume);
+    final response = await http.get(requestUri, headers: defaultHeaders);
+
+    if (response.statusCode == 200) {
+      return ApiResponseModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+    }
+  }
+
+  /// Method remove account by authorized request.
+  Future<ApiResponseModel> removeAccount(
       FlutterSecureStorage secureStorage) async {
     String? userToken = await secureStorage.read(key: jwtTokenKey);
 

@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 1-1/22/23, 8:37 PM
+ * Copyright (c) 1-1/22/23, 11:57 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/security/oauth2.dart';
 import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
-import 'package:fellowworkerfront/views/main_vaiew.dart';
+import 'package:fellowworkerfront/views/main_view.dart';
 import 'package:fellowworkerfront/views/profile_view.dart';
 import 'package:fellowworkerfront/views/registration_view.dart';
 import 'package:flutter/material.dart';
@@ -149,16 +149,20 @@ class _MyHomePageState extends State<MyHomePage>
   void logout() async {
     if (await securityStorage.containsKey(key: jwtTokenKey)) {
       securityStorage.delete(key: jwtTokenKey);
+      Future.delayed(
+          const Duration(seconds: 1),
+          () => {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => super.widget))
+              });
+      UtilityWidgets.dialogBuilderMessage(
+          context, "Вы успешно вышли из аккаунта");
+    } else {
+      UtilityWidgets.dialogBuilderMessage(
+          context, "У вас нету активной сессии");
     }
-
-    Future.delayed(
-        const Duration(seconds: 1),
-            () => {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => super.widget))
-        });
   }
 
   @override

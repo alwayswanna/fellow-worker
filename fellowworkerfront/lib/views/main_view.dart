@@ -1,8 +1,9 @@
 /*
- * Copyright (c) 1-1/19/23, 11:07 PM
+ * Copyright (c) 1-1/22/23, 11:57 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
@@ -82,13 +83,7 @@ class FullScreenWidget extends StatelessWidget {
   static Card buildCard(BuildContext context, String message, String assetPath,
       String routePath, String description) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-        side: const BorderSide(
-          width: 2.0,
-          color: Colors.black,
-        ),
-      ),
+      shape: UtilityWidgets.buildCardShapes(),
       borderOnForeground: true,
       margin: const EdgeInsets.all(60),
       child: ResponsiveGridRow(children: [
@@ -113,17 +108,9 @@ class FullScreenWidget extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 100, 0, 20),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, "/");
-                },
-                child: const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      "Перейти",
-                      style: TextStyle(color: Colors.white, fontSize: 30.0),
-                    )),
-              ),
+              child: UtilityWidgets.buildCardButton(() {
+                Navigator.pushNamed(context, "/");
+              }, "Перейти", 30),
             )
           ],
         ))
