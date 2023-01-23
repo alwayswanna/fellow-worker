@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/23/23, 11:18 PM
+ * Copyright (c) 1-1/23/23, 11:19 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -101,13 +101,11 @@ class AccountService {
     String accessToken = tokenMap["access_token"]!;
     defaultHeaders["Authorization"] = "Bearer $accessToken";
 
-    print("body message: $bodyMessage");
     final response = await http.put(
         Uri.parse(clientManagerHost + changePasswordAPI),
         headers: defaultHeaders,
         body: bodyMessage);
 
-    print("response status code: ${response.statusCode}");
     return jsonDecode(utf8.decode(response.bodyBytes))['message'];
   }
 }
