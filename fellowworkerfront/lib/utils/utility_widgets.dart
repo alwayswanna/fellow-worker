@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 11:57 PM
+ * Copyright (c) 1-1/23/23, 11:18 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,12 +8,12 @@ import 'package:flutter/material.dart';
 class UtilityWidgets {
 
   static Future<void> dialogBuilderApi(
-      BuildContext context, Future<String> response) {
+      BuildContext context, Future<String> response, String message, String onOkRedirectionPath) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Создание аккаунта.'),
+          title: Text(message),
           content: FutureBuilder<String>(
             future: response,
             builder: (context, snapshot) {
@@ -31,7 +31,7 @@ class UtilityWidgets {
               ),
               child: const Text('Ok'),
               onPressed: () {
-                Navigator.pushNamed(context, "/");
+                Navigator.pushNamed(context, onOkRedirectionPath);
               },
             ),
             TextButton(

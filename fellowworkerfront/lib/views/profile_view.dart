@@ -1,8 +1,9 @@
 /*
- * Copyright (c) 1-1/22/23, 11:57 PM
+ * Copyright (c) 1-1/23/23, 11:18 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:fellowworkerfront/main.dart';
 import 'package:fellowworkerfront/models/account_response_model.dart';
 import 'package:fellowworkerfront/service/account_service.dart';
 import 'package:fellowworkerfront/service/account_utils.dart';
@@ -17,6 +18,7 @@ const deleteActionAccount = "Вы действительно хотите уда
 
 class _ProfileWidget extends State<Profile>
     with SingleTickerProviderStateMixin {
+
   late FlutterSecureStorage securityStorage;
 
   _ProfileWidget({required FlutterSecureStorage sS}) {
@@ -34,6 +36,12 @@ class _ProfileWidget extends State<Profile>
         vsync: this,
         duration: const Duration(seconds: 5),
         reverseDuration: const Duration(seconds: 5));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -122,15 +130,75 @@ class _ProfileWidget extends State<Profile>
                           6,
                           Colors.black,
                           25),
-                      buildCardButton(4, "Удалить", 20, null),
-                      buildCardButton(4, "Редактировать", 20, null),
-                      buildCardButton(4, "Сменить пароль", 20, null),
+                      ResponsiveGridCol(
+                          md: 4,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: UtilityWidgets.buildCardButton(() {
+                              dialogBuilderMessage(context,
+                                  "Вы действительно хотите удалить аккаунт?");
+                            }, "Удалить", 20),
+                          )),
+                      ResponsiveGridCol(
+                          md: 4,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: UtilityWidgets.buildCardButton(() {
+                              Navigator.pushNamed(context, "/");
+                            }, "Редактировать", 20),
+                          )),
+                      ResponsiveGridCol(
+                          md: 4,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: UtilityWidgets.buildCardButton(() {
+                              Navigator.pushNamed(context, "/change-password");
+                            }, "Сменить пароль", 20),
+                          ))
                     ],
                   ),
                 )),
           ]),
         ),
       ),
+    );
+  }
+
+  void removeAccount() {
+    AccountService().removeAccount(securityStorage);
+    securityStorage.delete(key: jwtTokenKey);
+    Navigator.pushNamed(context, "/");
+  }
+
+  Future<void> dialogBuilderMessage(BuildContext context, String message) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Оповещение'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Да'),
+              onPressed: () {
+                removeAccount();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: const Text('Нет'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -142,18 +210,6 @@ class _ProfileWidget extends State<Profile>
           padding: const EdgeInsets.all(20.0),
           child: Text(message ?? "Не указано",
               style: UtilityWidgets.cardTextStyle(fontColor, fontSize)),
-        ));
-  }
-
-  ResponsiveGridCol buildCardButton(int? md, String message, double fontSize,
-      VoidCallbackAction? voidCallbackAction) {
-    return ResponsiveGridCol(
-        md: md,
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: UtilityWidgets.buildCardButton(() {
-            voidCallbackAction;
-          }, message, fontSize),
         ));
   }
 }

@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 1-1/22/23, 11:57 PM
+ * Copyright (c) 1-1/23/23, 11:18 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'dart:convert';
 
 import 'package:fellowworkerfront/models/account_request_model.dart';
+import 'package:fellowworkerfront/models/change_password.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,14 +15,17 @@ import '../models/account_response_model.dart';
 import '../security/oauth2.dart';
 
 const String clientManagerHost = "http://127.0.0.1:8090";
-const String resumeCreate = "/api/v1/account/create";
-const String currentResume = "/api/v1/account/current";
+const String accountCreateAPI = "/api/v1/account/create";
+const String currentAccountAPI = "/api/v1/account/current";
+const String deleteAccountAPI = "/api/v1/account/delete";
+const String changePasswordAPI = "/api/v1/account/change-password";
 final defaultHeaders = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*"
 };
 
 class AccountService {
+
   Future<String> createAccount(
       String username,
       String password,
@@ -42,7 +46,7 @@ class AccountService {
         birthDate: birthDate));
 
     final response = await http.post(
-        Uri.parse(clientManagerHost + resumeCreate),
+        Uri.parse(clientManagerHost + accountCreateAPI),
         headers: defaultHeaders,
         body: bodyMessage);
     if (response.statusCode == 200) {
@@ -61,7 +65,7 @@ class AccountService {
         Oauth2Service.convertTokenToMap(userToken!);
     String accessToken = tokenMap["access_token"]!;
     defaultHeaders["Authorization"] = "Bearer $accessToken";
-    final requestUri = Uri.parse(clientManagerHost + currentResume);
+    final requestUri = Uri.parse(clientManagerHost + currentAccountAPI);
     final response = await http.get(requestUri, headers: defaultHeaders);
 
     if (response.statusCode == 200) {
@@ -73,22 +77,37 @@ class AccountService {
   }
 
   /// Method remove account by authorized request.
-  Future<ApiResponseModel> removeAccount(
-      FlutterSecureStorage secureStorage) async {
+  Future<String> removeAccount(FlutterSecureStorage secureStorage) async {
     String? userToken = await secureStorage.read(key: jwtTokenKey);
 
     Map<dynamic, dynamic> tokenMap =
         Oauth2Service.convertTokenToMap(userToken!);
     String accessToken = tokenMap["access_token"]!;
     defaultHeaders["Authorization"] = "Bearer $accessToken";
-    final requestUri = Uri.parse(clientManagerHost + currentResume);
-    final response = await http.get(requestUri, headers: defaultHeaders);
+    final requestUri = Uri.parse(clientManagerHost + deleteAccountAPI);
+    final response = await http.delete(requestUri, headers: defaultHeaders);
 
-    if (response.statusCode == 200) {
-      return ApiResponseModel.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes)));
-    } else {
-      return jsonDecode(utf8.decode(response.bodyBytes))['message'];
-    }
+    return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+  }
+
+  Future<String> changePassword(FlutterSecureStorage secureStorage,
+      String oldPassword, String newPassword) async {
+    var bodyMessage = jsonEncode(ChangePasswordModel(
+        oldPassword: oldPassword, newPassword: newPassword));
+    String? userToken = await secureStorage.read(key: jwtTokenKey);
+
+    Map<dynamic, dynamic> tokenMap =
+        Oauth2Service.convertTokenToMap(userToken!);
+    String accessToken = tokenMap["access_token"]!;
+    defaultHeaders["Authorization"] = "Bearer $accessToken";
+
+    print("body message: $bodyMessage");
+    final response = await http.put(
+        Uri.parse(clientManagerHost + changePasswordAPI),
+        headers: defaultHeaders,
+        body: bodyMessage);
+
+    print("response status code: ${response.statusCode}");
+    return jsonDecode(utf8.decode(response.bodyBytes))['message'];
   }
 }

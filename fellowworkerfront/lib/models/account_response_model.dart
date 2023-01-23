@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 8:37 PM
+ * Copyright (c) 1-1/23/23, 11:18 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,11 +8,10 @@ class ApiResponseModel {
   final AccountDataModel? accountDataModel;
   final List<AccountDataModel?>? accounts;
 
-  const ApiResponseModel({
-    required this.message,
-    required this.accountDataModel,
-    required this.accounts,
-  });
+  const ApiResponseModel(
+      {required this.message,
+      required this.accountDataModel,
+      required this.accounts});
 
   factory ApiResponseModel.fromJson(Map<String, dynamic> json) {
     List<AccountDataModel> accounts = List.empty();

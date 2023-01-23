@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 11:57 PM
+ * Copyright (c) 1-1/23/23, 11:18 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -15,9 +15,11 @@ const accountTypes = ["  Соискатель", "  Работодатель"];
 
 class _Registration extends State<Registration>
     with SingleTickerProviderStateMixin {
+
   final AccountService accountService = AccountService();
   late AnimationController _animationController;
   late String? typeAccount;
+  late bool _passwordVisibility;
   var controllerFirstName = TextEditingController();
   var controllerMiddleName = TextEditingController();
   var controllerLastName = TextEditingController();
@@ -43,6 +45,7 @@ class _Registration extends State<Registration>
   @override
   void initState() {
     super.initState();
+    _passwordVisibility = false;
     typeAccount = accountTypes.first;
     _animationController = AnimationController(
         vsync: this,
@@ -104,6 +107,19 @@ class _Registration extends State<Registration>
                         obscureText: true,
                         controller: passwordController,
                         decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _passwordVisibility
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Theme.of(context).primaryColorDark,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _passwordVisibility = !_passwordVisibility;
+                              });
+                            },
+                          ),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -223,7 +239,7 @@ class _Registration extends State<Registration>
         controllerLastName.text,
         type,
         selectedDate.toIso8601String());
-    UtilityWidgets.dialogBuilderApi(context, response);
+    UtilityWidgets.dialogBuilderApi(context, response, "Создание аккаунта", '/');
   }
 }
 

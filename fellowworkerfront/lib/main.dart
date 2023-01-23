@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 1-1/22/23, 11:57 PM
+ * Copyright (c) 1-1/23/23, 11:18 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/security/oauth2.dart';
 import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
+import 'package:fellowworkerfront/views/change_password_view.dart';
 import 'package:fellowworkerfront/views/main_view.dart';
 import 'package:fellowworkerfront/views/profile_view.dart';
 import 'package:fellowworkerfront/views/registration_view.dart';
@@ -35,7 +36,9 @@ class MyApp extends StatelessWidget {
       title: 'Fellow worker',
       routes: {
         '/registration': (context) => const Registration(),
-        '/profile': (context) => Profile(sS: flutterSecureStorage)
+        '/profile': (context) => Profile(sS: flutterSecureStorage),
+        '/change-password': (context) =>
+            ChangePassword(sS: flutterSecureStorage)
       },
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,
