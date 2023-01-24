@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/22/23, 8:37 PM
+ * Copyright (c) 12-1/24/23, 10:30 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -194,6 +194,6 @@ public class AccountService {
     public ApiResponseModel getCurrentAccountData() {
         var account = accountRepository.findAccountById(oAuth2SecurityContextService.getUserId())
                 .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Неверно введены данные."));
-        return accountModelMapper.toApiResponseModel("Аккаунт успешно получен.", account);
+        return accountModelMapper.toApiResponseModel("Данные аккаунта успешно получены", account);
     }
 }

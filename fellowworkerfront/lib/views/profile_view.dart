@@ -1,12 +1,14 @@
 /*
- * Copyright (c) 1-1/23/23, 11:18 PM
+ * Copyright (c) 1-1/24/23, 10:30 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/main.dart';
 import 'package:fellowworkerfront/models/account_response_model.dart';
+import 'package:fellowworkerfront/models/fellow_worker_response_model.dart';
 import 'package:fellowworkerfront/service/account_service.dart';
 import 'package:fellowworkerfront/service/account_utils.dart';
+import 'package:fellowworkerfront/service/resume_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -18,20 +20,29 @@ const deleteActionAccount = "Вы действительно хотите уда
 
 class _ProfileWidget extends State<Profile>
     with SingleTickerProviderStateMixin {
-
   late FlutterSecureStorage securityStorage;
+  late AccountService accountService;
+  late ResumeService resumeService;
 
-  _ProfileWidget({required FlutterSecureStorage sS}) {
+  _ProfileWidget(
+      {required FlutterSecureStorage sS,
+      required AccountService aS,
+      required ResumeService rS}) {
     securityStorage = sS;
+    accountService = aS;
+    resumeService = rS;
   }
 
   late Future<ApiResponseModel> responseModel;
+  late Future<FellowWorkerResponseModel> fellowWorkerResponseModel;
   late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
-    responseModel = AccountService().getCurrentAccountData(securityStorage);
+    responseModel = accountService.getCurrentAccountData(securityStorage);
+    fellowWorkerResponseModel =
+        resumeService.currentUserResume(securityStorage);
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -126,7 +137,7 @@ class _ProfileWidget extends State<Profile>
                       buildResponsiveGridCard(
                           "Тип аккаунта:", 6, Colors.blueGrey, 25),
                       buildResponsiveGridCard(
-                          AccountUtils.extractAccountType(account.role),
+                          RequestUtils.extractAccountType(account.role),
                           6,
                           Colors.black,
                           25),
@@ -154,7 +165,14 @@ class _ProfileWidget extends State<Profile>
                             child: UtilityWidgets.buildCardButton(() {
                               Navigator.pushNamed(context, "/change-password");
                             }, "Сменить пароль", 20),
-                          ))
+                          )),
+                      buildResponsiveGridCard(
+                          account.role == employeeResponse
+                              ? "Ваши активные резюме: "
+                              : "Ваши активные вакансии: ",
+                          null,
+                          Colors.black,
+                          30)
                     ],
                   ),
                 )),
@@ -165,7 +183,7 @@ class _ProfileWidget extends State<Profile>
   }
 
   void removeAccount() {
-    AccountService().removeAccount(securityStorage);
+    accountService.removeAccount(securityStorage);
     securityStorage.delete(key: jwtTokenKey);
     Navigator.pushNamed(context, "/");
   }
@@ -216,13 +234,22 @@ class _ProfileWidget extends State<Profile>
 
 class Profile extends StatefulWidget {
   late FlutterSecureStorage securityStorage;
+  late AccountService accountService;
+  late ResumeService resumeService;
 
-  Profile({required FlutterSecureStorage sS, super.key}) {
+  Profile(
+      {required FlutterSecureStorage sS,
+      required AccountService aS,
+      required ResumeService rS,
+      super.key}) {
     securityStorage = sS;
+    accountService = aS;
+    resumeService = rS;
   }
 
   @override
   State<StatefulWidget> createState() {
-    return _ProfileWidget(sS: securityStorage);
+    return _ProfileWidget(
+        sS: securityStorage, aS: accountService, rS: resumeService);
   }
 }

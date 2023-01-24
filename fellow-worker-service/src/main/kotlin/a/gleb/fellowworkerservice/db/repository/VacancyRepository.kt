@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/24/23, 10:30 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -24,4 +24,6 @@ interface VacancyRepository : CoroutineCrudRepository<Vacancy, UUID> {
     suspend fun findVacancyByTypeOfWorkPlacement(typeOfWork: TypeOfWorkPlacement): List<Vacancy>
 
     suspend fun findVacancyByKeySkillsContains(skill: String): List<Vacancy>
+
+    suspend fun findAllByOwnerId(id: UUID): List<Vacancy>
 }

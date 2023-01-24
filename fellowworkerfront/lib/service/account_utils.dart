@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/23/23, 11:18 PM
+ * Copyright (c) 1-1/24/23, 10:30 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -9,7 +9,12 @@ const employeeType = 'Соискатель';
 const companyType = 'Работодатель';
 const adminType = 'Администратор';
 
-class AccountUtils {
+final defaultHeaders = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": "*"
+};
+
+class RequestUtils {
 
   static String extractAccountType(String responseEnum) {
     if (responseEnum == employeeResponse) {

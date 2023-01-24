@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/23/23, 11:19 PM
+ * Copyright (c) 1-1/24/23, 10:30 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -13,16 +13,14 @@ import 'package:http/http.dart' as http;
 import '../main.dart';
 import '../models/account_response_model.dart';
 import '../security/oauth2.dart';
+import 'account_utils.dart';
 
 const String clientManagerHost = "http://127.0.0.1:8090";
 const String accountCreateAPI = "/api/v1/account/create";
 const String currentAccountAPI = "/api/v1/account/current";
 const String deleteAccountAPI = "/api/v1/account/delete";
 const String changePasswordAPI = "/api/v1/account/change-password";
-final defaultHeaders = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*"
-};
+
 
 class AccountService {
 

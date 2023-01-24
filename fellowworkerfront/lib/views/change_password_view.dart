@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/23/23, 11:18 PM
+ * Copyright (c) 1-1/24/23, 10:30 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -14,8 +14,8 @@ import '../styles/gradient_color.dart';
 
 class _ChangePassword extends State<ChangePassword>
     with SingleTickerProviderStateMixin {
-
   late FlutterSecureStorage securityStorage;
+  late AccountService accountService;
   var oldPasswordCont = TextEditingController();
   var newPasswordController = TextEditingController();
   var newPasswordVerifyController = TextEditingController();
@@ -24,8 +24,10 @@ class _ChangePassword extends State<ChangePassword>
   late bool _newPasswordVisible;
   late bool _newPasswordVerifyVisible;
 
-  _ChangePassword({required FlutterSecureStorage sS}) {
+  _ChangePassword(
+      {required FlutterSecureStorage sS, required AccountService aS}) {
     securityStorage = sS;
+    accountService = aS;
   }
 
   @override
@@ -177,8 +179,8 @@ class _ChangePassword extends State<ChangePassword>
     } else if (newPassword != passwordVerify) {
       response = Future<String>.value("Пароли не совпадают");
     } else {
-      response = AccountService()
-          .changePassword(securityStorage, oldPassword, newPassword);
+      response = accountService.changePassword(
+          securityStorage, oldPassword, newPassword);
     }
     UtilityWidgets.dialogBuilderApi(
         context, response, "Смена пароля", '/profile');
@@ -193,13 +195,18 @@ class _ChangePassword extends State<ChangePassword>
 
 class ChangePassword extends StatefulWidget {
   late FlutterSecureStorage securityStorage;
+  late AccountService accountService;
 
-  ChangePassword({required FlutterSecureStorage sS, super.key}) {
+  ChangePassword(
+      {required FlutterSecureStorage sS,
+      required AccountService aS,
+      super.key}) {
     securityStorage = sS;
+    accountService = aS;
   }
 
   @override
   State<StatefulWidget> createState() {
-    return _ChangePassword(sS: securityStorage);
+    return _ChangePassword(sS: securityStorage, aS: accountService);
   }
 }
