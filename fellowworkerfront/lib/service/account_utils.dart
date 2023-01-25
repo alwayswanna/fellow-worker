@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 1-1/24/23, 10:30 PM
+ * Copyright (c) 1-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
-const employeeResponse = "EMPOYEE";
+const employeeResponse = "EMPLOYEE";
 const companyResponse = "COMPANY";
 const employeeType = 'Соискатель';
 const companyType = 'Работодатель';

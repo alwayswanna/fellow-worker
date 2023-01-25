@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 1-1/23/23, 11:18 PM
+ * Copyright (c) 1-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
-import 'package:fellowworkerfront/service/account_service.dart';
+import 'package:fellowworkerfront/service/client_manager_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
@@ -16,7 +16,7 @@ const accountTypes = ["  Соискатель", "  Работодатель"];
 class _Registration extends State<Registration>
     with SingleTickerProviderStateMixin {
 
-  final AccountService accountService = AccountService();
+  final ClientManagerService accountService = ClientManagerService();
   late AnimationController _animationController;
   late String? typeAccount;
   late bool _passwordVisibility;
@@ -104,29 +104,30 @@ class _Registration extends State<Registration>
                   child: Container(
                       padding: padding,
                       child: TextField(
-                        obscureText: true,
-                        controller: passwordController,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _passwordVisibility
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                              color: Theme.of(context).primaryColorDark,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _passwordVisibility = !_passwordVisibility;
-                              });
-                            },
+                    controller: passwordController,
+                    enableSuggestions: false,
+                    obscureText: !_passwordVisibility,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisibility
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Theme.of(context).primaryColorDark,
                           ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          hintText: "Пароль:",
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisibility = !_passwordVisibility;
+                            });
+                          },
                         ),
-                      ))),
+                        hintText: "Пароль:",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20))),
+                  ))),
               ResponsiveGridCol(
                   md: 6,
                   child: UtilityWidgets.buildTextField(

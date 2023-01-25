@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/13/23, 9:17 PM
+ * Copyright (c) 12-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -181,7 +181,7 @@ class ResumeService(
         } catch (e: Exception) {
             throw UnexpectedErrorException(
                 BAD_GATEWAY,
-                "Ошибка при создании резюме, попробуйте повторить попытку позже"
+                "Ошибка при получении резюме, попробуйте повторить попытку позже"
             )
         }
     }

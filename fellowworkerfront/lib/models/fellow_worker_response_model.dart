@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 1-1/24/23, 10:30 PM
+ * Copyright (c) 1-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
 class FellowWorkerResponseModel {
   final String message;
-  final ResumeResponseModel resumeResponse;
-  final List<ResumeResponseModel> resumes;
-  final VacancyResponseApiModel vacancyResponse;
-  final List<VacancyResponseApiModel> vacancies;
+  final ResumeResponseModel? resumeResponse;
+  final List<ResumeResponseModel>? resumes;
+  final VacancyResponseApiModel? vacancyResponse;
+  final List<VacancyResponseApiModel>? vacancies;
 
   const FellowWorkerResponseModel(
       {required this.message,

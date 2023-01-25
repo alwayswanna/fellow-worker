@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/24/23, 10:30 PM
+ * Copyright (c) 1-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -22,7 +22,7 @@ const String deleteAccountAPI = "/api/v1/account/delete";
 const String changePasswordAPI = "/api/v1/account/change-password";
 
 
-class AccountService {
+class ClientManagerService {
 
   Future<String> createAccount(
       String username,

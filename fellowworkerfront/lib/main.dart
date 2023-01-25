@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 1-1/24/23, 10:30 PM
+ * Copyright (c) 1-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/security/oauth2.dart';
-import 'package:fellowworkerfront/service/account_service.dart';
-import 'package:fellowworkerfront/service/resume_service.dart';
+import 'package:fellowworkerfront/service/client_manager_service.dart';
+import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/change_password_view.dart';
@@ -20,8 +20,8 @@ const jwtTokenKey = "jwtToken";
 
 void main() {
   var securityStorage = const FlutterSecureStorage();
-  var accountService = AccountService();
-  var resumeService = ResumeService();
+  var accountService = ClientManagerService();
+  var resumeService = FellowWorkerService();
   setPathUrlStrategy();
   securityStorage.delete(key: jwtTokenKey);
   runApp(MyApp(sS: securityStorage, aS: accountService, rS: resumeService));
@@ -29,13 +29,13 @@ void main() {
 
 class MyApp extends StatelessWidget {
   late FlutterSecureStorage flutterSecureStorage;
-  late AccountService accountService;
-  late ResumeService resumeService;
+  late ClientManagerService accountService;
+  late FellowWorkerService resumeService;
 
   MyApp(
       {required FlutterSecureStorage sS,
-      required AccountService aS,
-      required ResumeService rS,
+      required ClientManagerService aS,
+      required FellowWorkerService rS,
       super.key}) {
     flutterSecureStorage = sS;
     accountService = aS;

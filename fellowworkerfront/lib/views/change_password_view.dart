@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 1-1/24/23, 10:30 PM
+ * Copyright (c) 1-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
-import 'package:fellowworkerfront/service/account_service.dart';
+import 'package:fellowworkerfront/service/client_manager_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/registration_view.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +15,7 @@ import '../styles/gradient_color.dart';
 class _ChangePassword extends State<ChangePassword>
     with SingleTickerProviderStateMixin {
   late FlutterSecureStorage securityStorage;
-  late AccountService accountService;
+  late ClientManagerService accountService;
   var oldPasswordCont = TextEditingController();
   var newPasswordController = TextEditingController();
   var newPasswordVerifyController = TextEditingController();
@@ -25,7 +25,7 @@ class _ChangePassword extends State<ChangePassword>
   late bool _newPasswordVerifyVisible;
 
   _ChangePassword(
-      {required FlutterSecureStorage sS, required AccountService aS}) {
+      {required FlutterSecureStorage sS, required ClientManagerService aS}) {
     securityStorage = sS;
     accountService = aS;
   }
@@ -195,11 +195,11 @@ class _ChangePassword extends State<ChangePassword>
 
 class ChangePassword extends StatefulWidget {
   late FlutterSecureStorage securityStorage;
-  late AccountService accountService;
+  late ClientManagerService accountService;
 
   ChangePassword(
       {required FlutterSecureStorage sS,
-      required AccountService aS,
+      required ClientManagerService aS,
       super.key}) {
     securityStorage = sS;
     accountService = aS;

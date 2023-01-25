@@ -85,6 +85,7 @@ fellow-worker:
             - /api/v1/vacancy/create
             - /api/v1/vacancy/edit
             - /api/v1/vacancy/delete-id
+            - /api/v1/vacancy/current-user-vacancies
 
 logging:
   level:

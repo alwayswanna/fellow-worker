@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 1-1/24/23, 10:30 PM
+ * Copyright (c) 1-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/main.dart';
 import 'package:fellowworkerfront/models/account_response_model.dart';
 import 'package:fellowworkerfront/models/fellow_worker_response_model.dart';
-import 'package:fellowworkerfront/service/account_service.dart';
 import 'package:fellowworkerfront/service/account_utils.dart';
-import 'package:fellowworkerfront/service/resume_service.dart';
+import 'package:fellowworkerfront/service/client_manager_service.dart';
+import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -21,28 +21,29 @@ const deleteActionAccount = "Вы действительно хотите уда
 class _ProfileWidget extends State<Profile>
     with SingleTickerProviderStateMixin {
   late FlutterSecureStorage securityStorage;
-  late AccountService accountService;
-  late ResumeService resumeService;
+  late ClientManagerService accountService;
+  late FellowWorkerService resumeService;
 
   _ProfileWidget(
       {required FlutterSecureStorage sS,
-      required AccountService aS,
-      required ResumeService rS}) {
+      required ClientManagerService aS,
+      required FellowWorkerService rS}) {
     securityStorage = sS;
     accountService = aS;
     resumeService = rS;
   }
 
-  late Future<ApiResponseModel> responseModel;
+  late Future<ApiResponseModel> clientManagerResponseModel;
   late Future<FellowWorkerResponseModel> fellowWorkerResponseModel;
   late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
-    responseModel = accountService.getCurrentAccountData(securityStorage);
-    fellowWorkerResponseModel =
-        resumeService.currentUserResume(securityStorage);
+    clientManagerResponseModel =
+        accountService.getCurrentAccountData(securityStorage);
+    fellowWorkerResponseModel = resumeService.getCurrenUserEntities(
+        securityStorage, clientManagerResponseModel);
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -62,7 +63,7 @@ class _ProfileWidget extends State<Profile>
           title: const Text("Fellow worker"),
         ),
         body: FutureBuilder(
-            future: responseModel,
+            future: clientManagerResponseModel,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 var apiResponse = snapshot.data as ApiResponseModel;
@@ -172,7 +173,57 @@ class _ProfileWidget extends State<Profile>
                               : "Ваши активные вакансии: ",
                           null,
                           Colors.black,
-                          30)
+                          30),
+                      ResponsiveGridCol(
+                        //TODO: change it;
+                          child: FutureBuilder(
+                              future: fellowWorkerResponseModel,
+                              builder: (context, snapshot) {
+                                List<Widget> children;
+                                if (snapshot.hasData) {
+                                  children = <Widget>[
+                                    const Icon(
+                                      Icons.check_circle_outline,
+                                      color: Colors.green,
+                                      size: 60,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: Text('Result: ${snapshot.data}'),
+                                    ),
+                                  ];
+                                } else if (snapshot.hasError) {
+                                  children = <Widget>[
+                                    const Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red,
+                                      size: 60,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: Text('Error: ${snapshot.error}'),
+                                    ),
+                                  ];
+                                } else {
+                                  children = const <Widget>[
+                                    SizedBox(
+                                      width: 60,
+                                      height: 60,
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 16),
+                                      child: Text('Awaiting result...'),
+                                    ),
+                                  ];
+                                }
+                                return Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: children,
+                                  ),
+                                );
+                              }))
                     ],
                   ),
                 )),
@@ -230,17 +281,25 @@ class _ProfileWidget extends State<Profile>
               style: UtilityWidgets.cardTextStyle(fontColor, fontSize)),
         ));
   }
+
+  Widget buildResume(ResumeResponseModel resumeResponse) {
+    return const Text("resume");
+  }
+
+  Widget buildVacancy(List<VacancyResponseApiModel> vacancies) {
+    return const Text("vacancy");
+  }
 }
 
 class Profile extends StatefulWidget {
   late FlutterSecureStorage securityStorage;
-  late AccountService accountService;
-  late ResumeService resumeService;
+  late ClientManagerService accountService;
+  late FellowWorkerService resumeService;
 
   Profile(
       {required FlutterSecureStorage sS,
-      required AccountService aS,
-      required ResumeService rS,
+      required ClientManagerService aS,
+      required FellowWorkerService rS,
       super.key}) {
     securityStorage = sS;
     accountService = aS;
