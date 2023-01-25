@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:37 PM
+ * Copyright (c) 1-1/25/23, 11:38 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -15,13 +15,12 @@ final defaultHeaders = {
 };
 
 class RequestUtils {
-
   static String extractAccountType(String responseEnum) {
     if (responseEnum == employeeResponse) {
       return employeeType;
     } else if (responseEnum == companyResponse) {
       return companyType;
-    }else{
+    } else {
       return adminType;
     }
   }
