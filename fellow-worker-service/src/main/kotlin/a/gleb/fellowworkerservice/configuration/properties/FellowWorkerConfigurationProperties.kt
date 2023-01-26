@@ -1,16 +1,18 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/26/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.fellowworkerservice.configuration.properties
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.web.cors.CorsConfiguration
 
 @ConfigurationProperties("fellow-worker")
 data class FellowWorkerConfigurationProperties(
     val securityConstraints: List<SecurityConstraints>,
-    val unprotectedPaths: List<String>
+    val unprotectedPaths: List<String>,
+    val cors: Cors
 )
 
 data class SecurityConstraints(
@@ -22,3 +24,5 @@ data class SecurityCollection(
     val patterns: List<String>,
     val methods: List<String>?
 )
+
+class Cors : CorsConfiguration()

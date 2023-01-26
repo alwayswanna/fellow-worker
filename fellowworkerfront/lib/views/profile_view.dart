@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:38 PM
+ * Copyright (c) 1-1/26/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -175,23 +175,13 @@ class _ProfileWidget extends State<Profile>
                           Colors.black,
                           30),
                       ResponsiveGridCol(
-                          //TODO: change it;
                           child: FutureBuilder(
                               future: fellowWorkerResponseModel,
                               builder: (context, snapshot) {
                                 List<Widget> children;
                                 if (snapshot.hasData) {
-                                  children = <Widget>[
-                                    const Icon(
-                                      Icons.check_circle_outline,
-                                      color: Colors.green,
-                                      size: 60,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: Text('Result: ${snapshot.data}'),
-                                    ),
-                                  ];
+                                  children = buildUserEntities(
+                                      fellowWorkerResponseModel, account);
                                 } else if (snapshot.hasError) {
                                   children = <Widget>[
                                     const Icon(
@@ -201,19 +191,25 @@ class _ProfileWidget extends State<Profile>
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 16),
-                                      child: Text('Error: ${snapshot.error}'),
+                                      child: Text(account.role ==
+                                              employeeResponse
+                                          ? "Ошибка при получении активных резюме"
+                                          : "Ошибка при получении активных вакансий"),
                                     ),
                                   ];
                                 } else {
-                                  children = const <Widget>[
-                                    SizedBox(
+                                  children = <Widget>[
+                                    const SizedBox(
                                       width: 60,
                                       height: 60,
                                       child: CircularProgressIndicator(),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(top: 16),
-                                      child: Text('Awaiting result...'),
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: Text(account.role ==
+                                              employeeResponse
+                                          ? "Получение активных резюме .. "
+                                          : "Получение активные вакансии .. "),
                                     ),
                                   ];
                                 }
@@ -282,12 +278,73 @@ class _ProfileWidget extends State<Profile>
         ));
   }
 
-  Widget buildResume(ResumeResponseModel resumeResponse) {
-    return const Text("resume");
+  List<Widget> buildUserEntities(
+      Future<FellowWorkerResponseModel> fellowWorkerResponseModel,
+      AccountDataModel accountDataModel) {
+    var role = accountDataModel.role;
+    if (role == employeeResponse) {
+      return [buildEmployeeResponseWidgets(fellowWorkerResponseModel)];
+    } else if (role == companyResponse) {
+      return [buildCompanyResponseWidgets(fellowWorkerResponseModel)];
+    } else {
+      return [
+        const Text("Администратор не может иметь активных вакансий и резюме.")
+      ];
+    }
   }
 
-  Widget buildVacancy(List<VacancyResponseApiModel> vacancies) {
-    return const Text("vacancy");
+  Widget buildEmployeeResponseWidgets(
+      Future<FellowWorkerResponseModel> fellowWorkerResponseModel) {
+    FellowWorkerResponseModel? responseModel;
+    fellowWorkerResponseModel.then((value) => responseModel = value);
+    if (responseModel != null || responseModel!.resumeResponse != null) {
+      var resume = responseModel!.resumeResponse!;
+      return ResponsiveGridRow(children: [
+        ResponsiveGridCol(md: 3, child: Text(resume.job)),
+        ResponsiveGridCol(md: 3, child: Text(resume.lastUpdate)),
+        ResponsiveGridCol(
+            md: 3,
+            child: ElevatedButton(
+              onPressed: () {},
+              child: const Text("Подробнее"),
+            )),
+        ResponsiveGridCol(
+            md: 3,
+            child: ElevatedButton(
+              onPressed: () {},
+              child: const Text("Удалить"),
+            ))
+      ]);
+    } else {
+      return ResponsiveGridCol(child: Text(responseModel!.message));
+    }
+  }
+
+  Widget buildCompanyResponseWidgets(
+      Future<FellowWorkerResponseModel> fellowWorkerResponseModel) {
+    FellowWorkerResponseModel? responseModel;
+    fellowWorkerResponseModel.then((value) => responseModel = value);
+    if (responseModel != null || responseModel!.vacancies != null) {
+      var vacancies = responseModel!.vacancies!;
+      List<ResponsiveGridCol> responsiveGridCol = <ResponsiveGridCol>[];
+      for (var v in vacancies) {
+        responsiveGridCol
+            .add(ResponsiveGridCol(md: 3, child: Text(v.vacancyName)));
+        responsiveGridCol
+            .add(ResponsiveGridCol(md: 3, child: Text(v.lastUpdate)));
+        responsiveGridCol.add(ResponsiveGridCol(
+            md: 3,
+            child: ElevatedButton(
+                onPressed: () {}, child: const Text("Подробнее"))));
+        responsiveGridCol.add(ResponsiveGridCol(
+            md: 3,
+            child: ElevatedButton(
+                onPressed: () {}, child: const Text("Удалить"))));
+      }
+      return ResponsiveGridRow(children: responsiveGridCol);
+    } else {
+      return ResponsiveGridCol(child: Text(responseModel!.message));
+    }
   }
 }
 

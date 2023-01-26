@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:37 PM
+ * Copyright (c) 1-1/26/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -19,13 +19,14 @@ const resumeCurrentUserAPI = "/api/v1/employee/current-user-resume";
 const vacanciesCurrentUserAPI = "/api/v1/vacancy/current-user-vacancies";
 
 class FellowWorkerService {
+
   /// Get current user resume.
   Future<FellowWorkerResponseModel> currentUserResume(
       FlutterSecureStorage secureStorage) async {
     String? userToken = await secureStorage.read(key: jwtTokenKey);
 
     Map<dynamic, dynamic> tokenMap =
-        Oauth2Service.convertTokenToMap(userToken!);
+    Oauth2Service.convertTokenToMap(userToken!);
     String accessToken = tokenMap["access_token"]!;
     defaultHeaders["Authorization"] = "Bearer $accessToken";
     final requestUri = Uri.parse(fellowWorkerHost + resumeCurrentUserAPI);
@@ -35,7 +36,12 @@ class FellowWorkerService {
       return FellowWorkerResponseModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
-      return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+      return FellowWorkerResponseModel(
+          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+          resumeResponse: null,
+          resumes: null,
+          vacancyResponse: null,
+          vacancies: null);
     }
   }
 
@@ -45,7 +51,7 @@ class FellowWorkerService {
     String? userToken = await secureStorage.read(key: jwtTokenKey);
 
     Map<dynamic, dynamic> tokenMap =
-        Oauth2Service.convertTokenToMap(userToken!);
+    Oauth2Service.convertTokenToMap(userToken!);
     String accessToken = tokenMap["access_token"]!;
     defaultHeaders["Authorization"] = "Bearer $accessToken";
     final requestUri = Uri.parse(fellowWorkerHost + vacanciesCurrentUserAPI);
@@ -55,7 +61,12 @@ class FellowWorkerService {
       return FellowWorkerResponseModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
-      return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+      return FellowWorkerResponseModel(
+          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+          resumeResponse: null,
+          resumes: null,
+          vacancyResponse: null,
+          vacancies: null);
     }
   }
 

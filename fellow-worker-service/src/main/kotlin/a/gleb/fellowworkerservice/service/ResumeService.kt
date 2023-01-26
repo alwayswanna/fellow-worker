@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/25/23, 11:37 PM
+ * Copyright (c) 12-1/26/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -37,14 +37,12 @@ class ResumeService(
         val userId = oauth2SecurityService.extractOauth2UserId()
 
         val existingResume = resumeRepository.findAllByOwnerRecordId(UUID.fromString(userId))
-        if (!existingResume.isNullOrEmpty()) {
+        if (existingResume != null) {
             logger.info {
-                "Current user: $userId already have resume (count: ${existingResume.size}), deleting existing resume"
+                "Current user: $userId already have resume (resumeId: ${existingResume.id}), deleting existing resume"
             }
-            existingResume.forEach {
-                resumeRepository.delete(it)
-                resumeSenderService.sendMessageRemove(ResumeMessageDelete(it.id))
-            }
+            resumeRepository.delete(existingResume)
+            resumeSenderService.sendMessageRemove(ResumeMessageDelete(existingResume.id))
         }
 
         val resume = resumeModelMapper.toResumeDtoModel(UUID.fromString(userId), request, null)
@@ -176,7 +174,7 @@ class ResumeService(
                     HttpStatus.NOT_FOUND,
                     "Вы еще не создавали резюме"
                 )
-            return resumeModelMapper.toResponseWithListOfResume(resume)
+            return resumeModelMapper.toFellowWorkerResponseModel(resume, "С вашим аккаунтом связаны следующие резюме")
 
         } catch (e: Exception) {
             throw UnexpectedErrorException(
