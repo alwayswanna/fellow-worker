@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:37 PM
+ * Copyright (c) 1-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -194,8 +194,8 @@ class _ChangePassword extends State<ChangePassword>
 }
 
 class ChangePassword extends StatefulWidget {
-  late FlutterSecureStorage securityStorage;
-  late ClientManagerService accountService;
+  late final FlutterSecureStorage securityStorage;
+  late final ClientManagerService accountService;
 
   ChangePassword(
       {required FlutterSecureStorage sS,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:37 PM
+ * Copyright (c) 1-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -9,6 +9,7 @@ import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/change_password_view.dart';
+import 'package:fellowworkerfront/views/edit_account_page.dart';
 import 'package:fellowworkerfront/views/main_view.dart';
 import 'package:fellowworkerfront/views/profile_view.dart';
 import 'package:fellowworkerfront/views/registration_view.dart';
@@ -54,7 +55,9 @@ class MyApp extends StatelessWidget {
         '/change-password': (context) => ChangePassword(
               sS: flutterSecureStorage,
               aS: accountService,
-            )
+            ),
+        '/edit-account': (context) =>
+            EditCurrentAccount(sS: flutterSecureStorage, fS: resumeService)
       },
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,

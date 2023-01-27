@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:37 PM
+ * Copyright (c) 1-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,10 +8,10 @@ import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
+import '../service/account_utils.dart';
 import '../styles/gradient_color.dart';
 
 const padding = EdgeInsets.all(10);
-const accountTypes = ["  Соискатель", "  Работодатель"];
 
 class _Registration extends State<Registration>
     with SingleTickerProviderStateMixin {

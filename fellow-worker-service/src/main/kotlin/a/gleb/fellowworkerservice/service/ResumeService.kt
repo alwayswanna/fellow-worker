@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/26/23, 11:40 PM
+ * Copyright (c) 12-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -169,11 +169,12 @@ class ResumeService(
         val userId = oauth2SecurityService.extractOauth2UserId()
 
         try {
-            val resume =
-                resumeRepository.findAllByOwnerRecordId(UUID.fromString(userId)) ?: throw InvalidUserDataException(
-                    HttpStatus.NOT_FOUND,
-                    "Вы еще не создавали резюме"
-                )
+            val resume = resumeRepository.findAllByOwnerRecordId(UUID.fromString(userId))
+                ?: return FellowWorkerResponseModel()
+                    .apply {
+                        message = "Вы еще не создавали резюме"
+                    }
+
             return resumeModelMapper.toFellowWorkerResponseModel(resume, "С вашим аккаунтом связаны следующие резюме")
 
         } catch (e: Exception) {

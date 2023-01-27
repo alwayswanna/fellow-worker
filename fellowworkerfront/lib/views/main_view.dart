@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/22/23, 11:57 PM
+ * Copyright (c) 1-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -14,6 +14,8 @@ const employeeText = "Здесь размещены самые свежие и "
 const recruiterText = "Здесь размещены самые свежие и "
     "проверенные резюме. \n Чтобы разместить свою вакансию перейдите в свой "
     "профиль.";
+
+const searchFieldHint = '🔎 Найти работу мечты';
 
 class FullScreenWidget extends StatelessWidget {
   const FullScreenWidget({super.key});
@@ -38,7 +40,7 @@ class FullScreenWidget extends StatelessWidget {
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20)),
-                        hintText: '🔎 Найти работу мечты',
+                        hintText: searchFieldHint,
                       ),
                     ),
                     Padding(

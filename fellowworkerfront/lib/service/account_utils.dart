@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:38 PM
+ * Copyright (c) 1-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,6 +8,8 @@ const companyResponse = "COMPANY";
 const employeeType = 'Соискатель';
 const companyType = 'Работодатель';
 const adminType = 'Администратор';
+
+const accountTypes = ["  Соискатель", "  Работодатель"];
 
 final defaultHeaders = {
   "Content-Type": "application/json",

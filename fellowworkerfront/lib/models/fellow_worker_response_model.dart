@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:37 PM
+ * Copyright (c) 1-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -32,12 +32,23 @@ class FellowWorkerResponseModel {
           .toList();
     }
 
+    ResumeResponseModel? resumeResponseModel;
+    if (json['resumeResponse'] != null) {
+      resumeResponseModel =
+          ResumeResponseModel.fromJson(json['resumeResponse']);
+    }
+
+    VacancyResponseApiModel? vacancyResponseApiModel;
+    if (json['vacancyResponse'] != null) {
+      vacancyResponseApiModel =
+          VacancyResponseApiModel.fromJson(json['vacancyResponse']);
+    }
+
     return FellowWorkerResponseModel(
         message: json['message'],
-        resumeResponse: ResumeResponseModel.fromJson(json['resumeResponse']),
+        resumeResponse: resumeResponseModel,
         resumes: resumes,
-        vacancyResponse:
-            VacancyResponseApiModel.fromJson(json['vacancyResponse']),
+        vacancyResponse: vacancyResponseApiModel,
         vacancies: vacancies);
   }
 }

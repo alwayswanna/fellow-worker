@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/26/23, 11:40 PM
+ * Copyright (c) 1-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -114,34 +114,34 @@ class _ProfileWidget extends State<Profile>
                       buildResponsiveGridCard(
                           responseModel.message, null, Colors.black, 30),
                       buildResponsiveGridCard(
-                          "Username:", 6, Colors.blueGrey, 25),
+                          "Username:", 6, Colors.blueGrey, 15),
                       buildResponsiveGridCard(
-                          account.username, 6, Colors.black, 25),
-                      buildResponsiveGridCard("Email:", 6, Colors.blueGrey, 25),
+                          account.username, 6, Colors.black, 15),
+                      buildResponsiveGridCard("Email:", 6, Colors.blueGrey, 15),
                       buildResponsiveGridCard(
-                          account.email, 6, Colors.black, 25),
-                      buildResponsiveGridCard("Имя:", 6, Colors.blueGrey, 25),
+                          account.email, 6, Colors.black, 15),
+                      buildResponsiveGridCard("Имя:", 6, Colors.blueGrey, 15),
                       buildResponsiveGridCard(
-                          account.firstName, 6, Colors.black, 25),
+                          account.firstName, 6, Colors.black, 15),
                       buildResponsiveGridCard(
-                          "Фамилия:", 6, Colors.blueGrey, 25),
+                          "Фамилия:", 6, Colors.blueGrey, 15),
                       buildResponsiveGridCard(
-                          account.middleName, 6, Colors.black, 25),
+                          account.middleName, 6, Colors.black, 15),
                       buildResponsiveGridCard(
-                          "Отчество:", 6, Colors.blueGrey, 25),
+                          "Отчество:", 6, Colors.blueGrey, 15),
                       buildResponsiveGridCard(
-                          account.lastName, 6, Colors.black, 25),
+                          account.lastName, 6, Colors.black, 15),
                       buildResponsiveGridCard(
-                          "Дата рождения:", 6, Colors.blueGrey, 25),
+                          "Дата рождения:", 6, Colors.blueGrey, 15),
                       buildResponsiveGridCard(
-                          account.birthDate, 6, Colors.black, 25),
+                          account.birthDate, 6, Colors.black, 15),
                       buildResponsiveGridCard(
-                          "Тип аккаунта:", 6, Colors.blueGrey, 25),
+                          "Тип аккаунта:", 6, Colors.blueGrey, 15),
                       buildResponsiveGridCard(
                           RequestUtils.extractAccountType(account.role),
                           6,
                           Colors.black,
-                          25),
+                          15),
                       ResponsiveGridCol(
                           md: 4,
                           child: Padding(
@@ -149,15 +149,15 @@ class _ProfileWidget extends State<Profile>
                             child: UtilityWidgets.buildCardButton(() {
                               dialogBuilderMessage(context,
                                   "Вы действительно хотите удалить аккаунт?");
-                            }, "Удалить", 20),
+                            }, "Удалить", 15),
                           )),
                       ResponsiveGridCol(
                           md: 4,
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: UtilityWidgets.buildCardButton(() {
-                              Navigator.pushNamed(context, "/");
-                            }, "Редактировать", 20),
+                              Navigator.pushNamed(context, "/edit-account");
+                            }, "Редактировать", 15),
                           )),
                       ResponsiveGridCol(
                           md: 4,
@@ -165,7 +165,7 @@ class _ProfileWidget extends State<Profile>
                             padding: const EdgeInsets.all(10.0),
                             child: UtilityWidgets.buildCardButton(() {
                               Navigator.pushNamed(context, "/change-password");
-                            }, "Сменить пароль", 20),
+                            }, "Сменить пароль", 15),
                           )),
                       buildResponsiveGridCard(
                           account.role == employeeResponse
@@ -178,47 +178,48 @@ class _ProfileWidget extends State<Profile>
                           child: FutureBuilder(
                               future: fellowWorkerResponseModel,
                               builder: (context, snapshot) {
-                                List<Widget> children;
+                                Widget children;
                                 if (snapshot.hasData) {
+                                  var fellowWorkerResponse = snapshot.data
+                                      as FellowWorkerResponseModel;
                                   children = buildUserEntities(
-                                      fellowWorkerResponseModel, account);
+                                      fellowWorkerResponse, account);
                                 } else if (snapshot.hasError) {
-                                  children = <Widget>[
-                                    const Icon(
+                                  children = ResponsiveGridRow(children: [
+                                    ResponsiveGridCol(
+                                        child: const Icon(
                                       Icons.error_outline,
                                       color: Colors.red,
                                       size: 60,
-                                    ),
-                                    Padding(
+                                    )),
+                                    ResponsiveGridCol(
+                                        child: Padding(
                                       padding: const EdgeInsets.only(top: 16),
                                       child: Text(account.role ==
                                               employeeResponse
                                           ? "Ошибка при получении активных резюме"
                                           : "Ошибка при получении активных вакансий"),
-                                    ),
-                                  ];
+                                    ))
+                                  ]);
                                 } else {
-                                  children = <Widget>[
-                                    const SizedBox(
+                                  children = ResponsiveGridRow(children: [
+                                    ResponsiveGridCol(
+                                        child: const SizedBox(
                                       width: 60,
                                       height: 60,
                                       child: CircularProgressIndicator(),
-                                    ),
-                                    Padding(
+                                    )),
+                                    ResponsiveGridCol(
+                                        child: Padding(
                                       padding: const EdgeInsets.only(top: 16),
                                       child: Text(account.role ==
                                               employeeResponse
                                           ? "Получение активных резюме .. "
                                           : "Получение активные вакансии .. "),
-                                    ),
-                                  ];
+                                    ))
+                                  ]);
                                 }
-                                return Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: children,
-                                  ),
-                                );
+                                return Center(child: children);
                               }))
                     ],
                   ),
@@ -272,33 +273,34 @@ class _ProfileWidget extends State<Profile>
     return ResponsiveGridCol(
         md: md,
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(13.0),
           child: Text(message ?? "Не указано",
               style: UtilityWidgets.cardTextStyle(fontColor, fontSize)),
         ));
   }
 
-  List<Widget> buildUserEntities(
-      Future<FellowWorkerResponseModel> fellowWorkerResponseModel,
+  Widget buildUserEntities(FellowWorkerResponseModel fellowWorkerResponseModel,
       AccountDataModel accountDataModel) {
     var role = accountDataModel.role;
     if (role == employeeResponse) {
-      return [buildEmployeeResponseWidgets(fellowWorkerResponseModel)];
+      return buildEmployeeResponseWidgets(fellowWorkerResponseModel);
     } else if (role == companyResponse) {
-      return [buildCompanyResponseWidgets(fellowWorkerResponseModel)];
+      return buildCompanyResponseWidgets(fellowWorkerResponseModel);
     } else {
-      return [
-        const Text("Администратор не может иметь активных вакансий и резюме.")
-      ];
+      return ResponsiveGridRow(children: [
+        buildResponsiveGridCard(
+            "Администратор не может иметь активных вакансий и резюме.",
+            12,
+            Colors.black,
+            15)
+      ]);
     }
   }
 
-  Widget buildEmployeeResponseWidgets(
-      Future<FellowWorkerResponseModel> fellowWorkerResponseModel) {
-    FellowWorkerResponseModel? responseModel;
-    fellowWorkerResponseModel.then((value) => responseModel = value);
-    if (responseModel != null || responseModel!.resumeResponse != null) {
-      var resume = responseModel!.resumeResponse!;
+  ResponsiveGridRow buildEmployeeResponseWidgets(
+      FellowWorkerResponseModel fellowWorkerResponseModel) {
+    if (fellowWorkerResponseModel.resumeResponse != null) {
+      var resume = fellowWorkerResponseModel.resumeResponse!;
       return ResponsiveGridRow(children: [
         ResponsiveGridCol(md: 3, child: Text(resume.job)),
         ResponsiveGridCol(md: 3, child: Text(resume.lastUpdate)),
@@ -316,16 +318,25 @@ class _ProfileWidget extends State<Profile>
             ))
       ]);
     } else {
-      return ResponsiveGridCol(child: Text(responseModel!.message));
+      return ResponsiveGridRow(children: [
+        buildResponsiveGridCard(
+            fellowWorkerResponseModel.message, 6, Colors.black, 15),
+        ResponsiveGridCol(
+            md: 6,
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: UtilityWidgets.buildCardButton(() {
+                print("Создать резюме");
+              }, "Создать резюме", 15),
+            ))
+      ]);
     }
   }
 
-  Widget buildCompanyResponseWidgets(
-      Future<FellowWorkerResponseModel> fellowWorkerResponseModel) {
-    FellowWorkerResponseModel? responseModel;
-    fellowWorkerResponseModel.then((value) => responseModel = value);
-    if (responseModel != null || responseModel!.vacancies != null) {
-      var vacancies = responseModel!.vacancies!;
+  ResponsiveGridRow buildCompanyResponseWidgets(
+      FellowWorkerResponseModel fellowWorkerResponseModel) {
+    if (fellowWorkerResponseModel.vacancies != null) {
+      var vacancies = fellowWorkerResponseModel.vacancies!;
       List<ResponsiveGridCol> responsiveGridCol = <ResponsiveGridCol>[];
       for (var v in vacancies) {
         responsiveGridCol
@@ -343,7 +354,9 @@ class _ProfileWidget extends State<Profile>
       }
       return ResponsiveGridRow(children: responsiveGridCol);
     } else {
-      return ResponsiveGridCol(child: Text(responseModel!.message));
+      return ResponsiveGridRow(children: [
+        ResponsiveGridCol(child: Text(fellowWorkerResponseModel.message))
+      ]);
     }
   }
 }
