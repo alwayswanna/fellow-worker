@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/29/23, 12:12 AM
+ * Copyright (c) 1-1/29/23, 12:23 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -320,11 +320,12 @@ class _ProfileWidget extends State<Profile>
     } else {
       return ResponsiveGridRow(children: [
         buildResponsiveGridCard(
-            fellowWorkerResponseModel.message, 6, Colors.black, 15),
+            fellowWorkerResponseModel.message, 4, Colors.black, 15),
+        ResponsiveGridCol(md:4, child: const Center()),
         ResponsiveGridCol(
-            md: 6,
+            md: 4,
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
+              padding: const EdgeInsets.all(10.0),
               child: UtilityWidgets.buildCardButton(() {
                 Navigator.pushNamed(context, "/create-resume");
               }, "Создать резюме", 15),
