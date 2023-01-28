@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/28/23, 2:59 PM
+ * Copyright (c) 1-1/28/23, 6:20 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,8 +8,11 @@ import 'package:flutter/material.dart';
 import '../service/account_utils.dart';
 
 class UtilityWidgets {
+  static String extractAccountRoleDataFromWidget(String? accountRoleWidget) {
+    if (accountRoleWidget == null || accountRoleWidget.isEmpty) {
+      return "";
+    }
 
-  static String extractAccountRoleDataFromWidget(String? accountRoleWidget){
     if (accountRoleWidget == accountTypes.first) {
       return "EMPLOYEE";
     } else if (accountRoleWidget == accountTypes.last) {
@@ -19,8 +22,8 @@ class UtilityWidgets {
     }
   }
 
-  static Future<void> dialogBuilderApi(
-      BuildContext context, Future<String> response, String message, String onOkRedirectionPath) {
+  static Future<void> dialogBuilderApi(BuildContext context,
+      Future<String> response, String message, String onOkRedirectionPath) {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {

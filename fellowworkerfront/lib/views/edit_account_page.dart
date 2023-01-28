@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/28/23, 2:59 PM
+ * Copyright (c) 1-1/28/23, 6:20 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,6 +11,10 @@ import 'package:responsive_grid/responsive_grid.dart';
 import '../service/account_utils.dart';
 import '../styles/gradient_color.dart';
 import '../utils/utility_widgets.dart';
+
+const String editAccountUserMessage = "Изменение аккаунта";
+const String backSuccessMessageCheck =
+    "Данные вашего аккаунт успешно обновлены.";
 
 class _EditCurrentAccount extends State<EditCurrentAccount>
     with SingleTickerProviderStateMixin {
@@ -36,7 +40,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
   @override
   void initState() {
     super.initState();
-    typeAccount = accountTypes.first;
+    typeAccount = null;
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -199,7 +203,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
     var timeNow = DateTime.now();
     var userYearDate = selectedDate.year;
     var userMonthDate = selectedDate.month;
-    var userDayDate = selectedDate.month;
+    var userDayDate = selectedDate.day;
 
     String? requestDate;
     if (userYearDate == timeNow.year &&
@@ -210,22 +214,35 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
       requestDate = selectedDate.toIso8601String();
     }
 
-    var response = clientManagerService.editAccount(
-        usernameController.text,
-        emailController.text,
-        controllerFirstName.text,
-        controllerMiddleName.text,
-        controllerLastName.text,
-        type,
-        requestDate,
-        securityStorage);
-    var messageResponse = await response;
-    UtilityWidgets.dialogBuilderApi(
-        context,
-        Future.value(
-            "Введите только те данные которые вы бы хотели изменить\n$messageResponse"),
-        "Изменение аккаунта",
-        '/profile');
+    if (usernameController.text.isEmpty &&
+        emailController.text.isEmpty &&
+        controllerFirstName.text.isEmpty &&
+        controllerMiddleName.text.isEmpty &&
+        controllerLastName.text.isEmpty &&
+        type.isEmpty &&
+        requestDate == null) {
+      UtilityWidgets.dialogBuilderApi(
+          context,
+          Future.value("Вы должны заполнить хотя бы одно поле"),
+          editAccountUserMessage,
+          '/profile');
+    } else {
+      var response = clientManagerService.editAccount(
+          usernameController.text,
+          emailController.text,
+          controllerFirstName.text,
+          controllerMiddleName.text,
+          controllerLastName.text,
+          type,
+          requestDate,
+          securityStorage);
+      var messageResponse = await response;
+      var message = response == backSuccessMessageCheck
+          ? backSuccessMessageCheck
+          : "Введите только те данные которые вы бы хотели изменить\n$messageResponse";
+      UtilityWidgets.dialogBuilderApi(
+          context, Future.value(message), editAccountUserMessage, '/profile');
+    }
   }
 
   @override

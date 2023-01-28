@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/28/23, 2:59 PM
+ * Copyright (c) 1-1/28/23, 6:20 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -23,7 +23,6 @@ const String deleteAccountAPI = "/api/v1/account/delete";
 const String changePasswordAPI = "/api/v1/account/change-password";
 
 class ClientManagerService {
-
   /// Method which send request to create new account.
   Future<String> createAccount(
       String username,
@@ -65,6 +64,8 @@ class ClientManagerService {
       String? accountType,
       String? birthDate,
       FlutterSecureStorage secureStorage) async {
+    var role = accountType!.isEmpty? null:accountType;
+
     var bodyMessage = jsonEncode(AccountRequestModel(
         username: username,
         password: null,
@@ -72,7 +73,7 @@ class ClientManagerService {
         firstName: firstName,
         middleName: middleName,
         lastName: lastName,
-        accountType: accountType,
+        accountType: role,
         birthDate: birthDate));
 
     String? userToken = await secureStorage.read(key: jwtTokenKey);
@@ -82,11 +83,10 @@ class ClientManagerService {
     String accessToken = tokenMap["access_token"]!;
     defaultHeaders["Authorization"] = "Bearer $accessToken";
     final requestUri = Uri.parse(clientManagerHost + accountEditAPI);
-
-    clearRequestHeadersContext();
-
     final response =
         await http.put(requestUri, headers: defaultHeaders, body: bodyMessage);
+
+    clearRequestHeadersContext();
     if (response.statusCode == 200) {
       return jsonDecode(utf8.decode(response.bodyBytes))['message'];
     } else {
@@ -154,7 +154,7 @@ class ClientManagerService {
     return jsonDecode(utf8.decode(response.bodyBytes))['message'];
   }
 
-  static void clearRequestHeadersContext(){
+  static void clearRequestHeadersContext() {
     defaultHeaders.remove("Authorization");
   }
 }

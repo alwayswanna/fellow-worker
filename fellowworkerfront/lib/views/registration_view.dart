@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/28/23, 2:59 PM
+ * Copyright (c) 1-1/28/23, 6:20 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,6 +11,7 @@ import 'package:responsive_grid/responsive_grid.dart';
 import '../service/account_utils.dart';
 import '../styles/gradient_color.dart';
 
+const accountCreateMessageToUser = "Создание аккаунта";
 const padding = EdgeInsets.all(10);
 
 class _Registration extends State<Registration>
@@ -45,7 +46,7 @@ class _Registration extends State<Registration>
   void initState() {
     super.initState();
     _passwordVisibility = false;
-    typeAccount = accountTypes.first;
+    typeAccount = null;
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -154,7 +155,7 @@ class _Registration extends State<Registration>
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                             hint: const Text("  Тип аккаунта:"),
-                            value: typeAccount,
+                            value: accountTypes.first,
                             onChanged: (value) {
                               setState(() {
                                 typeAccount = value!;
@@ -223,16 +224,32 @@ class _Registration extends State<Registration>
   Future<void> sendRequestCreateAccount() async {
     var type = UtilityWidgets.extractAccountRoleDataFromWidget(typeAccount);
 
-    var response = accountService.createAccount(
-        usernameController.text,
-        passwordController.text,
-        emailController.text,
-        controllerFirstName.text,
-        controllerMiddleName.text,
-        controllerLastName.text,
-        type,
-        selectedDate.toIso8601String());
-    UtilityWidgets.dialogBuilderApi(context, response, "Создание аккаунта", '/');
+    if (usernameController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        controllerFirstName.text.isEmpty ||
+        controllerMiddleName.text.isEmpty ||
+        controllerLastName.text.isEmpty ||
+        type.isEmpty ||
+        selectedDate.toIso8601String().isEmpty) {
+      UtilityWidgets.dialogBuilderApi(
+          context,
+          Future.value("У вас остались не заполненные поля"),
+          accountCreateMessageToUser,
+          '/profile');
+    } else {
+      var response = accountService.createAccount(
+          usernameController.text,
+          passwordController.text,
+          emailController.text,
+          controllerFirstName.text,
+          controllerMiddleName.text,
+          controllerLastName.text,
+          type,
+          selectedDate.toIso8601String());
+      UtilityWidgets.dialogBuilderApi(
+          context, response, accountCreateMessageToUser, '/');
+    }
   }
 }
 
