@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/27/23, 10:22 PM
+ * Copyright (c) 1-1/29/23, 12:12 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -326,7 +326,7 @@ class _ProfileWidget extends State<Profile>
             child: Padding(
               padding: const EdgeInsets.all(5.0),
               child: UtilityWidgets.buildCardButton(() {
-                print("Создать резюме");
+                Navigator.pushNamed(context, "/create-resume");
               }, "Создать резюме", 15),
             ))
       ]);

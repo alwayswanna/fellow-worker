@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/28/23, 2:59 PM
+ * Copyright (c) 1-1/29/23, 12:12 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -9,7 +9,8 @@ import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/change_password_view.dart';
-import 'package:fellowworkerfront/views/edit_account_page.dart';
+import 'package:fellowworkerfront/views/create_resume_view.dart';
+import 'package:fellowworkerfront/views/edit_account_view.dart';
 import 'package:fellowworkerfront/views/main_view.dart';
 import 'package:fellowworkerfront/views/profile_view.dart';
 import 'package:fellowworkerfront/views/registration_view.dart';
@@ -58,7 +59,10 @@ class MyApp extends StatelessWidget {
               aS: accountService,
             ),
         '/edit-account': (context) =>
-            EditCurrentAccount(sS: flutterSecureStorage, cM: accountService)
+            EditCurrentAccount(sS: flutterSecureStorage, cM: accountService),
+        '/create-resume': (context) => CreateResume(
+            fS: flutterSecureStorage,
+            fW: resumeService)
       },
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,

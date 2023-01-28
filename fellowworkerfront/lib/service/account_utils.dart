@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/27/23, 10:22 PM
+ * Copyright (c) 1-1/29/23, 12:12 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -10,6 +10,7 @@ const companyType = 'Работодатель';
 const adminType = 'Администратор';
 
 const accountTypes = ["  Соискатель", "  Работодатель"];
+const educationLevels = ["  Специалитет", "  Бакалавриат"];
 
 final defaultHeaders = {
   "Content-Type": "application/json",

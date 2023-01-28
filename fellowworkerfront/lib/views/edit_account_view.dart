@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/28/23, 6:20 PM
+ * Copyright (c) 1-1/29/23, 12:12 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -12,6 +12,7 @@ import '../service/account_utils.dart';
 import '../styles/gradient_color.dart';
 import '../utils/utility_widgets.dart';
 
+const padding = EdgeInsets.all(10);
 const String editAccountUserMessage = "Изменение аккаунта";
 const String backSuccessMessageCheck =
     "Данные вашего аккаунт успешно обновлены.";
@@ -59,7 +60,6 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
   }
 
   Widget buildLayout() {
-    var padding = const EdgeInsets.all(10);
     return Center(
       child: SingleChildScrollView(
         child: SizedBox(
