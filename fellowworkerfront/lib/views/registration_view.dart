@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/27/23, 10:22 PM
+ * Copyright (c) 1-1/28/23, 2:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -15,7 +15,6 @@ const padding = EdgeInsets.all(10);
 
 class _Registration extends State<Registration>
     with SingleTickerProviderStateMixin {
-
   final ClientManagerService accountService = ClientManagerService();
   late AnimationController _animationController;
   late String? typeAccount;
@@ -104,30 +103,30 @@ class _Registration extends State<Registration>
                   child: Container(
                       padding: padding,
                       child: TextField(
-                    controller: passwordController,
-                    enableSuggestions: false,
-                    obscureText: !_passwordVisibility,
-                    autocorrect: false,
-                    decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _passwordVisibility
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Theme.of(context).primaryColorDark,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _passwordVisibility = !_passwordVisibility;
-                            });
-                          },
-                        ),
-                        hintText: "Пароль:",
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20))),
-                  ))),
+                        controller: passwordController,
+                        enableSuggestions: false,
+                        obscureText: !_passwordVisibility,
+                        autocorrect: false,
+                        decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _passwordVisibility
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Theme.of(context).primaryColorDark,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _passwordVisibility = !_passwordVisibility;
+                                });
+                              },
+                            ),
+                            hintText: "Пароль:",
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20))),
+                      ))),
               ResponsiveGridCol(
                   md: 6,
                   child: UtilityWidgets.buildTextField(
@@ -222,14 +221,7 @@ class _Registration extends State<Registration>
   }
 
   Future<void> sendRequestCreateAccount() async {
-    var type = "COMPANY";
-    if (typeAccount == accountTypes.first) {
-      type = "EMPLOYEE";
-    } else if (typeAccount == accountTypes.last) {
-      type = "COMPANY";
-    } else {
-      type = "EMPLOYEE";
-    }
+    var type = UtilityWidgets.extractAccountRoleDataFromWidget(typeAccount);
 
     var response = accountService.createAccount(
         usernameController.text,

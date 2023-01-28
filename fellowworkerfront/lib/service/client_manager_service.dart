@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/25/23, 11:38 PM
+ * Copyright (c) 1-1/28/23, 2:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -17,11 +17,14 @@ import 'account_utils.dart';
 
 const String clientManagerHost = "http://127.0.0.1:8090";
 const String accountCreateAPI = "/api/v1/account/create";
+const String accountEditAPI = "/api/v1/account/edit";
 const String currentAccountAPI = "/api/v1/account/current";
 const String deleteAccountAPI = "/api/v1/account/delete";
 const String changePasswordAPI = "/api/v1/account/change-password";
 
 class ClientManagerService {
+
+  /// Method which send request to create new account.
   Future<String> createAccount(
       String username,
       String password,
@@ -52,6 +55,45 @@ class ClientManagerService {
     }
   }
 
+  /// Method which send request to edit current account data.
+  Future<String> editAccount(
+      String? username,
+      String? email,
+      String? firstName,
+      String? middleName,
+      String? lastName,
+      String? accountType,
+      String? birthDate,
+      FlutterSecureStorage secureStorage) async {
+    var bodyMessage = jsonEncode(AccountRequestModel(
+        username: username,
+        password: null,
+        email: email,
+        firstName: firstName,
+        middleName: middleName,
+        lastName: lastName,
+        accountType: accountType,
+        birthDate: birthDate));
+
+    String? userToken = await secureStorage.read(key: jwtTokenKey);
+
+    Map<dynamic, dynamic> tokenMap =
+        Oauth2Service.convertTokenToMap(userToken!);
+    String accessToken = tokenMap["access_token"]!;
+    defaultHeaders["Authorization"] = "Bearer $accessToken";
+    final requestUri = Uri.parse(clientManagerHost + accountEditAPI);
+
+    clearRequestHeadersContext();
+
+    final response =
+        await http.put(requestUri, headers: defaultHeaders, body: bodyMessage);
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+    } else {
+      return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+    }
+  }
+
   /// Method get info by current account with Oauth2.
   Future<ApiResponseModel> getCurrentAccountData(
       FlutterSecureStorage secureStorage) async {
@@ -63,6 +105,8 @@ class ClientManagerService {
     defaultHeaders["Authorization"] = "Bearer $accessToken";
     final requestUri = Uri.parse(clientManagerHost + currentAccountAPI);
     final response = await http.get(requestUri, headers: defaultHeaders);
+
+    clearRequestHeadersContext();
 
     if (response.statusCode == 200) {
       return ApiResponseModel.fromJson(
@@ -83,9 +127,12 @@ class ClientManagerService {
     final requestUri = Uri.parse(clientManagerHost + deleteAccountAPI);
     final response = await http.delete(requestUri, headers: defaultHeaders);
 
+    clearRequestHeadersContext();
+
     return jsonDecode(utf8.decode(response.bodyBytes))['message'];
   }
 
+  /// Method which send request to change password for current user.
   Future<String> changePassword(FlutterSecureStorage secureStorage,
       String oldPassword, String newPassword) async {
     var bodyMessage = jsonEncode(ChangePasswordModel(
@@ -102,6 +149,12 @@ class ClientManagerService {
         headers: defaultHeaders,
         body: bodyMessage);
 
+    clearRequestHeadersContext();
+
     return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+  }
+
+  static void clearRequestHeadersContext(){
+    defaultHeaders.remove("Authorization");
   }
 }

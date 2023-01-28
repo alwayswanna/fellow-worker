@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/24/23, 10:30 PM
+ * Copyright (c) 12-1/28/23, 2:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -75,7 +75,9 @@ public class AccountService {
      * @return {@link ApiResponseModel} response for user.
      */
     public ApiResponseModel editAccount(AccountRequestModel requestModel) {
-        validateAccountDataInDataBase(requestModel);
+        if(requestModel.getUsername() != null || requestModel.getEmail() != null){
+            validateAccountDataInDataBase(requestModel);
+        }
         var account = accountRepository.findAccountById(oAuth2SecurityContextService.getUserId())
                 .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Неверно введены данные."));
         /* fill data from request in the account fields  */

@@ -1,11 +1,23 @@
 /*
- * Copyright (c) 1-1/23/23, 11:18 PM
+ * Copyright (c) 1-1/28/23, 2:59 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:flutter/material.dart';
 
+import '../service/account_utils.dart';
+
 class UtilityWidgets {
+
+  static String extractAccountRoleDataFromWidget(String? accountRoleWidget){
+    if (accountRoleWidget == accountTypes.first) {
+      return "EMPLOYEE";
+    } else if (accountRoleWidget == accountTypes.last) {
+      return "COMPANY";
+    } else {
+      return "EMPLOYEE";
+    }
+  }
 
   static Future<void> dialogBuilderApi(
       BuildContext context, Future<String> response, String message, String onOkRedirectionPath) {

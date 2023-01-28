@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 1-1/17/23, 11:26 PM
+ * Copyright (c) 1-1/28/23, 2:59 PM
  * Created by https://github.com/alwayswanna
  */
 
 class AccountRequestModel {
-  final String username;
-  final String password;
-  final String email;
-  final String firstName;
-  final String middleName;
-  final String lastName;
-  final String accountType;
-  final String birthDate;
+  final String? username;
+  final String? password;
+  final String? email;
+  final String? firstName;
+  final String? middleName;
+  final String? lastName;
+  final String? accountType;
+  final String? birthDate;
 
   const AccountRequestModel(
       {required this.username,

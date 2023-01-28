@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/27/23, 10:22 PM
+ * Copyright (c) 1-1/28/23, 2:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -21,11 +21,12 @@ const jwtTokenKey = "jwtToken";
 
 void main() {
   var securityStorage = const FlutterSecureStorage();
-  var accountService = ClientManagerService();
-  var resumeService = FellowWorkerService();
+  var clientManagerService = ClientManagerService();
+  var fellowWorkerService = FellowWorkerService();
   setPathUrlStrategy();
   securityStorage.delete(key: jwtTokenKey);
-  runApp(MyApp(sS: securityStorage, aS: accountService, rS: resumeService));
+  runApp(MyApp(
+      sS: securityStorage, aS: clientManagerService, rS: fellowWorkerService));
 }
 
 class MyApp extends StatelessWidget {
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
               aS: accountService,
             ),
         '/edit-account': (context) =>
-            EditCurrentAccount(sS: flutterSecureStorage, fS: resumeService)
+            EditCurrentAccount(sS: flutterSecureStorage, cM: accountService)
       },
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,
