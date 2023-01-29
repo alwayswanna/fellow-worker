@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/24/23, 10:30 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -19,6 +19,7 @@ import a.gleb.fellowworkerservice.exception.UnexpectedErrorException
 import a.gleb.fellowworkerservice.mapper.VacancyModelMapper
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.util.CollectionUtils
 import java.util.*
 
 @Service
@@ -252,6 +253,30 @@ class VacancyService(
                 HttpStatus.BAD_GATEWAY,
                 UNEXPECTED_ERROR
             )
+        }
+    }
+
+    /**
+     * Method returns all vacancies by current user.
+     */
+    suspend fun getCurrentUserVacancies(): FellowWorkerResponseModel {
+        val userId = oauth2SecurityService.extractOauth2UserId()
+
+        val vacancyIterable = vacancyRepository.findAllByOwnerId(UUID.fromString(userId))
+        val messageToResponse = if (CollectionUtils.isEmpty(vacancyIterable)) {
+            "У вас нету активных вакансий."
+        } else {
+            "Ваши активные вакансии:"
+        }
+
+        return if (CollectionUtils.isEmpty(vacancyIterable)) {
+            FellowWorkerResponseModel().apply {
+                message = messageToResponse
+            }
+        } else {
+            vacancyModelMapper.toVacancyResponseFromList(vacancyIterable).apply {
+                message = messageToResponse
+            }
         }
     }
 

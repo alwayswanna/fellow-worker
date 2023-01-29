@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/13/23, 9:17 PM
+ * Copyright (c) 12-1/26/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -42,19 +42,6 @@ class ResumeModelMapper {
             .apply {
                 message = messageToUser
                 resumeResponse = toResumeResponse(resume)
-            }
-    }
-
-    /**
-     * Method convert list of entities [Resume] from database to response [FellowWorkerResponseModel].
-     * @param resumeList collection with resume from database.
-     */
-    suspend fun toResponseWithListOfResume(resumeList: List<Resume>): FellowWorkerResponseModel {
-        return FellowWorkerResponseModel()
-            .apply {
-                resumes = resumeList.asSequence()
-                    .map { toResumeResponse(it) }
-                    .toList()
             }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/26/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -17,6 +17,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.web.cors.reactive.CorsConfigurationSource
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import reactor.core.publisher.Flux
 
 const val ROLE_PREFIX: String = "ROLE_"
@@ -43,7 +45,8 @@ class FellowWorkerSecurityConfiguration(
     @Bean
     fun oauth2SecurityWebFilterChain(httpSecurity: ServerHttpSecurity): SecurityWebFilterChain {
         httpSecurity
-            .cors().and().csrf().disable()
+            .anonymous().disable()
+            .csrf().disable()
             .authorizeExchange { restrictApiMethods(it) }
             .oauth2ResourceServer()
             .jwt {
@@ -52,8 +55,18 @@ class FellowWorkerSecurityConfiguration(
 
                 it.jwtAuthenticationConverter(reactiveJwtConverter)
             }
+        httpSecurity.cors{
+            it.configurationSource(corsConfiguration(properties))
+        }
 
         return httpSecurity.build()
+    }
+
+    @Bean
+    fun corsConfiguration(properties: FellowWorkerConfigurationProperties): CorsConfigurationSource{
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", properties.cors)
+        return source
     }
 
     private fun restrictApiMethods(authorizeExchangeSpec: ServerHttpSecurity.AuthorizeExchangeSpec) {

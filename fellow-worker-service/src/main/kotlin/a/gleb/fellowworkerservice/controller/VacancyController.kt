@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/24/23, 10:30 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -230,5 +230,28 @@ class VacancyController(
     @GetMapping("/vacancies-by-type-time")
     suspend fun getVacanciesByTypeWorkTime(@RequestParam @NotNull type: String): FellowWorkerResponseModel {
         return vacancyService.findVacancyByType(type)
+    }
+
+    @Operation(
+        summary = "Получить все вакансии текущего пользователя.",
+        tags = [VACANCY_TAG_NAME],
+        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)],
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                description = "OK", responseCode = "200",
+                content = [Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = Schema(implementation = FellowWorkerResponseModel::class)
+                )]
+            ),
+            ApiResponse(description = "Bad request", responseCode = "400"),
+            ApiResponse(description = "Internal server error", responseCode = "500")
+        ]
+    )
+    @GetMapping("/current-user-vacancies")
+    suspend fun getCurrentUserVacancies(): FellowWorkerResponseModel{
+        return vacancyService.getCurrentUserVacancies()
     }
 }

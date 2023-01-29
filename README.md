@@ -33,6 +33,18 @@ Server which create JWT tokens.
 
 http://127.0.0.1:9001/authorize/token
 
+## _cv-generator_
+
+Service which cat create PDF files with resume info.
+
+http://127.0.0.1:7044/swagger-ui.html
+
+## _fellowworkerfron_
+
+Frontend module for all microservices.
+
+http://127.0.0.1:8888/
+
 
 
 Final qualifying work for the university.

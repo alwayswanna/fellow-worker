@@ -11,3 +11,10 @@
 /api-common/target/
 /cv-generator/.mvn/
 /cv-generator/target/
+/fellowworkerfront/test/widget_test.dart
+/fellowworkerfront/.dart_tool
+/fellowworkerfront/.idea
+/fellowworkerfront/fellowworkerfront.iml
+/fellowworkerfront/build
+/fellowworkerfront/.flutter-plugins
+/fellowworkerfront/.flutter-plugins-dependencies

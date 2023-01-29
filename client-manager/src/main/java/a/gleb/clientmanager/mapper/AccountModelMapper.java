@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-1/25/23, 11:37 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -38,7 +38,7 @@ public class AccountModelMapper {
                 .lastName(requestModel.getLastName())
                 .birthData(requestModel.getBirthDate())
                 .role(AccountType.EMPLOYEE == requestModel.getAccountType() ?
-                        AccountRole.COMPANY : AccountRole.EMPLOYEE
+                        AccountRole.EMPLOYEE : AccountRole.COMPANY
                 )
                 .enabled(true)
                 .build();

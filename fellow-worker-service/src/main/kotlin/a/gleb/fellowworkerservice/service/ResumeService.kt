@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/13/23, 9:17 PM
+ * Copyright (c) 12-1/27/23, 10:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -37,14 +37,12 @@ class ResumeService(
         val userId = oauth2SecurityService.extractOauth2UserId()
 
         val existingResume = resumeRepository.findAllByOwnerRecordId(UUID.fromString(userId))
-        if (!existingResume.isNullOrEmpty()) {
+        if (existingResume != null) {
             logger.info {
-                "Current user: $userId already have resume (count: ${existingResume.size}), deleting existing resume"
+                "Current user: $userId already have resume (resumeId: ${existingResume.id}), deleting existing resume"
             }
-            existingResume.forEach {
-                resumeRepository.delete(it)
-                resumeSenderService.sendMessageRemove(ResumeMessageDelete(it.id))
-            }
+            resumeRepository.delete(existingResume)
+            resumeSenderService.sendMessageRemove(ResumeMessageDelete(existingResume.id))
         }
 
         val resume = resumeModelMapper.toResumeDtoModel(UUID.fromString(userId), request, null)
@@ -171,17 +169,18 @@ class ResumeService(
         val userId = oauth2SecurityService.extractOauth2UserId()
 
         try {
-            val resume =
-                resumeRepository.findAllByOwnerRecordId(UUID.fromString(userId)) ?: throw InvalidUserDataException(
-                    HttpStatus.NOT_FOUND,
-                    "Вы еще не создавали резюме"
-                )
-            return resumeModelMapper.toResponseWithListOfResume(resume)
+            val resume = resumeRepository.findAllByOwnerRecordId(UUID.fromString(userId))
+                ?: return FellowWorkerResponseModel()
+                    .apply {
+                        message = "Вы еще не создавали резюме"
+                    }
+
+            return resumeModelMapper.toFellowWorkerResponseModel(resume, "С вашим аккаунтом связаны следующие резюме")
 
         } catch (e: Exception) {
             throw UnexpectedErrorException(
                 BAD_GATEWAY,
-                "Ошибка при создании резюме, попробуйте повторить попытку позже"
+                "Ошибка при получении резюме, попробуйте повторить попытку позже"
             )
         }
     }

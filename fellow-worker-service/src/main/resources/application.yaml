@@ -60,15 +60,15 @@ spring:
           destination: cv
 
 fellow-worker:
-  unprotected-paths:
-    - /api/v1/employee/get-all-resume
-    - /api/v1/employee/get-resume-id
-    - /api/v1/vacancy/vacancy-all
-    - /api/v1/vacancy/id
-    - /api/v1/vacancy/vacancies-by-skills
-    - /api/v1/vacancy/vacancies-by-type
-    - /api/v1/vacancy/vacancies-by-city
-    - /api/v1/vacancy/vacancies-by-type-time
+  cors:
+    enabled: true
+    allowed-origins:
+      - "*"
+    allowed-origins-all: true
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
   security-constraints:
     - roles:
         - EMPLOYEE
@@ -85,6 +85,16 @@ fellow-worker:
             - /api/v1/vacancy/create
             - /api/v1/vacancy/edit
             - /api/v1/vacancy/delete-id
+            - /api/v1/vacancy/current-user-vacancies
+  unprotected-paths:
+    - /api/v1/employee/get-all-resume
+    - /api/v1/employee/get-resume-id
+    - /api/v1/vacancy/vacancy-all
+    - /api/v1/vacancy/id
+    - /api/v1/vacancy/vacancies-by-skills
+    - /api/v1/vacancy/vacancies-by-type
+    - /api/v1/vacancy/vacancies-by-city
+    - /api/v1/vacancy/vacancies-by-type-time
 
 logging:
   level:

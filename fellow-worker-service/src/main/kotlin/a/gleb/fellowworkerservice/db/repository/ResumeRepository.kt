@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-1/26/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -15,5 +15,5 @@ interface ResumeRepository : CoroutineCrudRepository<Resume, UUID> {
 
     suspend fun findResumeById(id: UUID): Resume?
 
-    suspend fun findAllByOwnerRecordId(id: UUID): List<Resume>?
+    suspend fun findAllByOwnerRecordId(id: UUID): Resume?
 }
