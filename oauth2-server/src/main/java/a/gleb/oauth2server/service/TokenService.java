@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-2/5/23, 11:50 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.oauth2server.service;
 
+import a.gleb.oauth2server.configuration.properties.OAuth2ServerProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,10 @@ public class TokenService {
     private static final String USERNAME_CLAIM = "username";
     private static final String FIRSTNAME_CLAIM = "first_name";
     private static final String MIDDLE_NAME_CLAIM = "middle_name";
+    private static final String ISSUER_URI = "iss";
 
     private final AccountService accountService;
+    private final OAuth2ServerProperties properties;
 
     public Map<String, String> enrichJwtToken(String username) {
         log.info("Enrich JWT for user: {}", username);
@@ -34,7 +37,8 @@ public class TokenService {
                     EMAIL_CLAIM, account.getEmail(),
                     USERNAME_CLAIM, account.getUsername(),
                     FIRSTNAME_CLAIM, account.getFirstName(),
-                    MIDDLE_NAME_CLAIM, account.getMiddleName()
+                    MIDDLE_NAME_CLAIM, account.getMiddleName(),
+                    ISSUER_URI, properties.getIssueUrl()
             );
         }
         return Map.of();

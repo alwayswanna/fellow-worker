@@ -1,11 +1,13 @@
 /*
- * Copyright (c) 1-1/12/23, 11:58 PM
+ * Copyright (c) 1-2/15/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.cvgenerator.models
 
 import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseModel
+import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseModel.EducationLevel.BACHELOR
+import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseModel.EducationLevel.SPECIALTY
 import a.gleb.apicommon.fellowworker.model.response.resume.WorkExperienceResponseModel
 import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageCreate
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -19,6 +21,7 @@ import org.imgscalr.Scalr
 import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.file.Files
 import java.util.*
 import javax.imageio.ImageIO
 
@@ -34,6 +37,21 @@ const val AVATAR_TEMPLATE_DEFAULT_PATH = "templates/default-avatar.png"
 /* PATH TO FONTS */
 const val BOLD_FONT_PATH = "templates/Nunito-Bold.ttf"
 const val FONT_PATH = "templates/Nunito-Regular.ttf"
+
+/* RU education levels */
+const val spec = "Специалитет"
+const val bac = "Бакалавриат"
+const val mag = "Магистрант"
+
+fun determineEduLevelOfResume(educationLevel: EducationResponseModel.EducationLevel): String {
+    return if (BACHELOR == educationLevel) {
+        bac
+    } else if (SPECIALTY == educationLevel) {
+        spec
+    } else {
+        mag
+    }
+}
 
 class CvDocumentModel(
     private val pdDocument: PDDocument,
@@ -101,6 +119,8 @@ class CvDocumentModel(
             height.toFloat()
         )
 
+        /* remove file and close stream of pdf file */
+        Files.delete(avatar.toPath())
         contentStream.close()
     }
 
@@ -225,7 +245,7 @@ class CvDocumentModel(
             contentStream,
             RIGHT_BORDER_X_COORDINATE_MAX,
             rightBorderStartYCoordinate,
-            educationApiModel.educationLevel,
+            determineEduLevelOfResume(educationApiModel.educationLevel),
             pdFont,
             8,
             Color.DARK_GRAY
@@ -273,7 +293,7 @@ class CvDocumentModel(
             contentStream,
             RIGHT_BORDER_X_COORDINATE_MAX,
             rightBorderStartYCoordinate,
-            workExperienceApiModel.workingSpecialty,
+            workExperienceApiModel.workingSpeciality,
             pdFont,
             8,
             Color.DARK_GRAY

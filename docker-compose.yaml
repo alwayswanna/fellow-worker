@@ -1,7 +1,81 @@
-version: "2"
+version: "3"
 
 services:
+####################### Microservices: ##############################################
+  frontend:
+    container_name: fellowworkerfront
+    image: alwayswanna/fellow-worker:frontend
+    ports:
+      - "8888:80"
+    links:
+      - fellow-worker-service
+      - oauth2-server
+      - client-manager
+      - cv-generator
+  client-manager:
+    container_name: client-manager
+    image: alwayswanna/fellow-worker:client-manager
+    ports:
+      - "8090:8090"
+    environment:
+      OAUTH2_SERVER_URL: 192.168.220.2
+      DATASOURCE_URL: host.docker.internal
+      JAVA_MEM: -Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication
+    networks:
+      stand:
+        ipv4_address: 192.168.220.3
+    links:
+      - postgres
+  oauth2-server:
+    container_name: oauth2-server
+    image: alwayswanna/fellow-worker:oauth2-server
+    ports:
+      - "9001:9001"
+    environment:
+      OAUTH2_SERVER_URL: 192.168.220.2
+      DATASOURCE_URL: host.docker.internal
+      JAVA_MEM: -Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication
+    networks:
+      stand:
+        ipv4_address: 192.168.220.2
+    links:
+      - postgres
+  cv-generator:
+    container_name: cv-generator
+    image: alwayswanna/fellow-worker:cv-generator
+    ports:
+      - "7044:7044"
+    environment:
+      OAUTH2_SERVER_URL: 192.168.220.2
+      RABBITMQ_URL: host.docker.internal
+      JAVA_MEM: -Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication
+    networks:
+      stand:
+        ipv4_address: 192.168.220.4
+    links:
+      - rabbit
+      - oauth2-server
+  fellow-worker-service:
+    container_name: resume-vacancy-service
+    image: alwayswanna/fellow-worker:fellow-worker-service
+    ports:
+      - "4334:4334"
+    environment:
+      OAUTH2_SERVER_URL: 192.168.220.2
+      DATASOURCE_URL: host.docker.internal
+      RABBITMQ_URL: host.docker.internal
+      JAVA_MEM: -Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication
+    networks:
+      stand:
+        ipv4_address: 192.168.220.5
+    links:
+      - mongo
+      - rabbit
+      - oauth2-server
+
+####################### Environment: ##############################################
   postgres:
+    container_name: postgresSQL
     image: postgres:latest
     environment:
       POSTGRES_DB: authorization
@@ -10,6 +84,7 @@ services:
     ports:
       - "5432:5432"
   mongo:
+    container_name: mongoDB
     image: mongo:latest
     ports:
       - "27017:27017"
@@ -18,7 +93,16 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: mongo
       MONGO_INITDB_DATABASE: fellow-worker
   rabbit:
+    container_name: rabbitMQ
     image: rabbitmq:3.11-management
     ports:
       - "15672:15672"
       - "5672:5672"
+
+networks:
+  stand:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.220.0/24
+

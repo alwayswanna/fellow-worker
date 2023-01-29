@@ -18,11 +18,19 @@ dependencies:
   flutter_secure_storage: ^7.0.1
   file_picker: ^5.2.5
   uuid: ^3.0.7
+  intl: ^0.18.0
+#  json_serializable: ^6.6.1
+#  build_runner: ^2.3.3
+  json_annotation: ^4.8.0
+  file_saver: ^0.1.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.1
+  source_gen: ^1.2.7
 
 flutter:
   uses-material-design: true

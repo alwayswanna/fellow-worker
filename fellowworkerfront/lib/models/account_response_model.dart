@@ -1,8 +1,13 @@
 /*
- * Copyright (c) 1-1/23/23, 11:18 PM
+ * Copyright (c) 1-2/8/23, 11:05 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:json_annotation/json_annotation.dart';
+
+part '../generated/account_response_model.g.dart';
+
+@JsonSerializable()
 class ApiResponseModel {
   final String message;
   final AccountDataModel? accountDataModel;
@@ -13,21 +18,11 @@ class ApiResponseModel {
       required this.accountDataModel,
       required this.accounts});
 
-  factory ApiResponseModel.fromJson(Map<String, dynamic> json) {
-    List<AccountDataModel> accounts = List.empty();
-    if (json['accounts'] != null) {
-      accounts = (json['accounts'] as List)
-          .map((e) => AccountDataModel.fromJson(e))
-          .toList();
-    }
-
-    return ApiResponseModel(
-        message: json['message'],
-        accountDataModel: AccountDataModel.fromJson(json['accountDataModel']),
-        accounts: accounts);
-  }
+  factory ApiResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$ApiResponseModelFromJson(json);
 }
 
+@JsonSerializable(explicitToJson: true)
 class AccountDataModel {
   final String username;
   final String firstName;
@@ -46,14 +41,6 @@ class AccountDataModel {
       required this.role,
       required this.birthDate});
 
-  factory AccountDataModel.fromJson(Map<String, dynamic> json) {
-    return AccountDataModel(
-        username: json['username'],
-        email: json['email'],
-        firstName: json['firstName'],
-        middleName: json['middleName'],
-        lastName: json['lastName'],
-        role: json['role'],
-        birthDate: json['birthDate']);
-  }
+  factory AccountDataModel.fromJson(Map<String, dynamic> json) =>
+      _$AccountDataModelFromJson(json);
 }

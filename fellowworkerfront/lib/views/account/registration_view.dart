@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/28/23, 6:20 PM
+ * Copyright (c) 1-2/19/23, 11:28 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,8 +8,8 @@ import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
-import '../service/account_utils.dart';
-import '../styles/gradient_color.dart';
+import '../../service/account_utils.dart';
+import '../../styles/gradient_color.dart';
 
 const accountCreateMessageToUser = "Создание аккаунта";
 const padding = EdgeInsets.all(10);
@@ -31,6 +31,8 @@ class _Registration extends State<Registration>
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
+        helpText: "Выбранная дата",
+        fieldLabelText: "Выберете дату: ",
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(1900, 8),
@@ -55,13 +57,9 @@ class _Registration extends State<Registration>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Fellow worker"),
-      ),
-      body:
-          GradientEnchanted.buildGradient(buildLayout(), _animationController),
-    );
+    return UtilityWidgets.buildTopBar(
+        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        context);
   }
 
   @override
@@ -257,7 +255,5 @@ class Registration extends StatefulWidget {
   const Registration({super.key});
 
   @override
-  State<StatefulWidget> createState() {
-    return _Registration();
-  }
+  createState() => _Registration();
 }

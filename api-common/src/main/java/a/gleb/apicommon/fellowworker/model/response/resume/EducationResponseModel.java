@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-2/7/23, 10:48 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -39,5 +39,11 @@ public class EducationResponseModel {
 
     @NotNull
     @Schema(description = "Ученая степень")
-    private String educationLevel;
+    private EducationLevel educationLevel;
+
+    public enum EducationLevel {
+        BACHELOR,
+        SPECIALTY,
+        MAGISTRACY
+    }
 }

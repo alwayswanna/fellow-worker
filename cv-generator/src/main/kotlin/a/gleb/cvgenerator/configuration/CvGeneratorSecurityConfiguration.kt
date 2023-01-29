@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-2/7/23, 10:13 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -13,11 +13,14 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 const val ROLE_PREFIX = "ROLE_"
 const val ROLE_KEY_CLAIM = "role"
@@ -30,18 +33,23 @@ private val unauthorizedPatterns: List<String> = listOf(
     "/error"
 )
 
-
 @Configuration
 @EnableWebSecurity
 class CvGeneratorSecurityConfiguration(
     private val properties: CvGeneratorConfigurationProperties
 ) {
 
+    /**
+     * Configure Spring security for microservice.
+     */
     @Bean
     fun oauth2SecurityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
-        httpSecurity.anonymous().disable()
-            .cors().disable()
-            .csrf().disable()
+        httpSecurity
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().cors()
+            .and()
+            .csrf()
+            .disable()
             .authorizeHttpRequests(this::configure)
             .oauth2ResourceServer()
             .jwt {
@@ -51,6 +59,16 @@ class CvGeneratorSecurityConfiguration(
             }
 
         return httpSecurity.build()
+    }
+
+    /**
+     * Method generate CORS for microservice.
+     */
+    @Bean
+    fun corsConfigurationSource(properties: CvGeneratorConfigurationProperties): CorsConfigurationSource {
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", properties.cors)
+        return source
     }
 
     /**
@@ -69,15 +87,7 @@ class CvGeneratorSecurityConfiguration(
             }
         }
 
-        val unprotectedPaths = properties.unprotectedPaths
-
-        val permitAllMappings = if(unprotectedPaths != null){
-            (unprotectedPaths + unauthorizedPatterns).toTypedArray()
-        }else{
-            unauthorizedPatterns.toTypedArray()
-        }
-
-        registry.requestMatchers(*permitAllMappings).permitAll()
+        registry.requestMatchers(*unauthorizedPatterns.toTypedArray()).permitAll()
     }
 
     /**

@@ -1,20 +1,19 @@
 /*
- * Copyright (c) 12-1/26/23, 11:40 PM
+ * Copyright (c) 12-2/15/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.fellowworkerservice.mapper
 
+import a.gleb.apicommon.fellowworker.model.request.resume.EducationApiModel
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.ContactResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.ResumeResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.WorkExperienceResponseModel
-import a.gleb.fellowworkerservice.db.dao.ContactModel
-import a.gleb.fellowworkerservice.db.dao.Education
-import a.gleb.fellowworkerservice.db.dao.Resume
-import a.gleb.fellowworkerservice.db.dao.WorkExperience
+import a.gleb.fellowworkerservice.db.dao.*
+import a.gleb.fellowworkerservice.db.dao.EducationLevel.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
@@ -66,7 +65,7 @@ class ResumeModelMapper {
                         startTime = it.startTime
                         endTime = it.endTime
                         educationalInstitution = it.educationalInstitution
-                        educationLevel = it.educationLevel
+                        educationLevel = determineResumeResponseEducationLevel(it.educationLevel)
                     }
                 }.toList()
                 professionalSkills = resume.professionalSkills
@@ -77,7 +76,7 @@ class ResumeModelMapper {
                                 startTime = it.startTime
                                 endTime = it.endTime
                                 companyName = it.companyName
-                                workingSpecialty = it.workingSpecialty
+                                workingSpeciality = it.workingSpecialty
                                 responsibilities = it.responsibilities
                             }
                     }
@@ -88,6 +87,16 @@ class ResumeModelMapper {
                 }
                 lastUpdate = resume.lastUpdate
             }
+    }
+
+    private fun determineResumeResponseEducationLevel(educationLevel: EducationLevel): EducationResponseModel.EducationLevel {
+        return if (BACHELOR.toString() == educationLevel.toString()) {
+            EducationResponseModel.EducationLevel.BACHELOR
+        } else if (MAGISTRACY.toString() == educationLevel.toString()) {
+            EducationResponseModel.EducationLevel.MAGISTRACY
+        } else {
+            EducationResponseModel.EducationLevel.SPECIALTY
+        }
     }
 
     /**
@@ -109,7 +118,7 @@ class ResumeModelMapper {
      */
     suspend fun toResumeDtoModel(userId: UUID, request: ResumeApiModel, resumeId: UUID?): Resume {
         return Resume(
-            id = resumeId?: UUID.randomUUID(),
+            id = resumeId ?: UUID.randomUUID(),
             ownerRecordId = userId,
             firstName = request.firstName,
             middleName = request.middleName,
@@ -117,7 +126,7 @@ class ResumeModelMapper {
             birthDate = request.birthDate,
             job = request.job,
             expectedSalary = request.expectedSalary,
-            about = request.about?: "",
+            about = request.about ?: "",
             education = toEducationDtoModel(request),
             professionalSkills = request.professionalSkills,
             workHistory = toWorkHistoryDto(request),
@@ -142,10 +151,23 @@ class ResumeModelMapper {
                     startTime = it.startTime,
                     endTime = it.endTime,
                     educationalInstitution = it.educationalInstitution,
-                    educationLevel = it.educationLevel.name
+                    educationLevel = determineEducationLevelFromString(it.educationLevel)
                 )
             }
             .toList()
+    }
+
+    /**
+     * Method map education level.
+     */
+    private fun determineEducationLevelFromString(level: EducationApiModel.EducationLevel): EducationLevel {
+        return if (SPECIALTY.toString() == level.toString()) {
+            SPECIALTY
+        } else if (BACHELOR.toString() == level.toString()) {
+            BACHELOR
+        } else {
+            MAGISTRACY
+        }
     }
 
     /**

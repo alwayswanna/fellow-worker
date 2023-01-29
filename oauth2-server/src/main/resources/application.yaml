@@ -8,10 +8,10 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/authorization
+    url: jdbc:postgresql://${DATASOURCE_URL}:5432/authorization
 
 oauth:
-  issue-url: http://127.0.0.1:9001
+  issue-url: http://${OAUTH2_SERVER_URL}:9001
   defaultClients:
     -
       default-client-id: message

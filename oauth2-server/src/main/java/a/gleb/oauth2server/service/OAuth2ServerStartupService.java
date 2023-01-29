@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-2/5/23, 11:50 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -32,7 +32,7 @@ public class OAuth2ServerStartupService implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         OAuth2ServerProperties.DefaultUser defaultUser = oAuth2ServerProperties.getDefaultUser();
 
-        if (!accountService.findAccountByUsernameOrEmail(defaultUser.getUsername()).isPresent()) {
+        if (accountService.findAccountByUsernameOrEmail(defaultUser.getUsername()).isEmpty()) {
             log.info("{}, create default user start ... ", getClass().getSimpleName());
             var defaultUserAccount = builder()
                     .username(defaultUser.getUsername())

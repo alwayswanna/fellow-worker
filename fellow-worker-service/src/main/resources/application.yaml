@@ -21,7 +21,7 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: http://127.0.0.1:9001
+          issuer-uri: http://${OAUTH2_SERVER_URL}:9001
   data:
     mongodb:
       authentication-database: admin
@@ -30,8 +30,9 @@ spring:
       username: mongo
       password: mongo
       uuid-representation: standard
+      host: ${DATASOURCE_URL}
   rabbitmq:
-    host: localhost
+    host: ${RABBITMQ_URL}
     port: 5672
     username: guest
     password: guest

@@ -40,4 +40,4 @@ client-manager:
 
 logging:
   level:
-    web: INFO
+    root: off

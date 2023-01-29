@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/11/23, 10:19 PM
+ * Copyright (c) 07-2/7/23, 10:48 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -56,7 +56,7 @@ data class Education(
 
     var educationalInstitution: String,
 
-    var educationLevel: String
+    var educationLevel: EducationLevel
 )
 
 class WorkExperience(
@@ -80,4 +80,10 @@ class ContactModel(
 
     var email: String
 )
+
+enum class EducationLevel {
+    BACHELOR,
+    SPECIALTY,
+    MAGISTRACY
+}
 

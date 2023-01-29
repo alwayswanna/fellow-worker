@@ -1,8 +1,13 @@
 /*
- * Copyright (c) 1-1/28/23, 2:59 PM
+ * Copyright (c) 1-2/8/23, 11:05 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:json_annotation/json_annotation.dart';
+
+part '../generated/account_request_model.g.dart';
+
+@JsonSerializable()
 class AccountRequestModel {
   final String? username;
   final String? password;
@@ -23,28 +28,7 @@ class AccountRequestModel {
       required this.accountType,
       required this.birthDate});
 
-  factory AccountRequestModel.fromJson(Map<String, dynamic> json) {
-    return AccountRequestModel(
-        username: json['username'],
-        password: json['password'],
-        email: json['email'],
-        firstName: json['firstName'],
-        middleName: json['middleName'],
-        lastName: json['lastName'],
-        accountType: json['accountType'],
-        birthDate: json['birthDate']);
-  }
+  factory AccountRequestModel.fromJson(Map<String, dynamic> json) => _$AccountRequestModelFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return {
-      'username': username,
-      'password': password,
-      'email': email,
-      'firstName': firstName,
-      'middleName': middleName,
-      'lastName': lastName,
-      'accountType': accountType,
-      'birthDate': birthDate
-    };
-  }
+  Map<String, dynamic> toJson() => _$AccountRequestModelToJson(this);
 }

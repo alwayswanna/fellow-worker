@@ -21,7 +21,9 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: http://127.0.0.1:9001
+          issuer-uri: http://${OAUTH2_SERVER_URL}:9001
+  rabbitmq:
+    host: ${RABBITMQ_URL}
   cloud:
     function:
       definition: receiveCreate;receiveRemove
@@ -57,8 +59,15 @@ spring:
             max-attempts: 5
 
 cv-generator:
-  unprotected-paths:
-    - /api/v2/**
+  cors:
+    enabled: true
+    allowed-origins:
+      - "*"
+    allowed-origins-all: true
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
   security-constraints:
     - roles:
         - EMPLOYEE

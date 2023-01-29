@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/18/23, 11:08 PM
+ * Copyright (c) 12-2/7/23, 10:13 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -44,6 +44,9 @@ public class ClientManagerSecurityConfiguration {
 
     private final ClientManagerConfigurationProperties properties;
 
+    /**
+     * Configure Spring security for microservice.
+     */
     @Bean
     public SecurityFilterChain oauth2SecurityWebFilterChain(
             HttpSecurity httpSecurity

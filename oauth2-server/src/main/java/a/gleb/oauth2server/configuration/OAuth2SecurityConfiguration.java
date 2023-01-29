@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-2/5/23, 11:50 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -25,7 +25,6 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
-import org.springframework.security.oauth2.server.authorization.settings.AbstractSettings;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.web.SecurityFilterChain;
@@ -82,11 +81,6 @@ public class OAuth2SecurityConfiguration {
         provider.setUserDetailsService(oAuth2UserDetailsService);
 
         return provider;
-    }
-
-    @Bean
-    public AbstractSettings clientSettings() {
-        return TokenSettings.builder().setting("issuer", properties.getIssueUrl()).build();
     }
 
     @Bean

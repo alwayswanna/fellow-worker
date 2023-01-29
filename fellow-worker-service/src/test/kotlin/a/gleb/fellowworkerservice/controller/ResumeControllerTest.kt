@@ -1,15 +1,12 @@
 /*
- * Copyright (c) 07-1/14/23, 7:54 PM
+ * Copyright (c) 07-2/7/23, 10:48 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.fellowworkerservice.controller
 
 import a.gleb.fellowworkerservice.BaseFellowWorkerServiceTest
-import a.gleb.fellowworkerservice.db.dao.ContactModel
-import a.gleb.fellowworkerservice.db.dao.Education
-import a.gleb.fellowworkerservice.db.dao.Resume
-import a.gleb.fellowworkerservice.db.dao.WorkExperience
+import a.gleb.fellowworkerservice.db.dao.*
 import kotlinx.coroutines.Dispatchers.Unconfined
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -281,7 +278,7 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
                     LocalDate.now().minusYears(2),
                     LocalDate.now(),
                     "BashGU",
-                    ""
+                    EducationLevel.MAGISTRACY
                 )
             ),
             listOf("Clever", "Soft", "etc"),
