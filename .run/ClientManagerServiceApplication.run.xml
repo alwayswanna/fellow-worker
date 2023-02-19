@@ -1,10 +1,14 @@
 <!--
-  ~ Copyright (c) 07.01.2023, 21:08
+  ~ Copyright (c) 2/5/23, 11:50 PM
   ~ Created by https://github.com/alwayswanna
   -->
 
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="ClientManagerServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <envs>
+      <env name="DATASOURCE_URL" value="localhost" />
+      <env name="OAUTH2_SERVER_URL" value="127.0.0.1" />
+    </envs>
     <module name="client-manager" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.clientmanager.ClientManagerApplication" />
     <option name="VM_PARAMETERS" value="-Xms128m -Xmx256m" />

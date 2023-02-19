@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 07-1/10/23, 11:08 PM
+ * Copyright (c) 07-2/2/23, 11:43 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.apicommon.fellowworker.model.response.resume;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -62,6 +63,7 @@ public class ResumeResponseModel {
 
     @Valid
     @Schema(description = "Информация об образовании")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<EducationResponseModel> education;
 
     @NotEmpty
@@ -70,6 +72,7 @@ public class ResumeResponseModel {
 
     @Valid
     @Schema(description = "История работы")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<WorkExperienceResponseModel> workingHistory;
 
     @Valid

@@ -45,6 +45,11 @@ Frontend module for all microservices.
 
 http://127.0.0.1:8888/
 
+For generate models:
+```shell
+flutter pub run build_runner build
+```
+
 
 
 Final qualifying work for the university.

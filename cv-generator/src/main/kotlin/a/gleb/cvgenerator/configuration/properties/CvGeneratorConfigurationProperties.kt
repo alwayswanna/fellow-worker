@@ -1,16 +1,17 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-2/7/23, 10:13 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.cvgenerator.configuration.properties
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.web.cors.CorsConfiguration
 
 @ConfigurationProperties("cv-generator")
 data class CvGeneratorConfigurationProperties(
     val securityConstraints: List<SecurityConstraints>,
-    val unprotectedPaths: List<String>?
+    var cors: Cors
 )
 
 data class SecurityConstraints(
@@ -22,3 +23,5 @@ data class SecurityCollection(
     val patterns: List<String>,
     val methods: List<String>?
 )
+
+class Cors : CorsConfiguration()

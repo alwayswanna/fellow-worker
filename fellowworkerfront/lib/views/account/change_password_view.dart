@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 1-1/27/23, 10:22 PM
+ * Copyright (c) 1-2/19/23, 11:28 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/service/client_manager_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
-import 'package:fellowworkerfront/views/registration_view.dart';
+import 'package:fellowworkerfront/views/account/registration_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
-import '../styles/gradient_color.dart';
+import '../../styles/gradient_color.dart';
 
 class _ChangePassword extends State<ChangePassword>
     with SingleTickerProviderStateMixin {
@@ -24,15 +24,11 @@ class _ChangePassword extends State<ChangePassword>
   late bool _newPasswordVisible;
   late bool _newPasswordVerifyVisible;
 
-  _ChangePassword(
-      {required FlutterSecureStorage sS, required ClientManagerService aS}) {
-    securityStorage = sS;
-    accountService = aS;
-  }
-
   @override
   void initState() {
     super.initState();
+    securityStorage = widget.securityStorage;
+    accountService = widget.accountService;
     _oldPasswordVisible = false;
     _newPasswordVisible = false;
     _newPasswordVerifyVisible = false;
@@ -44,12 +40,9 @@ class _ChangePassword extends State<ChangePassword>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Fellow worker"),
-      ),
-      body:
-          GradientEnchanted.buildGradient(buildLayout(), _animationController),
+    return UtilityWidgets.buildTopBar(
+        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        context
     );
   }
 
@@ -206,7 +199,5 @@ class ChangePassword extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() {
-    return _ChangePassword(sS: securityStorage, aS: accountService);
-  }
+  createState() => _ChangePassword();
 }

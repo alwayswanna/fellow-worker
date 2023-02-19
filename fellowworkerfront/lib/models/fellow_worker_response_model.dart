@@ -1,8 +1,13 @@
 /*
- * Copyright (c) 1-1/27/23, 10:22 PM
+ * Copyright (c) 1-2/15/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:json_annotation/json_annotation.dart';
+
+part '../generated/fellow_worker_response_model.g.dart';
+
+@JsonSerializable()
 class FellowWorkerResponseModel {
   final String message;
   final ResumeResponseModel? resumeResponse;
@@ -10,12 +15,11 @@ class FellowWorkerResponseModel {
   final VacancyResponseApiModel? vacancyResponse;
   final List<VacancyResponseApiModel>? vacancies;
 
-  const FellowWorkerResponseModel(
-      {required this.message,
-      required this.resumeResponse,
-      required this.resumes,
-      required this.vacancyResponse,
-      required this.vacancies});
+  const FellowWorkerResponseModel({required this.message,
+    required this.resumeResponse,
+    required this.resumes,
+    required this.vacancyResponse,
+    required this.vacancies});
 
   factory FellowWorkerResponseModel.fromJson(Map<String, dynamic> json) {
     List<ResumeResponseModel> resumes = List.empty();
@@ -53,6 +57,7 @@ class FellowWorkerResponseModel {
   }
 }
 
+@JsonSerializable()
 class ResumeResponseModel {
   final String resumeId;
   final String userId;
@@ -63,61 +68,32 @@ class ResumeResponseModel {
   final String job;
   final String expectedSalary;
   final String about;
-  final List<EducationResponseModel>? education;
+  final List<dynamic>? education;
   final List<String> professionalSkills;
-  final List<WorkExperienceResponseModel>? workingHistory;
-  final ContactResponseModel contact;
+  final List<dynamic>? workingHistory;
+  final dynamic contact;
   final String lastUpdate;
 
-  const ResumeResponseModel(
-      {required this.resumeId,
-      required this.userId,
-      required this.firstName,
-      required this.middleName,
-      required this.lastName,
-      required this.birthDate,
-      required this.job,
-      required this.expectedSalary,
-      required this.about,
-      required this.education,
-      required this.professionalSkills,
-      required this.workingHistory,
-      required this.contact,
-      required this.lastUpdate});
+  const ResumeResponseModel({required this.resumeId,
+    required this.userId,
+    required this.firstName,
+    required this.middleName,
+    required this.lastName,
+    required this.birthDate,
+    required this.job,
+    required this.expectedSalary,
+    required this.about,
+    required this.education,
+    required this.professionalSkills,
+    required this.workingHistory,
+    required this.contact,
+    required this.lastUpdate});
 
-  factory ResumeResponseModel.fromJson(Map<String, dynamic> json) {
-    List<EducationResponseModel> education = List.empty();
-    if (json['education'] != null) {
-      education = (json['education'] as List)
-          .map((e) => EducationResponseModel.fromJson(e))
-          .toList();
-    }
-
-    List<WorkExperienceResponseModel> workingHistory = List.empty();
-    if (json['workingHistory'] != null) {
-      workingHistory = (json['workingHistory'] as List)
-          .map((e) => WorkExperienceResponseModel.fromJson(e))
-          .toList();
-    }
-
-    return ResumeResponseModel(
-        resumeId: json['resumeId'],
-        userId: json['userId'],
-        firstName: json['firstName'],
-        middleName: json['middleName'],
-        lastName: json['lastName'],
-        birthDate: json['birthDate'],
-        job: json['job'],
-        expectedSalary: json['expectedSalary'],
-        about: json['about'],
-        education: education,
-        professionalSkills: json['professionalSkills'],
-        workingHistory: workingHistory,
-        contact: ContactResponseModel.fromJson(json['contact']),
-        lastUpdate: json['contact']);
-  }
+  factory ResumeResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$ResumeResponseModelFromJson(json);
 }
 
+@JsonSerializable()
 class WorkExperienceResponseModel {
   final String startTime;
   final String endTime;
@@ -125,55 +101,44 @@ class WorkExperienceResponseModel {
   final String workingSpeciality;
   final String responsibilities;
 
-  const WorkExperienceResponseModel(
-      {required this.startTime,
-      required this.endTime,
-      required this.companyName,
-      required this.workingSpeciality,
-      required this.responsibilities});
+  const WorkExperienceResponseModel({required this.startTime,
+    required this.endTime,
+    required this.companyName,
+    required this.workingSpeciality,
+    required this.responsibilities});
 
-  factory WorkExperienceResponseModel.fromJson(Map<String, dynamic> json) {
-    return WorkExperienceResponseModel(
-        startTime: json['startTime'],
-        endTime: json['endTime'],
-        companyName: json['companyName'],
-        workingSpeciality: json['workingSpeciality'],
-        responsibilities: json['responsibilities']);
-  }
+  factory WorkExperienceResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$WorkExperienceResponseModelFromJson(json);
 }
 
+@JsonSerializable()
 class ContactResponseModel {
   final String phone;
   final String email;
 
   const ContactResponseModel({required this.phone, required this.email});
 
-  factory ContactResponseModel.fromJson(Map<String, dynamic> json) {
-    return ContactResponseModel(phone: json['phone'], email: json['email']);
-  }
+  factory ContactResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$ContactResponseModelFromJson(json);
 }
 
+@JsonSerializable()
 class EducationResponseModel {
   final String startTime;
   final String endTime;
-  final String educationInstitution;
+  final String educationalInstitution;
   final String educationLevel;
 
-  const EducationResponseModel(
-      {required this.startTime,
-      required this.endTime,
-      required this.educationInstitution,
-      required this.educationLevel});
+  const EducationResponseModel({required this.startTime,
+    required this.endTime,
+    required this.educationalInstitution,
+    required this.educationLevel});
 
-  factory EducationResponseModel.fromJson(Map<String, dynamic> json) {
-    return EducationResponseModel(
-        startTime: json['startTime'],
-        endTime: json['endTime'],
-        educationInstitution: json['educationInstitution'],
-        educationLevel: json['educationLevel']);
-  }
+  factory EducationResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$EducationResponseModelFromJson(json);
 }
 
+@JsonSerializable()
 class VacancyResponseApiModel {
   final String resumeId;
   final String vacancyName;
@@ -185,40 +150,27 @@ class VacancyResponseApiModel {
   final String cityName;
   final List<String> workingResponsibilities;
   final List<String> companyBonuses;
-  final ContactApiModel contactApiModel;
+  final dynamic contactApiModel;
   final String lastUpdate;
 
-  const VacancyResponseApiModel(
-      {required this.resumeId,
-      required this.vacancyName,
-      required this.typeOfWork,
-      required this.typeOfWorkPlacement,
-      required this.companyName,
-      required this.companyFullAddress,
-      required this.keySkills,
-      required this.cityName,
-      required this.workingResponsibilities,
-      required this.companyBonuses,
-      required this.contactApiModel,
-      required this.lastUpdate});
+  const VacancyResponseApiModel({required this.resumeId,
+    required this.vacancyName,
+    required this.typeOfWork,
+    required this.typeOfWorkPlacement,
+    required this.companyName,
+    required this.companyFullAddress,
+    required this.keySkills,
+    required this.cityName,
+    required this.workingResponsibilities,
+    required this.companyBonuses,
+    required this.contactApiModel,
+    required this.lastUpdate});
 
-  factory VacancyResponseApiModel.fromJson(Map<String, dynamic> json) {
-    return VacancyResponseApiModel(
-        resumeId: json['resumeId'],
-        vacancyName: json['vacancyName'],
-        typeOfWork: json['typeOfWork'],
-        typeOfWorkPlacement: json['typeOfWorkPlacement'],
-        companyName: json['companyName'],
-        companyFullAddress: json['companyFullAddress'],
-        keySkills: json['keySkills'],
-        cityName: json['cityName'],
-        workingResponsibilities: json['workingResponsibilities'],
-        companyBonuses: json['companyBonuses'],
-        contactApiModel: ContactApiModel.fromJson(json['contactApiModel']),
-        lastUpdate: json['lastUpdate']);
-  }
+  factory VacancyResponseApiModel.fromJson(Map<String, dynamic> json) =>
+      _$VacancyResponseApiModelFromJson(json);
 }
 
+@JsonSerializable()
 class ContactApiModel {
   final String fio;
   final String phone;
@@ -227,8 +179,6 @@ class ContactApiModel {
   const ContactApiModel(
       {required this.fio, required this.phone, required this.email});
 
-  factory ContactApiModel.fromJson(Map<String, dynamic> json) {
-    return ContactApiModel(
-        fio: json['fio'], phone: json['phone'], email: json['email']);
-  }
+  factory ContactApiModel.fromJson(Map<String, dynamic> json) =>
+      _$ContactApiModelFromJson(json);
 }

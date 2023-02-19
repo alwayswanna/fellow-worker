@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/11/23, 10:31 PM
+ * Copyright (c) 07-2/15/23, 11:40 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -36,7 +36,7 @@ public class WorkExperienceResponseModel {
 
     @NotEmpty
     @Schema(description = "Занимаемая должность", example = "Заведующий хоз. учета")
-    private String workingSpecialty;
+    private String workingSpeciality;
 
     @Schema(description = "Трудовые обязанности", example = "Выход из границ.")
     private String responsibilities;

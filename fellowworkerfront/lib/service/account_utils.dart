@@ -1,16 +1,30 @@
 /*
- * Copyright (c) 1-1/29/23, 12:12 AM
+ * Copyright (c) 1-2/18/23, 6:30 PM
  * Created by https://github.com/alwayswanna
  */
+
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:uuid/uuid.dart';
+
+import '../main.dart';
+import '../security/oauth2.dart';
 
 const employeeResponse = "EMPLOYEE";
 const companyResponse = "COMPANY";
 const employeeType = 'Соискатель';
 const companyType = 'Работодатель';
 const adminType = 'Администратор';
+const undergraduate = 'BACHELOR';
+const specialist = 'SPECIALTY';
+const master = 'MAGISTRACY';
 
 const accountTypes = ["  Соискатель", "  Работодатель"];
-const educationLevels = ["  Специалитет", "  Бакалавриат"];
+const educationLevels = ["  Специалитет", "  Бакалавриат", "  Магистрант"];
+
+const uuid = Uuid();
 
 final defaultHeaders = {
   "Content-Type": "application/json",
@@ -26,5 +40,32 @@ class RequestUtils {
     } else {
       return adminType;
     }
+  }
+
+  static void clearRequestHeadersContext() {
+    defaultHeaders.remove("Authorization");
+  }
+
+  static Future<void> injectJwtToHeaders(FlutterSecureStorage flutterSecureStorage) async {
+    String? userToken = await flutterSecureStorage.read(key: jwtTokenKey);
+    var tokenMap = Oauth2Service.convertTokenToMap(userToken!);
+    String accessToken = tokenMap["access_token"]!;
+    defaultHeaders["Authorization"] = "Bearer $accessToken";
+  }
+
+  static String? buildBase64Image(PlatformFile? file) {
+    if (file == null) {
+      return null;
+    }
+
+    return base64Encode(file.bytes!);
+  }
+
+  static String? buildExtension(PlatformFile? file) {
+    if (file == null) {
+      return null;
+    }
+
+    return file.extension;
   }
 }

@@ -1,19 +1,21 @@
 /*
- * Copyright (c) 1-1/29/23, 12:12 AM
+ * Copyright (c) 1-2/19/23, 11:28 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/security/oauth2.dart';
 import 'package:fellowworkerfront/service/client_manager_service.dart';
+import 'package:fellowworkerfront/service/cv_generator_service.dart';
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
-import 'package:fellowworkerfront/views/change_password_view.dart';
-import 'package:fellowworkerfront/views/create_resume_view.dart';
-import 'package:fellowworkerfront/views/edit_account_view.dart';
+import 'package:fellowworkerfront/views/account/change_password_view.dart';
+import 'package:fellowworkerfront/views/account/edit_account_view.dart';
+import 'package:fellowworkerfront/views/account/profile_view.dart';
+import 'package:fellowworkerfront/views/account/registration_view.dart';
 import 'package:fellowworkerfront/views/main_view.dart';
-import 'package:fellowworkerfront/views/profile_view.dart';
-import 'package:fellowworkerfront/views/registration_view.dart';
+import 'package:fellowworkerfront/views/resume/create_resume_view.dart';
+import 'package:fellowworkerfront/views/vacancy/create_vacancy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -24,25 +26,32 @@ void main() {
   var securityStorage = const FlutterSecureStorage();
   var clientManagerService = ClientManagerService();
   var fellowWorkerService = FellowWorkerService();
+  var cvGeneratorService = CvGeneratorService();
   setPathUrlStrategy();
   securityStorage.delete(key: jwtTokenKey);
   runApp(MyApp(
-      sS: securityStorage, aS: clientManagerService, rS: fellowWorkerService));
+      sS: securityStorage,
+      aS: clientManagerService,
+      rS: fellowWorkerService,
+      cG: cvGeneratorService));
 }
 
 class MyApp extends StatelessWidget {
-  late FlutterSecureStorage flutterSecureStorage;
-  late ClientManagerService accountService;
-  late FellowWorkerService resumeService;
+  late final FlutterSecureStorage flutterSecureStorage;
+  late final ClientManagerService clientManagerService;
+  late final FellowWorkerService fellowWorkerService;
+  late final CvGeneratorService cvGeneratorService;
 
   MyApp(
       {required FlutterSecureStorage sS,
       required ClientManagerService aS,
       required FellowWorkerService rS,
+      required CvGeneratorService cG,
       super.key}) {
     flutterSecureStorage = sS;
-    accountService = aS;
-    resumeService = rS;
+    clientManagerService = aS;
+    fellowWorkerService = rS;
+    cvGeneratorService = cG;
   }
 
   // This widget is the root of your application.
@@ -53,16 +62,27 @@ class MyApp extends StatelessWidget {
       routes: {
         '/registration': (context) => const Registration(),
         '/profile': (context) => Profile(
-            sS: flutterSecureStorage, aS: accountService, rS: resumeService),
+          sS: flutterSecureStorage,
+          aS: clientManagerService,
+          rS: fellowWorkerService,
+          cG: cvGeneratorService
+        ),
         '/change-password': (context) => ChangePassword(
-              sS: flutterSecureStorage,
-              aS: accountService,
-            ),
-        '/edit-account': (context) =>
-            EditCurrentAccount(sS: flutterSecureStorage, cM: accountService),
+          sS: flutterSecureStorage,
+          aS: clientManagerService,
+        ),
+        '/edit-account': (context) => EditCurrentAccount(
+          sS: flutterSecureStorage,
+          cM: clientManagerService
+        ),
         '/create-resume': (context) => CreateResume(
-            fS: flutterSecureStorage,
-            fW: resumeService)
+          fS: flutterSecureStorage,
+          fW: fellowWorkerService
+        ),
+        '/create-vacancy': (context) => CreateVacancy(
+            fWS: fellowWorkerService,
+            fSS: flutterSecureStorage
+        )
       },
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,

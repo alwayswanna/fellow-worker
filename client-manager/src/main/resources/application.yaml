@@ -21,12 +21,12 @@ spring:
     oauth2:
       resource-server:
         jwt:
-          issuer-uri: http://127.0.0.1:9001
+          issuer-uri: http://${OAUTH2_SERVER_URL}:9001
   datasource:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/authorization
+    url: jdbc:postgresql://${DATASOURCE_URL}:5432/authorization
 
 client-manager:
   cors:

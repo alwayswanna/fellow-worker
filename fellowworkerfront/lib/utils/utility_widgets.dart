@@ -1,13 +1,27 @@
 /*
- * Copyright (c) 1-1/28/23, 6:20 PM
+ * Copyright (c) 1-2/18/23, 7:03 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:fellowworkerfront/utils/value_pickers.dart';
 import 'package:flutter/material.dart';
+import 'package:responsive_grid/responsive_grid.dart';
 
 import '../service/account_utils.dart';
 
 class UtilityWidgets {
+  static Scaffold buildTopBar(Widget bodyWidget, BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+            title: GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, "/");
+          },
+          child: const Text("Fellow worker"),
+        )),
+        body: bodyWidget);
+  }
+
   static String extractAccountRoleDataFromWidget(String? accountRoleWidget) {
     if (accountRoleWidget == null || accountRoleWidget.isEmpty) {
       return "";
@@ -20,6 +34,34 @@ class UtilityWidgets {
     } else {
       return "EMPLOYEE";
     }
+  }
+
+  static ResponsiveGridCol buildResponsiveGridCardNullable(String? message,
+      int? md, Color fontColor, double fontSize, EdgeInsets? padding) {
+    var widgetPadding = padding ?? const EdgeInsets.all(13.0);
+    return ResponsiveGridCol(
+        md: md,
+        child: Padding(
+          padding: widgetPadding,
+          child: Text(message ?? "Не указано",
+              style: UtilityWidgets.cardTextStyle(fontColor, fontSize)),
+        ));
+  }
+
+  static ResponsiveGridCol emptyLine() {
+    return ResponsiveGridCol(child: const Padding(padding: EdgeInsets.all(13)));
+  }
+
+  static ResponsiveGridCol buildResponsiveGridCard(
+      String? message, int? md, Color fontColor, double fontSize) {
+    return buildResponsiveGridCardNullable(message = message, md = md,
+        fontColor = fontColor, fontSize = fontSize, null);
+  }
+
+  static ResponsiveGridCol buildResponsiveGridCardWithPadding(String? message,
+      int? md, Color fontColor, double fontSize, EdgeInsets padding) {
+    return buildResponsiveGridCardNullable(message = message, md = md,
+        fontColor = fontColor, fontSize = fontSize, padding = padding);
   }
 
   static Future<void> dialogBuilderApi(BuildContext context,
@@ -35,7 +77,7 @@ class UtilityWidgets {
               if (snapshot.hasData) {
                 return Text(snapshot.data!);
               } else {
-                return const CircularProgressIndicator();
+                return progressiveBar();
               }
             },
           ),
@@ -64,6 +106,18 @@ class UtilityWidgets {
     );
   }
 
+  static Center progressiveBar() {
+    return sizedProgressiveBar(100, 100);
+  }
+
+  static Center sizedProgressiveBar(double width, double height) {
+    return Center(
+        child: SizedBox(
+            width: width,
+            height: height,
+            child: const CircularProgressIndicator(color: Colors.cyan)));
+  }
+
   static Future<void> dialogBuilderMessage(
       BuildContext context, String message) {
     return showDialog<void>(
@@ -86,6 +140,116 @@ class UtilityWidgets {
         );
       },
     );
+  }
+
+  static Widget buildWorkExperienceWidgets(
+      List<String> workExperienceUuids,
+      Map<String, DateTime> startTimeMap,
+      Map<String, DateTime> endTimeMap,
+      Map<String, TextEditingController> companyNameMap,
+      Map<String, TextEditingController> positionNameMap,
+      Map<String, TextEditingController> responsibilitiesMap) {
+    /** creates id for group of work widgets */
+    var workExperienceId = uuid.v1().toString();
+
+    var inTime = DateTime.now();
+    var outTime = DateTime.now();
+    var companyName = TextEditingController();
+    var positionName = TextEditingController();
+    var responsibilitiesName = TextEditingController();
+
+    /** added data to map */
+    workExperienceUuids.add(workExperienceId);
+    startTimeMap.addAll({workExperienceId: inTime});
+    endTimeMap.addAll({workExperienceId: outTime});
+    companyNameMap.addAll({workExperienceId: companyName});
+    positionNameMap.addAll({workExperienceId: positionName});
+    responsibilitiesMap.addAll({workExperienceId: responsibilitiesName});
+
+    return ResponsiveGridRow(children: [
+      ResponsiveGridCol(
+          md: 6,
+          child: Padding(
+              padding: const EdgeInsets.all(10),
+              // создаваемое поле для DatePicker выносим в отдельный класс со State - ами и обновляем его там
+              child: StateTextFieldWidget(
+                tM: startTimeMap,
+                id: workExperienceId,
+                m: "Дата трудоустройства:",
+              ))),
+      ResponsiveGridCol(
+          md: 6,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: StateTextFieldWidget(
+                tM: endTimeMap, id: workExperienceId, m: "Дата увольнения:"),
+          )),
+      ResponsiveGridCol(
+          md: 12,
+          child:
+              UtilityWidgets.buildTextField(companyName, "Название компании:")),
+      ResponsiveGridCol(
+          md: 6,
+          child: UtilityWidgets.buildTextField(positionName, "Должность:")),
+      ResponsiveGridCol(
+          md: 12,
+          child: UtilityWidgets.buildTextField(
+              responsibilitiesName, "Обязанности:"))
+    ]);
+  }
+
+  static Widget buildEducationFrame(
+      List<String> educationUuids,
+      Map<String, DateTime> startTime,
+      Map<String, DateTime> endTime,
+      Map<String, TextEditingController> universityName,
+      Map<String, TextEditingController> educationLevel) {
+    /** creates id for group of education widgets */
+    var uuidEducationFrame = uuid.v1().toString();
+
+    var startTimeEditingController = DateTime.now();
+    var endTimeEditingController = DateTime.now();
+    var universityNameEditingController = TextEditingController();
+    var educationLevelEditingController = TextEditingController();
+
+    /** adding widgets to map */
+    educationUuids.add(uuidEducationFrame);
+    startTime.addAll({uuidEducationFrame: startTimeEditingController});
+    endTime.addAll({uuidEducationFrame: endTimeEditingController});
+    universityName
+        .addAll({uuidEducationFrame: universityNameEditingController});
+    educationLevel
+        .addAll({uuidEducationFrame: educationLevelEditingController});
+
+    return ResponsiveGridRow(children: [
+      ResponsiveGridCol(
+          md: 6,
+          child: Padding(
+              padding: const EdgeInsets.all(10),
+              // создаваемое поле для DatePicker выносим в отдельный класс со State - ами и обновляем его там
+              child: StateTextFieldWidget(
+                tM: startTime,
+                id: uuidEducationFrame,
+                m: "Дата поступления:",
+              ))),
+      ResponsiveGridCol(
+          md: 6,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: StateTextFieldWidget(
+                tM: endTime, id: uuidEducationFrame, m: "Дата окончания:"),
+          )),
+      ResponsiveGridCol(
+          md: 12,
+          child: UtilityWidgets.buildTextField(
+              universityNameEditingController, "Название учебного заведения:")),
+      ResponsiveGridCol(
+          md: 6,
+          child: StateDropdownButtonWidget(
+              tec: educationLevel,
+              id: uuidEducationFrame,
+              m: "Ученая степень:")),
+    ]);
   }
 
   static Padding buildTextField(TextEditingController controller, String hint) {
@@ -133,6 +297,21 @@ class UtilityWidgets {
       },
       child: Padding(
           padding: const EdgeInsets.all(10),
+          child: Text(
+            message,
+            style: TextStyle(color: Colors.white, fontSize: fontSize),
+          )),
+    );
+  }
+
+  static Widget buildCardButtonPadding(VoidCallback voidCallback,
+      String message, double fontSize, double paddingValue) {
+    return ElevatedButton(
+      onPressed: () {
+        voidCallback();
+      },
+      child: Padding(
+          padding: EdgeInsets.all(paddingValue),
           child: Text(
             message,
             style: TextStyle(color: Colors.white, fontSize: fontSize),

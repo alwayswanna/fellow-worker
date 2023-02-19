@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/28/23, 6:20 PM
+ * Copyright (c) 1-2/2/23, 11:04 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -64,7 +64,7 @@ class ClientManagerService {
       String? accountType,
       String? birthDate,
       FlutterSecureStorage secureStorage) async {
-    var role = accountType!.isEmpty? null:accountType;
+    var role = accountType!.isEmpty ? null : accountType;
 
     var bodyMessage = jsonEncode(AccountRequestModel(
         username: username,
@@ -86,7 +86,7 @@ class ClientManagerService {
     final response =
         await http.put(requestUri, headers: defaultHeaders, body: bodyMessage);
 
-    clearRequestHeadersContext();
+    RequestUtils.clearRequestHeadersContext();
     if (response.statusCode == 200) {
       return jsonDecode(utf8.decode(response.bodyBytes))['message'];
     } else {
@@ -106,7 +106,7 @@ class ClientManagerService {
     final requestUri = Uri.parse(clientManagerHost + currentAccountAPI);
     final response = await http.get(requestUri, headers: defaultHeaders);
 
-    clearRequestHeadersContext();
+    RequestUtils.clearRequestHeadersContext();
 
     if (response.statusCode == 200) {
       return ApiResponseModel.fromJson(
@@ -127,7 +127,7 @@ class ClientManagerService {
     final requestUri = Uri.parse(clientManagerHost + deleteAccountAPI);
     final response = await http.delete(requestUri, headers: defaultHeaders);
 
-    clearRequestHeadersContext();
+    RequestUtils.clearRequestHeadersContext();
 
     return jsonDecode(utf8.decode(response.bodyBytes))['message'];
   }
@@ -149,12 +149,8 @@ class ClientManagerService {
         headers: defaultHeaders,
         body: bodyMessage);
 
-    clearRequestHeadersContext();
+    RequestUtils.clearRequestHeadersContext();
 
     return jsonDecode(utf8.decode(response.bodyBytes))['message'];
-  }
-
-  static void clearRequestHeadersContext() {
-    defaultHeaders.remove("Authorization");
   }
 }

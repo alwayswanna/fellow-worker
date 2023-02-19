@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/29/23, 12:12 AM
+ * Copyright (c) 1-2/19/23, 11:28 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,9 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
-import '../service/account_utils.dart';
-import '../styles/gradient_color.dart';
-import '../utils/utility_widgets.dart';
+import '../../service/account_utils.dart';
+import '../../service/validation_service.dart';
+import '../../styles/gradient_color.dart';
+import '../../utils/utility_widgets.dart';
 
 const padding = EdgeInsets.all(10);
 const String editAccountUserMessage = "Изменение аккаунта";
@@ -32,15 +33,11 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
   var usernameController = TextEditingController();
   DateTime selectedDate = DateTime.now();
 
-  _EditCurrentAccount(
-      {required FlutterSecureStorage sS, required ClientManagerService cM}) {
-    securityStorage = sS;
-    clientManagerService = cM;
-  }
-
   @override
   void initState() {
     super.initState();
+    securityStorage = widget.securityStorage;
+    clientManagerService = widget.clientManagerService;
     typeAccount = null;
     _animationController = AnimationController(
         vsync: this,
@@ -50,12 +47,9 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Fellow worker"),
-      ),
-      body:
-          GradientEnchanted.buildGradient(buildLayout(), _animationController),
+    return UtilityWidgets.buildTopBar(
+        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        context
     );
   }
 
@@ -169,9 +163,9 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
                                 shape: const RoundedRectangleBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(5)))),
-                            child: Padding(
+                            child: const Padding(
                                 padding: padding,
-                                child: const Text(
+                                child: Text(
                                   "Изменить аккаунт",
                                   style: TextStyle(
                                       fontSize: 20,
@@ -187,6 +181,8 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
+        helpText: "Выбранная дата",
+        fieldLabelText: "Выберете дату: ",
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(1900, 8),
@@ -200,19 +196,10 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
 
   Future<void> sendRequestToEditAccount() async {
     var type = UtilityWidgets.extractAccountRoleDataFromWidget(typeAccount);
-    var timeNow = DateTime.now();
-    var userYearDate = selectedDate.year;
-    var userMonthDate = selectedDate.month;
-    var userDayDate = selectedDate.day;
 
-    String? requestDate;
-    if (userYearDate == timeNow.year &&
-        userMonthDate == timeNow.month &&
-        userDayDate == timeNow.day) {
-      requestDate = null;
-    } else {
-      requestDate = selectedDate.toIso8601String();
-    }
+    String? requestDate = ValidationService.isValidBirthDate(selectedDate)
+        ? selectedDate.toIso8601String()
+        : null;
 
     if (usernameController.text.isEmpty &&
         emailController.text.isEmpty &&
@@ -227,7 +214,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
           editAccountUserMessage,
           '/profile');
     } else {
-      var response = clientManagerService.editAccount(
+      var messageResponse = await clientManagerService.editAccount(
           usernameController.text,
           emailController.text,
           controllerFirstName.text,
@@ -236,10 +223,11 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
           type,
           requestDate,
           securityStorage);
-      var messageResponse = await response;
-      var message = response == backSuccessMessageCheck
+
+      var message = messageResponse == backSuccessMessageCheck
           ? backSuccessMessageCheck
           : "Введите только те данные которые вы бы хотели изменить\n$messageResponse";
+
       UtilityWidgets.dialogBuilderApi(
           context, Future.value(message), editAccountUserMessage, '/profile');
     }
@@ -265,7 +253,5 @@ class EditCurrentAccount extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() {
-    return _EditCurrentAccount(sS: securityStorage, cM: clientManagerService);
-  }
+  createState() => _EditCurrentAccount();
 }
