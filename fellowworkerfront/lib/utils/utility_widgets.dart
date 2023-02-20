@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/18/23, 7:03 PM
+ * Copyright (c) 1-2/23/23, 10:10 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -77,7 +77,7 @@ class UtilityWidgets {
               if (snapshot.hasData) {
                 return Text(snapshot.data!);
               } else {
-                return progressiveBar();
+                return sizedProgressiveBar(50, 50);
               }
             },
           ),
@@ -106,16 +106,15 @@ class UtilityWidgets {
     );
   }
 
-  static Center progressiveBar() {
+  static SizedBox progressiveBar() {
     return sizedProgressiveBar(100, 100);
   }
 
-  static Center sizedProgressiveBar(double width, double height) {
-    return Center(
-        child: SizedBox(
+  static SizedBox sizedProgressiveBar(double width, double height) {
+    return SizedBox(
             width: width,
             height: height,
-            child: const CircularProgressIndicator(color: Colors.cyan)));
+            child: const Center(child: CircularProgressIndicator(color: Colors.cyan)));
   }
 
   static Future<void> dialogBuilderMessage(
@@ -247,6 +246,7 @@ class UtilityWidgets {
           md: 6,
           child: StateDropdownButtonWidget(
               tec: educationLevel,
+              dV: educationLevels,
               id: uuidEducationFrame,
               m: "Ученая степень:")),
     ]);

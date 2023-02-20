@@ -1,27 +1,38 @@
 /*
- * Copyright (c) 2-2/23/23, 10:10 PM
+ * Copyright (c) 2-2/24/23, 10:12 PM
  * Created by https://github.com/alwayswanna
  */
 
-import 'package:fellowworkerfront/models/vacancy_request_model.dart';
-import 'package:fellowworkerfront/service/account_utils.dart';
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
-import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
+import '../../models/fellow_worker_response_model.dart';
+import '../../models/vacancy_request_model.dart';
+import '../../service/account_utils.dart';
 import '../../styles/gradient_color.dart';
+import '../../utils/utility_widgets.dart';
 import '../../utils/value_pickers.dart';
 import '../account/edit_account_view.dart';
 
-const createVacancy = "Создание вакансии";
+const editVacancy = "Редактирование вакансии";
 
-class _CreateVacancy extends State<CreateVacancy>
+class _EditVacancy extends State<EditVacancy>
     with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late VacancyResponseApiModel _vacancyResponseApiModel;
   late FellowWorkerService _fellowWorkerService;
   late FlutterSecureStorage _flutterSecureStorage;
-  late AnimationController _animationController;
+  bool isNeedInfo = true;
+
+  var vacancyNameTEC = TextEditingController();
+  var companyNameTEC = TextEditingController();
+  var companyAddressTEC = TextEditingController();
+  var cityNameTEC = TextEditingController();
+  var contactFullNameTEC = TextEditingController();
+  var emailAddressTEC = TextEditingController();
+  var phoneTEC = TextEditingController();
 
   // required skills
   var professionalSkillsFrames = <ResponsiveGridCol>[];
@@ -38,16 +49,9 @@ class _CreateVacancy extends State<CreateVacancy>
   var typePlacementMap = {uuid.v1().toString(): TextEditingController()};
   var typeTimeMap = {uuid.v1().toString(): TextEditingController()};
 
-  var vacancyNameTEC = TextEditingController();
-  var companyNameTEC = TextEditingController();
-  var companyAddressTEC = TextEditingController();
-  var cityNameTEC = TextEditingController();
-  var contactFullNameTEC = TextEditingController();
-  var emailAddressTEC = TextEditingController();
-  var phoneTEC = TextEditingController();
-
   @override
   void initState() {
+    _vacancyResponseApiModel = widget.vacancyResponseApiModel;
     _fellowWorkerService = widget.fellowWorkerService;
     _flutterSecureStorage = widget.flutterSecureStorage;
     _animationController = AnimationController(
@@ -65,12 +69,32 @@ class _CreateVacancy extends State<CreateVacancy>
 
   @override
   Widget build(BuildContext context) {
+    if (isNeedInfo) {
+      Future.delayed(Duration.zero, () {
+        UtilityWidgets.dialogBuilderMessage(context,
+            "К сожалению перечисленные поля придется заполнить заново: \n - требуемые профессиональные навыки\n - рабочие обязанности\n - условия\n - формат занятости\n - формат работы \nПриносим свои извинения 😔");
+      });
+      isNeedInfo = false;
+    }
+
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(buildLayout(), _animationController),
-        context);
+        GradientEnchanted.buildGradient(
+            buildPageLayout(),
+            _animationController
+        ),
+        context
+    );
   }
 
-  Widget buildLayout() {
+  Widget buildPageLayout() {
+    var contact = ContactApiModel.fromJson(_vacancyResponseApiModel.contactApiModel);
+    vacancyNameTEC.text = _vacancyResponseApiModel.vacancyName;
+    companyNameTEC.text = _vacancyResponseApiModel.companyName;
+    companyAddressTEC.text = _vacancyResponseApiModel.companyFullAddress;
+    cityNameTEC.text = _vacancyResponseApiModel.cityName;
+    contactFullNameTEC.text = contact.fio;
+    emailAddressTEC.text = contact.email;
+    phoneTEC.text = contact.phone;
     return Center(
         child: SingleChildScrollView(
             child: SizedBox(
@@ -80,7 +104,7 @@ class _CreateVacancy extends State<CreateVacancy>
                       child: Center(
                           child: Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: Text("Создать вакансию",
+                    child: Text("Редактировать вакансию",
                         style: UtilityWidgets.pageTitleStyle()),
                   ))),
                   ResponsiveGridCol(
@@ -202,7 +226,7 @@ class _CreateVacancy extends State<CreateVacancy>
                         padding: padding,
                         child: ElevatedButton(
                             onPressed: () {
-                              sendRequestToCreateVacancy();
+                              sendRequestToEditVacancy();
                             },
                             style: ElevatedButton.styleFrom(
                                 shape: const RoundedRectangleBorder(
@@ -211,7 +235,7 @@ class _CreateVacancy extends State<CreateVacancy>
                             child: const Padding(
                                 padding: padding,
                                 child: Text(
-                                  "Создать вакансию",
+                                  "Редактировать вакансию",
                                   style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
@@ -220,20 +244,61 @@ class _CreateVacancy extends State<CreateVacancy>
                 ]))));
   }
 
+  ResponsiveGridCol buildInputSkills(
+      List<ResponsiveGridCol> frames,
+      List<TextEditingController> tec, String message
+  ) {
+    return ResponsiveGridCol(
+        md: 12, child: buildTextFieldProfSkills(frames, tec, message));
+  }
+
   ResponsiveGridCol buildDropDown(
       String message,
       Map<String, TextEditingController> mapTec,
-      Map<String, String> dropDownValues) {
+      Map<String, String> dropDownValues
+  ) {
     return ResponsiveGridCol(
         md: 6,
         child: StateDropdownButtonWidget(
             tec: mapTec,
             dV: dropDownValues.keys.toList(),
             id: mapTec.keys.first.toString(),
-            m: message));
+            m: message
+        )
+    );
   }
 
-  Future<void> sendRequestToCreateVacancy() async {
+  Padding buildTextFieldProfSkills(List<ResponsiveGridCol> frames,
+      List<TextEditingController> tec, String message
+  ) {
+    var controller = TextEditingController();
+    tec.add(controller);
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+            suffixIcon: IconButton(
+              icon: Icon(
+                Icons.add,
+                color: Theme.of(context).primaryColorDark,
+              ),
+              onPressed: () {
+                setState(() {
+                  frames.add(buildInputSkills(frames, tec, message));
+                });
+              },
+            ),
+            hintText: message,
+            filled: true,
+            fillColor: Colors.white,
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(20))),
+      ),
+    );
+  }
+
+  Future<void> sendRequestToEditVacancy() async {
     var vacancyName = vacancyNameTEC.text;
     var companyName = companyNameTEC.text;
     var companyAddress = companyAddressTEC.text;
@@ -281,83 +346,53 @@ class _CreateVacancy extends State<CreateVacancy>
           : typeOfWorkMap[typeOfWorkMap.keys.last];
 
       var typePlacement =
-          typePlacementMap.values.first.text == placementType.keys.first
-              ? placementType[placementType.keys.first]
-              : placementType[placementType.keys.last];
+      typePlacementMap.values.first.text == placementType.keys.first
+          ? placementType[placementType.keys.first]
+          : placementType[placementType.keys.last];
 
       var vacancy = VacancyApiModel(
-        vacancyId: null,
-        vacancyName: vacancyName,
-        typeOfWork: typeTime,
-        typeOfWorkPlacement: typePlacement,
-        companyName: companyName,
-        companyFullAddress: companyAddress,
-        keySkills: profSkills,
-        cityName: cityName,
-        workingResponsibilities: responsibilities,
-        companyBonuses: conditions,
-        contactApiModel: CompanyContactApiModel(
-            fio: contactFullName,
-            phone: phone,
-            email: emailAddress
-        )
+          vacancyId: _vacancyResponseApiModel.resumeId,
+          vacancyName: vacancyName,
+          typeOfWork: typeTime,
+          typeOfWorkPlacement: typePlacement,
+          companyName: companyName,
+          companyFullAddress: companyAddress,
+          keySkills: profSkills,
+          cityName: cityName,
+          workingResponsibilities: responsibilities,
+          companyBonuses: conditions,
+          contactApiModel: CompanyContactApiModel(
+              fio: contactFullName,
+              phone: phone,
+              email: emailAddress
+          )
       );
 
-      var response =
-          _fellowWorkerService.createVacancy(_flutterSecureStorage, vacancy);
+      var response = _fellowWorkerService.editVacancy(
+          _flutterSecureStorage,
+          vacancy
+      );
       UtilityWidgets.dialogBuilderApi(
-          context, response, createVacancy, '/profile');
+          context, response, editVacancy, '/profile');
     }
-  }
-
-  ResponsiveGridCol buildInputSkills(List<ResponsiveGridCol> frames,
-      List<TextEditingController> tec, String message) {
-    return ResponsiveGridCol(
-        md: 12, child: buildTextFieldProfSkills(frames, tec, message));
-  }
-
-  Padding buildTextFieldProfSkills(List<ResponsiveGridCol> frames,
-      List<TextEditingController> tec, String message) {
-    var controller = TextEditingController();
-    tec.add(controller);
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-            suffixIcon: IconButton(
-              icon: Icon(
-                Icons.add,
-                color: Theme.of(context).primaryColorDark,
-              ),
-              onPressed: () {
-                setState(() {
-                  frames.add(buildInputSkills(frames, tec, message));
-                });
-              },
-            ),
-            hintText: message,
-            filled: true,
-            fillColor: Colors.white,
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(20))),
-      ),
-    );
   }
 }
 
-class CreateVacancy extends StatefulWidget {
+class EditVacancy extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
   late final FlutterSecureStorage flutterSecureStorage;
+  late final VacancyResponseApiModel vacancyResponseApiModel;
 
-  CreateVacancy(
+  EditVacancy(
       {required FellowWorkerService fWS,
       required FlutterSecureStorage fSS,
+      required VacancyResponseApiModel vRAM,
       super.key}) {
-    flutterSecureStorage = fSS;
     fellowWorkerService = fWS;
+    flutterSecureStorage = fSS;
+    vacancyResponseApiModel = vRAM;
   }
 
   @override
-  createState() => _CreateVacancy();
+  createState() => _EditVacancy();
 }
