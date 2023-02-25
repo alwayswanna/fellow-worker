@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/19/23, 11:28 PM
+ * Copyright (c) 1-2/20/23, 11:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -18,7 +18,8 @@ import '../../utils/utility_widgets.dart';
 const padding = EdgeInsets.all(10);
 const String createResume = "Создание резюме";
 
-class _CreateResume extends State<CreateResume> with SingleTickerProviderStateMixin {
+class _CreateResume extends State<CreateResume>
+    with SingleTickerProviderStateMixin {
   late FlutterSecureStorage _flutterSecureStorage;
   late FellowWorkerService _fellowWorkerService;
   late AnimationController _animationController;
@@ -82,8 +83,7 @@ class _CreateResume extends State<CreateResume> with SingleTickerProviderStateMi
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
         GradientEnchanted.buildGradient(buildLayout(), _animationController),
-        context
-    );
+        context);
   }
 
   Widget buildLayout() {
@@ -281,11 +281,10 @@ class _CreateResume extends State<CreateResume> with SingleTickerProviderStateMi
   }
 
   ResponsiveGridCol buildInputSkills() {
-    return ResponsiveGridCol(
-        md: 12, child: buildTextFieldProfSkills(controllerLastName));
+    return ResponsiveGridCol(md: 12, child: buildTextFieldProfSkills());
   }
 
-  Padding buildTextFieldProfSkills(TextEditingController controller) {
+  Padding buildTextFieldProfSkills() {
     var skillController = TextEditingController();
     professionalSkillsTec.add(skillController);
     return Padding(

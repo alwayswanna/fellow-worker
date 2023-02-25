@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2-2/8/23, 11:42 PM
+# Copyright (c) 2-2/23/23, 10:10 PM
 # Created by https://github.com/alwayswanna
 #
 
@@ -10,7 +10,7 @@ mvn clean package --quiet
 # shellcheck disable=SC2164
 cd fellowworkerfront
 # build flutter models.
-flutter pub run build_runner build
+flutter pub run build_runner build --delete-conflicting-outputs
 # build web layer to output directory
 flutter build web
 # shellcheck disable=SC2103

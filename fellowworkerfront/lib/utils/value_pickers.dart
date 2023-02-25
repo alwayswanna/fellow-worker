@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2-2/16/23, 7:56 PM
+ * Copyright (c) 2-2/23/23, 10:10 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:flutter/material.dart';
-
-import '../service/account_utils.dart';
 
 class StateTextFieldWidget extends StatefulWidget {
   late final Map<String, DateTime> timeMap;
   late final String uuidWidget;
   late final String message;
 
-  StateTextFieldWidget(
-      {super.key,
-      required Map<String, DateTime> tM,
-      required String id,
-      required String m}) {
+  StateTextFieldWidget({super.key,
+    required Map<String, DateTime> tM,
+    required String id,
+    required String m}) {
     timeMap = tM;
     uuidWidget = id;
     message = m;
@@ -47,7 +44,8 @@ class _StateTextFieldWidget extends State<StateTextFieldWidget> {
             fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
             hintText:
-                " $message ${timeMap[uuidWidget]!.year}/${timeMap[uuidWidget]!.month}/${timeMap[uuidWidget]!.day}"),
+            " $message ${timeMap[uuidWidget]!.year}/${timeMap[uuidWidget]!
+                .month}/${timeMap[uuidWidget]!.day}"),
         readOnly: true,
         // when true user cannot edit text
         onTap: () async {
@@ -66,7 +64,7 @@ class _StateTextFieldWidget extends State<StateTextFieldWidget> {
         lastDate: DateTime(2101));
     if (picked != null && picked != mapController[valueId]!) {
       setState(() {
-        mapController[valueId] = picked!;
+        mapController[valueId] = picked;
       });
     }
   }
@@ -74,15 +72,17 @@ class _StateTextFieldWidget extends State<StateTextFieldWidget> {
 
 class StateDropdownButtonWidget extends StatefulWidget {
   late final Map<String, TextEditingController> textEditingContMap;
+  late final List<String> dropDownValues;
   late final String uuidWidget;
   late final String message;
 
-  StateDropdownButtonWidget(
-      {super.key,
-      required Map<String, TextEditingController> tec,
-      required String id,
-      required String m}) {
+  StateDropdownButtonWidget({super.key,
+    required Map<String, TextEditingController> tec,
+    required List<String> dV,
+    required String id,
+    required String m}) {
     textEditingContMap = tec;
+    dropDownValues = dV;
     uuidWidget = id;
     message = m;
   }
@@ -93,6 +93,7 @@ class StateDropdownButtonWidget extends StatefulWidget {
 
 class _StateDropdownButtonWidget extends State<StateDropdownButtonWidget> {
   late final Map<String, TextEditingController> textEditingContMap;
+  late final List<String> dropDownValues;
   late final String uuidWidget;
   late final String message;
 
@@ -101,6 +102,7 @@ class _StateDropdownButtonWidget extends State<StateDropdownButtonWidget> {
     textEditingContMap = widget.textEditingContMap;
     uuidWidget = widget.uuidWidget;
     message = widget.message;
+    dropDownValues = widget.dropDownValues;
     super.initState();
   }
 
@@ -129,14 +131,14 @@ class _StateDropdownButtonWidget extends State<StateDropdownButtonWidget> {
 
   List<DropdownMenuItem<String>> buildDropDownButtonsForEducationFrame() {
     List<DropdownMenuItem<String>> buttons = [];
-    for(var level in educationLevels){
+    for (var level in dropDownValues) {
       buttons.add(
-        DropdownMenuItem(
-            value: level,
-            child: Text(
-              level,
-              style: const TextStyle(color: Colors.black),
-            ))
+          DropdownMenuItem(
+              value: level,
+              child: Text(
+                level,
+                style: const TextStyle(color: Colors.black),
+              ))
       );
     }
 

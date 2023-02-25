@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/18/23, 6:30 PM
+ * Copyright (c) 1-2/20/23, 11:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -20,6 +20,16 @@ const adminType = 'Администратор';
 const undergraduate = 'BACHELOR';
 const specialist = 'SPECIALTY';
 const master = 'MAGISTRACY';
+
+const typeOfWorkMap = {
+  '  Полная занятость' : 'FULL_EMPLOYMENT',
+  '  Частичная занятость':'PART_TIME_EMPLOYMENT'
+};
+
+const placementType = {
+  '  Офис':'OFFICE',
+  '  Удаленная':'REMOTE'
+};
 
 const accountTypes = ["  Соискатель", "  Работодатель"];
 const educationLevels = ["  Специалитет", "  Бакалавриат", "  Магистрант"];

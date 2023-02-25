@@ -39,17 +39,11 @@ Service which cat create PDF files with resume info.
 
 http://127.0.0.1:7044/swagger-ui.html
 
-## _fellowworkerfron_
+## _fellowworkerfront_
 
 Frontend module for all microservices.
 
 http://127.0.0.1:8888/
-
-For generate models:
-```shell
-flutter pub run build_runner build
-```
-
 
 
 Final qualifying work for the university.

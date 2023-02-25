@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/19/23, 11:28 PM
+ * Copyright (c) 1-2/23/23, 10:10 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -23,6 +23,8 @@ const editResumeUserAPI = "/api/v1/employee/edit-resume";
 // for company mappings;
 const createVacancyUserAPI = "/api/v1/vacancy/create";
 const vacanciesCurrentUserAPI = "/api/v1/vacancy/current-user-vacancies";
+const vacancyDeleteUserAPI = "/api/v1/vacancy/delete-id";
+const vacancyEditUserAPI = "/api/v1/vacancy/edit";
 
 class FellowWorkerService {
 
@@ -117,8 +119,10 @@ class FellowWorkerService {
   }
 
   /// edit resume method, PUT
-  Future<String> editResume(FlutterSecureStorage secureStorage,
-      ResumeApiModel requestBodyMessage) async {
+  Future<String> editResume(
+      FlutterSecureStorage secureStorage,
+      ResumeApiModel requestBodyMessage
+  ) async {
     var bodyMessage = jsonEncode(requestBodyMessage);
 
     await RequestUtils.injectJwtToHeaders(secureStorage);
@@ -160,13 +164,58 @@ class FellowWorkerService {
       FlutterSecureStorage flutterSecureStorage,
       VacancyApiModel vacancyApiModel
   ) async {
-    await RequestUtils.injectJwtToHeaders(flutterSecureStorage);
-
     var bodyMessage = jsonEncode(vacancyApiModel);
+
+    await RequestUtils.injectJwtToHeaders(flutterSecureStorage);
 
     final requestUri = Uri.parse(fellowWorkerHost + createVacancyUserAPI);
 
     var response = await http.post(
+        requestUri,
+        headers: defaultHeaders,
+        body: bodyMessage
+    );
+    RequestUtils.clearRequestHeadersContext();
+
+    if (response.statusCode == 200) {
+      return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+    } else if (response.statusCode == 400) {
+      return Future<String>.value(
+          "Не все поля заполнены или заполнены в неправильном формате");
+    } else {
+      return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+    }
+  }
+
+  /// delete vacancy, DELETE
+  Future<String> deleteVacancy(
+      FlutterSecureStorage flutterSecureStorage,
+      String vacancyId
+  ) async {
+    await RequestUtils.injectJwtToHeaders(flutterSecureStorage);
+
+    final requestUri =
+    Uri.parse("$fellowWorkerHost$vacancyDeleteUserAPI?vacancyId=$vacancyId");
+
+    var response = await http.delete(requestUri, headers: defaultHeaders);
+
+    RequestUtils.clearRequestHeadersContext();
+
+    return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+  }
+
+  /// edit vacancy, PUT
+  Future<String> editVacancy(
+      FlutterSecureStorage flutterSecureStorage,
+      VacancyApiModel vacancyApiModel
+  ) async {
+    var bodyMessage = jsonEncode(vacancyApiModel);
+
+    await RequestUtils.injectJwtToHeaders(flutterSecureStorage);
+
+    final requestUri = Uri.parse(fellowWorkerHost + vacancyEditUserAPI);
+
+    var response = await http.put(
         requestUri,
         headers: defaultHeaders,
         body: bodyMessage
