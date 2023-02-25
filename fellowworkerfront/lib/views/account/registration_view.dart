@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/19/23, 11:28 PM
+ * Copyright (c) 1-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -16,7 +16,7 @@ const padding = EdgeInsets.all(10);
 
 class _Registration extends State<Registration>
     with SingleTickerProviderStateMixin {
-  final ClientManagerService accountService = ClientManagerService();
+  late ClientManagerService _clientManagerService;
   late AnimationController _animationController;
   late String? typeAccount;
   late bool _passwordVisibility;
@@ -49,6 +49,7 @@ class _Registration extends State<Registration>
     super.initState();
     _passwordVisibility = false;
     typeAccount = null;
+    _clientManagerService = widget.accountService;
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -236,7 +237,7 @@ class _Registration extends State<Registration>
           accountCreateMessageToUser,
           '/profile');
     } else {
-      var response = accountService.createAccount(
+      var response = _clientManagerService.createAccount(
           usernameController.text,
           passwordController.text,
           emailController.text,
@@ -252,7 +253,14 @@ class _Registration extends State<Registration>
 }
 
 class Registration extends StatefulWidget {
-  const Registration({super.key});
+  late final ClientManagerService accountService;
+
+  Registration({
+    required ClientManagerService aS,
+    super.key
+  }) {
+    accountService = aS;
+  }
 
   @override
   createState() => _Registration();

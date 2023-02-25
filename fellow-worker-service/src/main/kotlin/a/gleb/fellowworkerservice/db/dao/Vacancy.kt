@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-2/25/23, 11:54 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -19,6 +19,8 @@ data class Vacancy(
     var ownerId: UUID,
 
     var vacancyName: String,
+
+    var salary: String?,
 
     var typeWork: TypeOfWork,
 

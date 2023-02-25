@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/19/23, 11:28 PM
+ * Copyright (c) 1-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,14 +7,12 @@ import 'package:fellowworkerfront/service/client_manager_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/account/registration_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../styles/gradient_color.dart';
 
 class _ChangePassword extends State<ChangePassword>
     with SingleTickerProviderStateMixin {
-  late FlutterSecureStorage securityStorage;
   late ClientManagerService accountService;
   var oldPasswordCont = TextEditingController();
   var newPasswordController = TextEditingController();
@@ -27,7 +25,6 @@ class _ChangePassword extends State<ChangePassword>
   @override
   void initState() {
     super.initState();
-    securityStorage = widget.securityStorage;
     accountService = widget.accountService;
     _oldPasswordVisible = false;
     _newPasswordVisible = false;
@@ -172,8 +169,7 @@ class _ChangePassword extends State<ChangePassword>
     } else if (newPassword != passwordVerify) {
       response = Future<String>.value("Пароли не совпадают");
     } else {
-      response = accountService.changePassword(
-          securityStorage, oldPassword, newPassword);
+      response = accountService.changePassword(oldPassword, newPassword);
     }
     UtilityWidgets.dialogBuilderApi(
         context, response, "Смена пароля", '/profile');
@@ -187,14 +183,12 @@ class _ChangePassword extends State<ChangePassword>
 }
 
 class ChangePassword extends StatefulWidget {
-  late final FlutterSecureStorage securityStorage;
   late final ClientManagerService accountService;
 
   ChangePassword(
-      {required FlutterSecureStorage sS,
+      {
       required ClientManagerService aS,
       super.key}) {
-    securityStorage = sS;
     accountService = aS;
   }
 

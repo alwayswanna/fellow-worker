@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/23/23, 10:10 PM
+ * Copyright (c) 1-3/7/23, 8:38 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,6 +7,7 @@ import 'package:fellowworkerfront/utils/value_pickers.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
+import '../models/fellow_worker_response_model.dart';
 import '../service/account_utils.dart';
 
 class UtilityWidgets {
@@ -55,6 +56,12 @@ class UtilityWidgets {
   static ResponsiveGridCol buildResponsiveGridCard(
       String? message, int? md, Color fontColor, double fontSize) {
     return buildResponsiveGridCardNullable(message = message, md = md,
+        fontColor = fontColor, fontSize = fontSize, null);
+  }
+
+  static ResponsiveGridCol buildResponsiveGridCartText(
+      String? message, Color fontColor, double fontSize) {
+    return buildResponsiveGridCardNullable(message = message, null,
         fontColor = fontColor, fontSize = fontSize, null);
   }
 
@@ -325,6 +332,75 @@ class UtilityWidgets {
       side: const BorderSide(
         width: 2.0,
         color: Colors.black,
+      ),
+    );
+  }
+
+  static Card workExperienceCard(WorkExperienceResponseModel wModel) {
+    return Card(
+      shape: UtilityWidgets.buildCardShapes(),
+      elevation: 10,
+      margin: const EdgeInsets.all(10),
+      child: ResponsiveGridRow(
+        children: [
+          UtilityWidgets.buildResponsiveGridCard(
+              "Дата трудоустройства: ${wModel.startTime}", 6, Colors.black, 15),
+          UtilityWidgets.buildResponsiveGridCard(
+              "Дата увольнения: ${wModel.endTime}", 6, Colors.black, 15),
+          UtilityWidgets.buildResponsiveGridCard(
+              "Компания: ${wModel.companyName}", 6, Colors.black, 15),
+          UtilityWidgets.buildResponsiveGridCard(
+              "Специальность: ${wModel.workingSpeciality}",
+              6,
+              Colors.black,
+              15),
+          UtilityWidgets.buildResponsiveGridCard(
+              "Рабочие обязанности: ${wModel.responsibilities}",
+              6,
+              Colors.black,
+              15),
+        ],
+      ),
+    );
+  }
+
+  static Card universityCard(EducationResponseModel eModel) {
+    String widgetLevel = "";
+    switch (eModel.educationLevel) {
+      case undergraduate:
+        {
+          widgetLevel = "Бакалавр";
+        }
+        break;
+      case master:
+        {
+          widgetLevel = "Магистрант";
+        }
+        break;
+      case specialist:
+        {
+          widgetLevel = "Специалитет";
+        }
+    }
+
+    return Card(
+      shape: UtilityWidgets.buildCardShapes(),
+      elevation: 10,
+      margin: const EdgeInsets.all(10),
+      child: ResponsiveGridRow(
+        children: [
+          UtilityWidgets.buildResponsiveGridCard(
+              "Дата поступления: ${eModel.startTime}", 6, Colors.black, 15),
+          UtilityWidgets.buildResponsiveGridCard(
+              "Дата окончания: ${eModel.endTime}", 6, Colors.black, 15),
+          UtilityWidgets.buildResponsiveGridCard(
+              "Учебное заведение: ${eModel.educationalInstitution}",
+              6,
+              Colors.black,
+              15),
+          UtilityWidgets.buildResponsiveGridCard(
+              "Ученая степень: $widgetLevel", 6, Colors.black, 15),
+        ],
       ),
     );
   }

@@ -1,32 +1,32 @@
 /*
- * Copyright (c) 2-2/7/23, 11:32 PM
+ * Copyright (c) 2-3/9/23, 11:54 PM
  * Created by https://github.com/alwayswanna
  */
+import 'package:fellowworkerfront/security/oauth2.dart';
 import 'package:file_saver/file_saver.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-import '../main.dart';
-import '../security/oauth2.dart';
 import 'account_utils.dart';
 
 const cvGeneratorHost = "http://127.0.0.1:7044";
 const cvGeneratorDownloadApi = "/api/v1/resume-download";
 
 class CvGeneratorService {
+
+  final Oauth2Service oauth2service;
+
+  CvGeneratorService(this.oauth2service);
+
   /// method download resume in pdf format
-  Future<String> downloadResume(
-      FlutterSecureStorage secureStorage, String resumeId) async {
-    String? userToken = await secureStorage.read(key: jwtTokenKey);
+  Future<String> downloadResume(String resumeId) async {
+    var userToken = await oauth2service.getAccessToken();
 
-    Map<dynamic, dynamic> tokenMap =
-        Oauth2Service.convertTokenToMap(userToken!);
-    String accessToken = tokenMap["access_token"]!;
-    defaultHeaders["Authorization"] = "Bearer $accessToken";
+    RequestUtils.injectTokenToRequest(userToken);
 
-    final requestUri =
-        Uri.parse("$cvGeneratorHost$cvGeneratorDownloadApi?resumeId=$resumeId");
+    final requestUri = Uri.parse("$cvGeneratorHost$cvGeneratorDownloadApi?resumeId=$resumeId");
     final response = await http.get(requestUri, headers: defaultHeaders);
+
+    RequestUtils.clearRequestHeadersContext();
 
     if (response.statusCode == 200) {
       await FileSaver.instance

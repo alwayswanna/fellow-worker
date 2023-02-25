@@ -89,13 +89,24 @@ fellow-worker:
             - /api/v1/vacancy/current-user-vacancies
   unprotected-paths:
     - /api/v1/employee/get-all-resume
+    - /api/v1/employee/filter-resumes
     - /api/v1/employee/get-resume-id
     - /api/v1/vacancy/vacancy-all
     - /api/v1/vacancy/id
-    - /api/v1/vacancy/vacancies-by-skills
-    - /api/v1/vacancy/vacancies-by-type
-    - /api/v1/vacancy/vacancies-by-city
-    - /api/v1/vacancy/vacancies-by-type-time
+    - /api/v1/vacancy/filter-vacancies
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 logging:
   level:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/13/23, 9:55 PM
+ * Copyright (c) 07-3/1/23, 10:18 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -189,19 +189,25 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
         saveVacancy(vacancy)
         TimeUnit.SECONDS.sleep(3)
 
-        webTestClient.get()
-            .uri {
-                it
-                    .path(VACANCY_PATH.plus("/vacancies-by-type"))
-                    .queryParam("type", vacancy.typeOfWorkPlacement.toString())
-                    .build()
+        val request = """
+            {
+                "city": null,
+                "typeOfWork": null,
+                "typeOfWorkPlacement": "${vacancy.typeOfWorkPlacement}",
+                "keySkills": null
             }
+        """.trimIndent()
+
+        webTestClient.post()
+            .uri(VACANCY_PATH.plus("/filter-vacancies"))
+            .contentType(APPLICATION_JSON)
+            .bodyValue(request)
             .exchange()
             .expectStatus()
             .isOk
             .expectBody()
             .jsonPath("$.message")
-            .doesNotExist()
+            .isEqualTo("Вот что мы нашли")
 
         assertEquals(1, vacancyRepository.findAll().asFlux().toStream().toList().size)
     }
@@ -213,19 +219,25 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
         saveVacancy(vacancy)
         TimeUnit.SECONDS.sleep(3)
 
-        webTestClient.get()
-            .uri {
-                it
-                    .path(VACANCY_PATH.plus("/vacancies-by-type-time"))
-                    .queryParam("type", vacancy.typeWork.toString())
-                    .build()
+        val request = """
+            {
+                "city": null,
+                "typeOfWork": "${vacancy.typeWork}",
+                "typeOfWorkPlacement": null,
+                "keySkills": null
             }
+        """.trimIndent()
+
+        webTestClient.post()
+            .uri(VACANCY_PATH.plus("/filter-vacancies"))
+            .contentType(APPLICATION_JSON)
+            .bodyValue(request)
             .exchange()
             .expectStatus()
             .isOk
             .expectBody()
             .jsonPath("$.message")
-            .doesNotExist()
+            .isEqualTo("Вот что мы нашли")
 
         assertEquals(1, vacancyRepository.findAll().asFlux().toStream().toList().size)
     }
@@ -235,21 +247,27 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
         /* prepare data */
         val vacancy = createDefaultVacancy()
         saveVacancy(vacancy)
-        TimeUnit.SECONDS.sleep(5)
+        TimeUnit.SECONDS.sleep(3)
 
-        webTestClient.get()
-            .uri {
-                it
-                    .path(VACANCY_PATH.plus("/vacancies-by-city"))
-                    .queryParam("city", vacancy.cityName)
-                    .build()
+        val request = """
+            {
+                "city": "${vacancy.cityName}",
+                "typeOfWork": null,
+                "typeOfWorkPlacement": null,
+                "keySkills": null
             }
+        """.trimIndent()
+
+        webTestClient.post()
+            .uri(VACANCY_PATH.plus("/filter-vacancies"))
+            .contentType(APPLICATION_JSON)
+            .bodyValue(request)
             .exchange()
             .expectStatus()
             .isOk
             .expectBody()
             .jsonPath("$.message")
-            .doesNotExist()
+            .isEqualTo("Вот что мы нашли")
 
         assertEquals(1, vacancyRepository.findAll().asFlux().toStream().toList().size)
     }
@@ -261,19 +279,25 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
         saveVacancy(vacancy)
         TimeUnit.SECONDS.sleep(3)
 
-        webTestClient.get()
-            .uri {
-                it
-                    .path(VACANCY_PATH.plus("/vacancies-by-skills"))
-                    .queryParam("skill", vacancy.keySkills[0])
-                    .build()
+        val request = """
+            {
+                "city": null,
+                "typeOfWork": null,
+                "typeOfWorkPlacement": null,
+                "keySkills": "${vacancy.keySkills[0]}"
             }
+        """.trimIndent()
+
+        webTestClient.post()
+            .uri(VACANCY_PATH.plus("/filter-vacancies"))
+            .contentType(APPLICATION_JSON)
+            .bodyValue(request)
             .exchange()
             .expectStatus()
             .isOk
             .expectBody()
             .jsonPath("$.message")
-            .doesNotExist()
+            .isEqualTo("Вот что мы нашли")
 
         assertEquals(1, vacancyRepository.findAll().asFlux().toStream().toList().size)
     }
@@ -291,6 +315,7 @@ class VacancyControllerTest : BaseFellowWorkerServiceTest() {
             UUID.randomUUID(),
             UUID.randomUUID(),
             "NameVacancy",
+            "15000",
             TypeOfWork.FULL_EMPLOYMENT,
             TypePlacement.OFFICE,
             "CompanyName",

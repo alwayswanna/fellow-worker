@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/22/23, 12:09 PM
+ * Copyright (c) 07-3/8/23, 10:11 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -23,6 +23,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Configuration
 public class JwtConfiguration {
@@ -52,8 +53,9 @@ public class JwtConfiguration {
             var userRoles = principal.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
-                    .toList();
+                    .collect(Collectors.toSet());
 
+            /* uses here set for does not create mixin-class */
             context.getClaims().claim(ROLE_CLAIM, userRoles);
 
             tokenService.enrichJwtToken(principal.getName())

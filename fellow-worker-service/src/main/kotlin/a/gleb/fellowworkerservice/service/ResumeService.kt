@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 12-1/27/23, 10:22 PM
+ * Copyright (c) 12-3/7/23, 10:25 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.fellowworkerservice.service
 
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
+import a.gleb.apicommon.fellowworker.model.request.resume.SearchResumeApiModel
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
 import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageCreate
 import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageDelete
+import a.gleb.fellowworkerservice.db.dao.Resume
 import a.gleb.fellowworkerservice.db.repository.ResumeRepository
 import a.gleb.fellowworkerservice.exception.InvalidUserDataException
 import a.gleb.fellowworkerservice.exception.UnexpectedErrorException
 import a.gleb.fellowworkerservice.mapper.ResumeModelMapper
+import kotlinx.coroutines.flow.asFlow
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_GATEWAY
@@ -36,7 +39,7 @@ class ResumeService(
     suspend fun createResume(request: ResumeApiModel): FellowWorkerResponseModel {
         val userId = oauth2SecurityService.extractOauth2UserId()
 
-        val existingResume = resumeRepository.findAllByOwnerRecordId(UUID.fromString(userId))
+        val existingResume = resumeRepository.findByOwnerRecordId(UUID.fromString(userId))
         if (existingResume != null) {
             logger.info {
                 "Current user: $userId already have resume (resumeId: ${existingResume.id}), deleting existing resume"
@@ -169,7 +172,7 @@ class ResumeService(
         val userId = oauth2SecurityService.extractOauth2UserId()
 
         try {
-            val resume = resumeRepository.findAllByOwnerRecordId(UUID.fromString(userId))
+            val resume = resumeRepository.findByOwnerRecordId(UUID.fromString(userId))
                 ?: return FellowWorkerResponseModel()
                     .apply {
                         message = "Вы еще не создавали резюме"
@@ -190,11 +193,59 @@ class ResumeService(
      */
     suspend fun allResume(): FellowWorkerResponseModel {
         try {
-            return resumeModelMapper.toResumeResponseFlow(resumeRepository.findAll())
+            val response = resumeModelMapper.toResumeResponseFlow(resumeRepository.findAll())
+            response.apply {
+                message = "Все найденные резюме"
+            }
+            return response
         } catch (e: Exception) {
             throw UnexpectedErrorException(
                 BAD_GATEWAY,
                 "Ошибка при получении всех резюме, попробуйте повторить попытку позже"
+            )
+        }
+    }
+
+    /**
+     * Method find resumes with specific option.
+     * @param request object with filter option
+     */
+    suspend fun filter(request: SearchResumeApiModel): FellowWorkerResponseModel {
+        try {
+            val result = mutableListOf<Resume>()
+
+            with(request) {
+                if (!city.isNullOrBlank()) {
+                    result.addAll(resumeRepository.findAllByCity(city))
+                }
+
+                if (!keySkills.isNullOrBlank()) {
+                    result.addAll(resumeRepository.findAllByProfessionalSkillsContains(keySkills))
+                }
+
+                if (!job.isNullOrBlank()) {
+                    result.addAll(resumeRepository.findAllByJobContains(job))
+                }
+
+                if (!salary.isNullOrBlank()) {
+                    result.addAll(resumeRepository.findAllByExpectedSalaryBetween(0, salary.toInt()))
+                }
+
+                val identicalVacancies = result.asSequence().map { it.id }.toSet()
+
+                val finalResult = result.filter { identicalVacancies.contains(it.id) }.asFlow()
+
+                val resumeResponse = resumeModelMapper.toResumeResponseFlow(finalResult)
+                resumeResponse.apply {
+                    message = "Вот что мы нашли"
+                }
+
+                return resumeResponse
+            }
+        } catch (e: Exception) {
+            throw UnexpectedErrorException(
+                BAD_GATEWAY,
+                "Ошибка при фильтрации попробуйте повторить попытку позже"
             )
         }
     }

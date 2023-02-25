@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/15/23, 11:40 PM
+ * Copyright (c) 1-3/6/23, 10:57 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -63,11 +63,12 @@ class ResumeResponseModel {
   final String userId;
   final String firstName;
   final String middleName;
-  final String lastName;
+  final String? lastName;
   final String birthDate;
   final String job;
-  final String expectedSalary;
-  final String about;
+  final String? city;
+  final String? expectedSalary;
+  final String? about;
   final List<dynamic>? education;
   final List<String> professionalSkills;
   final List<dynamic>? workingHistory;
@@ -82,6 +83,7 @@ class ResumeResponseModel {
     required this.birthDate,
     required this.job,
     required this.expectedSalary,
+    required this.city,
     required this.about,
     required this.education,
     required this.professionalSkills,
@@ -142,6 +144,7 @@ class EducationResponseModel {
 class VacancyResponseApiModel {
   final String resumeId;
   final String vacancyName;
+  final String? salary;
   final String typeOfWork;
   final String typeOfWorkPlacement;
   final String companyName;
@@ -155,6 +158,7 @@ class VacancyResponseApiModel {
 
   const VacancyResponseApiModel({required this.resumeId,
     required this.vacancyName,
+    required this.salary,
     required this.typeOfWork,
     required this.typeOfWorkPlacement,
     required this.companyName,

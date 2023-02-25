@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-2/24/23, 10:12 PM
+ * Copyright (c) 2-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,7 +7,6 @@ import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/vacancy/edit_vacancy.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
@@ -19,13 +18,11 @@ class _AboutVacancy extends State<AboutVacancy>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late FellowWorkerService _fellowWorkerService;
-  late FlutterSecureStorage _flutterSecureStorage;
   late VacancyResponseApiModel _vacancyResponseApiModel;
 
   @override
   void initState() {
     _fellowWorkerService = widget.fellowWorkerService;
-    _flutterSecureStorage = widget.flutterSecureStorage;
     _vacancyResponseApiModel = widget.vacancyResponseApiModel;
     _animationController = AnimationController(
         vsync: this,
@@ -84,44 +81,43 @@ class _AboutVacancy extends State<AboutVacancy>
 
     String typeOfWork = "Не заполнен";
     typeOfWorkMap.forEach((key, value) {
-      if(value == _vacancyResponseApiModel.typeOfWork){
+      if (value == _vacancyResponseApiModel.typeOfWork) {
         typeOfWork = key.replaceAll("  ", "");
       }
     });
 
     String workFormat = "Не заполнен";
     placementType.forEach((key, value) {
-      if(value == _vacancyResponseApiModel.typeOfWorkPlacement){
+      if (value == _vacancyResponseApiModel.typeOfWorkPlacement) {
         workFormat = key.replaceAll("  ", "");
       }
     });
 
     String keySkills = "";
-    if(_vacancyResponseApiModel.keySkills.isEmpty){
+    if (_vacancyResponseApiModel.keySkills.isEmpty) {
       keySkills = "Не заполнен";
-    }else{
+    } else {
       for (var element in _vacancyResponseApiModel.keySkills) {
         keySkills = "$keySkills \n - $element";
       }
     }
 
     String responsibilities = "";
-    if(_vacancyResponseApiModel.keySkills.isEmpty){
+    if (_vacancyResponseApiModel.keySkills.isEmpty) {
       responsibilities = "Не заполнен";
-    }else{
+    } else {
       for (var element in _vacancyResponseApiModel.workingResponsibilities) {
         responsibilities = "$responsibilities \n - $element";
       }
     }
 
-    var contactApiModel = ContactApiModel
-        .fromJson(_vacancyResponseApiModel.contactApiModel);
-
+    var contactApiModel =
+        ContactApiModel.fromJson(_vacancyResponseApiModel.contactApiModel);
 
     String conditions = "";
-    if(_vacancyResponseApiModel.companyBonuses.isEmpty){
+    if (_vacancyResponseApiModel.companyBonuses.isEmpty) {
       conditions = "Не заполнен";
-    }else{
+    } else {
       for (var element in _vacancyResponseApiModel.companyBonuses) {
         conditions = "$conditions \n - $element";
       }
@@ -133,17 +129,37 @@ class _AboutVacancy extends State<AboutVacancy>
         UtilityWidgets.buildResponsiveGridCard(
             _vacancyResponseApiModel.vacancyName, 10, Colors.black, 25),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
+            "Заработная плата:", 12, Colors.blueGrey, 10, textPadding),
+        UtilityWidgets.buildResponsiveGridCardWithPadding(
+            _vacancyResponseApiModel.salary, 12, Colors.black, 15, textPadding),
+        UtilityWidgets.buildResponsiveGridCardWithPadding(
             "Наименование компании:", 6, Colors.blueGrey, 10, textPadding),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
             "Город:", 6, Colors.blueGrey, 10, textPadding),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
-            _vacancyResponseApiModel.companyName, 6, Colors.black, 15, textPadding),
+            _vacancyResponseApiModel.companyName,
+            6,
+            Colors.black,
+            15,
+            textPadding),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
-            _vacancyResponseApiModel.cityName, 6, Colors.black, 15, textPadding),
+            _vacancyResponseApiModel.cityName,
+            6,
+            Colors.black,
+            15,
+            textPadding),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
-            "Юридический адрес компании:", 12, Colors.blueGrey, 10, textPadding),
+            "Юридический адрес компании:",
+            12,
+            Colors.blueGrey,
+            10,
+            textPadding),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
-            _vacancyResponseApiModel.companyFullAddress, 12, Colors.black, 15, textPadding),
+            _vacancyResponseApiModel.companyFullAddress,
+            12,
+            Colors.black,
+            15,
+            textPadding),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
             "Тип занятости:", 6, Colors.blueGrey, 10, textPadding),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
@@ -159,7 +175,11 @@ class _AboutVacancy extends State<AboutVacancy>
             keySkills, 6, Colors.black, 15, textPadding),
         UtilityWidgets.emptyLine(),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
-            "Чем вам предстоит заниматься:", 12, Colors.blueGrey, 15, textPadding),
+            "Чем вам предстоит заниматься:",
+            12,
+            Colors.blueGrey,
+            15,
+            textPadding),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
             responsibilities, 6, Colors.black, 15, textPadding),
         UtilityWidgets.emptyLine(),
@@ -185,7 +205,11 @@ class _AboutVacancy extends State<AboutVacancy>
             contactApiModel.email, 6, Colors.black, 15, textPadding),
         UtilityWidgets.emptyLine(),
         UtilityWidgets.buildResponsiveGridCardWithPadding(
-            "Дата последнего обновления: $viewDateTime", 12, Colors.black, 15, textPadding),
+            "Дата последнего обновления: $viewDateTime",
+            12,
+            Colors.black,
+            15,
+            textPadding),
         UtilityWidgets.emptyLine(),
         ResponsiveGridCol(
             md: 2,
@@ -197,9 +221,7 @@ class _AboutVacancy extends State<AboutVacancy>
                       MaterialPageRoute(
                           builder: (context) => EditVacancy(
                               fWS: _fellowWorkerService,
-                              fSS: _flutterSecureStorage,
-                              vRAM: _vacancyResponseApiModel
-                          )));
+                              vRAM: _vacancyResponseApiModel)));
                 }, "Редактировать", 18.0, 13.0))),
         ResponsiveGridCol(
             md: 2,
@@ -208,8 +230,8 @@ class _AboutVacancy extends State<AboutVacancy>
               child: UtilityWidgets.buildCardButtonPadding(() {
                 UtilityWidgets.dialogBuilderApi(
                     context,
-                    _fellowWorkerService.deleteVacancy(
-                        _flutterSecureStorage, _vacancyResponseApiModel.resumeId),
+                    _fellowWorkerService
+                        .deleteVacancy(_vacancyResponseApiModel.resumeId),
                     "Удалить резюме",
                     "/profile");
               }, "Удалить", 18.0, 13.0),
@@ -221,16 +243,14 @@ class _AboutVacancy extends State<AboutVacancy>
 
 class AboutVacancy extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
-  late final FlutterSecureStorage flutterSecureStorage;
   late final VacancyResponseApiModel vacancyResponseApiModel;
 
-  AboutVacancy(
-      {required FellowWorkerService fWS,
-      required FlutterSecureStorage fSS,
-      required VacancyResponseApiModel vacancy,
-      super.key}) {
+  AboutVacancy({
+    required FellowWorkerService fWS,
+    required VacancyResponseApiModel vacancy,
+    super.key
+  }) {
     fellowWorkerService = fWS;
-    flutterSecureStorage = fSS;
     vacancyResponseApiModel = vacancy;
   }
 

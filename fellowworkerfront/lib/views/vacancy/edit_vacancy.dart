@@ -1,11 +1,10 @@
 /*
- * Copyright (c) 2-2/24/23, 10:12 PM
+ * Copyright (c) 2-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../models/fellow_worker_response_model.dart';
@@ -23,11 +22,11 @@ class _EditVacancy extends State<EditVacancy>
   late AnimationController _animationController;
   late VacancyResponseApiModel _vacancyResponseApiModel;
   late FellowWorkerService _fellowWorkerService;
-  late FlutterSecureStorage _flutterSecureStorage;
   bool isNeedInfo = true;
 
   var vacancyNameTEC = TextEditingController();
   var companyNameTEC = TextEditingController();
+  var salaryTEC = TextEditingController();
   var companyAddressTEC = TextEditingController();
   var cityNameTEC = TextEditingController();
   var contactFullNameTEC = TextEditingController();
@@ -53,7 +52,6 @@ class _EditVacancy extends State<EditVacancy>
   void initState() {
     _vacancyResponseApiModel = widget.vacancyResponseApiModel;
     _fellowWorkerService = widget.fellowWorkerService;
-    _flutterSecureStorage = widget.flutterSecureStorage;
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -88,6 +86,7 @@ class _EditVacancy extends State<EditVacancy>
 
   Widget buildPageLayout() {
     var contact = ContactApiModel.fromJson(_vacancyResponseApiModel.contactApiModel);
+    salaryTEC.text = _vacancyResponseApiModel.salary?? "Не указана";
     vacancyNameTEC.text = _vacancyResponseApiModel.vacancyName;
     companyNameTEC.text = _vacancyResponseApiModel.companyName;
     companyAddressTEC.text = _vacancyResponseApiModel.companyFullAddress;
@@ -111,6 +110,10 @@ class _EditVacancy extends State<EditVacancy>
                       md: 6,
                       child: UtilityWidgets.buildTextField(
                           vacancyNameTEC, "Название вакансии:")),
+                  ResponsiveGridCol(
+                      md: 6,
+                      child: UtilityWidgets.buildTextField(
+                          salaryTEC, "Размер заработной платы:")),
                   ResponsiveGridCol(
                       md: 6,
                       child: UtilityWidgets.buildTextField(
@@ -353,6 +356,7 @@ class _EditVacancy extends State<EditVacancy>
       var vacancy = VacancyApiModel(
           vacancyId: _vacancyResponseApiModel.resumeId,
           vacancyName: vacancyName,
+          salary: salaryTEC.text == "Не указана"? null : salaryTEC.text,
           typeOfWork: typeTime,
           typeOfWorkPlacement: typePlacement,
           companyName: companyName,
@@ -368,10 +372,7 @@ class _EditVacancy extends State<EditVacancy>
           )
       );
 
-      var response = _fellowWorkerService.editVacancy(
-          _flutterSecureStorage,
-          vacancy
-      );
+      var response = _fellowWorkerService.editVacancy(vacancy);
       UtilityWidgets.dialogBuilderApi(
           context, response, editVacancy, '/profile');
     }
@@ -380,16 +381,14 @@ class _EditVacancy extends State<EditVacancy>
 
 class EditVacancy extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
-  late final FlutterSecureStorage flutterSecureStorage;
   late final VacancyResponseApiModel vacancyResponseApiModel;
 
-  EditVacancy(
-      {required FellowWorkerService fWS,
-      required FlutterSecureStorage fSS,
-      required VacancyResponseApiModel vRAM,
-      super.key}) {
+  EditVacancy({
+    required FellowWorkerService fWS,
+    required VacancyResponseApiModel vRAM,
+    super.key
+  }) {
     fellowWorkerService = fWS;
-    flutterSecureStorage = fSS;
     vacancyResponseApiModel = vRAM;
   }
 

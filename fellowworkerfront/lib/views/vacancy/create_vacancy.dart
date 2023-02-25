@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-2/23/23, 10:10 PM
+ * Copyright (c) 2-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,7 +8,6 @@ import 'package:fellowworkerfront/service/account_utils.dart';
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../styles/gradient_color.dart';
@@ -20,7 +19,6 @@ const createVacancy = "Создание вакансии";
 class _CreateVacancy extends State<CreateVacancy>
     with SingleTickerProviderStateMixin {
   late FellowWorkerService _fellowWorkerService;
-  late FlutterSecureStorage _flutterSecureStorage;
   late AnimationController _animationController;
 
   // required skills
@@ -40,6 +38,7 @@ class _CreateVacancy extends State<CreateVacancy>
 
   var vacancyNameTEC = TextEditingController();
   var companyNameTEC = TextEditingController();
+  var salaryTEC = TextEditingController();
   var companyAddressTEC = TextEditingController();
   var cityNameTEC = TextEditingController();
   var contactFullNameTEC = TextEditingController();
@@ -49,7 +48,6 @@ class _CreateVacancy extends State<CreateVacancy>
   @override
   void initState() {
     _fellowWorkerService = widget.fellowWorkerService;
-    _flutterSecureStorage = widget.flutterSecureStorage;
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -87,6 +85,13 @@ class _CreateVacancy extends State<CreateVacancy>
                       md: 6,
                       child: UtilityWidgets.buildTextField(
                           vacancyNameTEC, "Название вакансии:")),
+                  ResponsiveGridCol(
+                      md: 6,
+                      child: UtilityWidgets.buildTextField(
+                          salaryTEC,
+                          "Заработная плата"
+                      )
+                  ),
                   ResponsiveGridCol(
                       md: 6,
                       child: UtilityWidgets.buildTextField(
@@ -288,6 +293,7 @@ class _CreateVacancy extends State<CreateVacancy>
       var vacancy = VacancyApiModel(
         vacancyId: null,
         vacancyName: vacancyName,
+        salary: salaryTEC.text,
         typeOfWork: typeTime,
         typeOfWorkPlacement: typePlacement,
         companyName: companyName,
@@ -303,10 +309,13 @@ class _CreateVacancy extends State<CreateVacancy>
         )
       );
 
-      var response =
-          _fellowWorkerService.createVacancy(_flutterSecureStorage, vacancy);
+      var response = _fellowWorkerService.createVacancy(vacancy);
       UtilityWidgets.dialogBuilderApi(
-          context, response, createVacancy, '/profile');
+          context,
+          response,
+          createVacancy,
+          '/profile'
+      );
     }
   }
 
@@ -348,13 +357,11 @@ class _CreateVacancy extends State<CreateVacancy>
 
 class CreateVacancy extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
-  late final FlutterSecureStorage flutterSecureStorage;
 
-  CreateVacancy(
-      {required FellowWorkerService fWS,
-      required FlutterSecureStorage fSS,
-      super.key}) {
-    flutterSecureStorage = fSS;
+  CreateVacancy({
+    required FellowWorkerService fWS,
+    super.key
+  }) {
     fellowWorkerService = fWS;
   }
 

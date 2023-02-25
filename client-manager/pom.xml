@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 07-07.01.2023, 20:28
+  ~ Copyright (c) 07-3/12/23, 5:21 PM
   ~ Created by https://github.com/alwayswanna
   -->
 
@@ -49,6 +49,10 @@
         </dependency>
 
         <!-- Other -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

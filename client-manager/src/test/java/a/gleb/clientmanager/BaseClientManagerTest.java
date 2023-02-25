@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-3/12/23, 1:00 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -43,7 +43,7 @@ public abstract class BaseClientManagerTest {
     public static final String ACCOUNT_PREFIX = "/api/v1/account";
     public static final String SUPPORT_PREFIX = "/api/v1/support";
 
-    private static PostgreSQLContainer POSTGRES = new PostgreSQLContainer();
+    private static PostgreSQLContainer POSTGRES = new PostgreSQLContainer("postgres:15.2-alpine");
 
     @MockBean
     public OAuth2SecurityContextService oAuth2SecurityContextService;

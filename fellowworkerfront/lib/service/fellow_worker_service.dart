@@ -1,12 +1,14 @@
 /*
- * Copyright (c) 1-2/23/23, 10:10 PM
+ * Copyright (c) 1-3/9/23, 11:54 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'dart:convert';
 
+import 'package:fellowworkerfront/models/search_resume_model.dart';
+import 'package:fellowworkerfront/models/search_vacancy_model.dart';
 import 'package:fellowworkerfront/models/vacancy_request_model.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fellowworkerfront/security/oauth2.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/account_response_model.dart';
@@ -26,13 +28,23 @@ const vacanciesCurrentUserAPI = "/api/v1/vacancy/current-user-vacancies";
 const vacancyDeleteUserAPI = "/api/v1/vacancy/delete-id";
 const vacancyEditUserAPI = "/api/v1/vacancy/edit";
 
+// mappings for all
+const searchVacanciesAPI = "/api/v1/vacancy/vacancy-all";
+const filterVacanciesAPI = "/api/v1/vacancy/filter-vacancies";
+const searchResumesAPI = "/api/v1/employee/get-all-resume";
+const filterResumeAPI = "/api/v1/employee/filter-resumes";
+
 class FellowWorkerService {
 
+  final Oauth2Service oauth2service;
+
+  FellowWorkerService(this.oauth2service);
+
   /// get current user resume, GET
-  Future<FellowWorkerResponseModel> currentUserResume(
-      FlutterSecureStorage secureStorage
-  ) async {
-    await RequestUtils.injectJwtToHeaders(secureStorage);
+  Future<FellowWorkerResponseModel> currentUserResume() async {
+    var userToken = await oauth2service.getAccessToken();
+    RequestUtils.injectTokenToRequest(userToken);
+
     final requestUri = Uri.parse(fellowWorkerHost + resumeCurrentUserAPI);
 
     var response = await http.get(requestUri, headers: defaultHeaders);
@@ -51,10 +63,10 @@ class FellowWorkerService {
   }
 
   /// get current user vacancies, GET
-  Future<FellowWorkerResponseModel> currentUserVacancies(
-      FlutterSecureStorage secureStorage
-  ) async {
-    await RequestUtils.injectJwtToHeaders(secureStorage);
+  Future<FellowWorkerResponseModel> currentUserVacancies() async {
+    var userToken = await oauth2service.getAccessToken();
+    RequestUtils.injectTokenToRequest(userToken);
+
     final requestUri = Uri.parse(fellowWorkerHost + vacanciesCurrentUserAPI);
 
     var response = await http.get(requestUri, headers: defaultHeaders);
@@ -74,15 +86,14 @@ class FellowWorkerService {
 
   /// get current user vacancy or resume, GET
   Future<FellowWorkerResponseModel> getCurrenUserEntities(
-      FlutterSecureStorage secureStorage,
       Future<ApiResponseModel> response
   ) async {
     var accountModel = await response;
 
     if (accountModel.accountDataModel?.role == companyResponse) {
-      return await currentUserVacancies(secureStorage);
+      return await currentUserVacancies();
     } else if (accountModel.accountDataModel?.role == employeeResponse) {
-      return currentUserResume(secureStorage);
+      return currentUserResume();
     } else {
       return Future.value(const FellowWorkerResponseModel(
           message: "Произошла ошибка",
@@ -95,17 +106,21 @@ class FellowWorkerService {
 
   /// create resume method, POST
   Future<String> createResume(
-      FlutterSecureStorage secureStorage,
       ResumeApiModel requestBodyMessage
   ) async {
     var bodyMessage = jsonEncode(requestBodyMessage);
 
-    await RequestUtils.injectJwtToHeaders(secureStorage);
+    var userToken = await oauth2service.getAccessToken();
+    RequestUtils.injectTokenToRequest(userToken);
 
     final requestUri = Uri.parse(fellowWorkerHost + createResumeUserAPI);
 
-    var response =
-        await http.post(requestUri, headers: defaultHeaders, body: bodyMessage);
+    var response = await http.post(
+        requestUri,
+        headers: defaultHeaders,
+        body: bodyMessage
+    );
+
     RequestUtils.clearRequestHeadersContext();
 
     if (response.statusCode == 200) {
@@ -120,12 +135,13 @@ class FellowWorkerService {
 
   /// edit resume method, PUT
   Future<String> editResume(
-      FlutterSecureStorage secureStorage,
+      
       ResumeApiModel requestBodyMessage
   ) async {
     var bodyMessage = jsonEncode(requestBodyMessage);
 
-    await RequestUtils.injectJwtToHeaders(secureStorage);
+    var userToken = await oauth2service.getAccessToken();
+    RequestUtils.injectTokenToRequest(userToken);
 
     final requestUri = Uri.parse(fellowWorkerHost + editResumeUserAPI);
     var response =
@@ -145,10 +161,10 @@ class FellowWorkerService {
 
   /// delete resume by id, DELETE
   Future<String> deleteResume(
-      FlutterSecureStorage secureStorage,
       String resumeId
   ) async {
-    await RequestUtils.injectJwtToHeaders(secureStorage);
+    var userToken = await oauth2service.getAccessToken();
+    RequestUtils.injectTokenToRequest(userToken);
 
     final requestUri =
         Uri.parse("$fellowWorkerHost$deleteResumeUserAPI?id=$resumeId");
@@ -161,12 +177,12 @@ class FellowWorkerService {
 
   /// create vacancy, POST
   Future<String> createVacancy(
-      FlutterSecureStorage flutterSecureStorage,
       VacancyApiModel vacancyApiModel
   ) async {
     var bodyMessage = jsonEncode(vacancyApiModel);
 
-    await RequestUtils.injectJwtToHeaders(flutterSecureStorage);
+    var userToken = await oauth2service.getAccessToken();
+    RequestUtils.injectTokenToRequest(userToken);
 
     final requestUri = Uri.parse(fellowWorkerHost + createVacancyUserAPI);
 
@@ -188,11 +204,9 @@ class FellowWorkerService {
   }
 
   /// delete vacancy, DELETE
-  Future<String> deleteVacancy(
-      FlutterSecureStorage flutterSecureStorage,
-      String vacancyId
-  ) async {
-    await RequestUtils.injectJwtToHeaders(flutterSecureStorage);
+  Future<String> deleteVacancy(String vacancyId) async {
+    var userToken = await oauth2service.getAccessToken();
+    RequestUtils.injectTokenToRequest(userToken);
 
     final requestUri =
     Uri.parse("$fellowWorkerHost$vacancyDeleteUserAPI?vacancyId=$vacancyId");
@@ -205,13 +219,11 @@ class FellowWorkerService {
   }
 
   /// edit vacancy, PUT
-  Future<String> editVacancy(
-      FlutterSecureStorage flutterSecureStorage,
-      VacancyApiModel vacancyApiModel
-  ) async {
+  Future<String> editVacancy(VacancyApiModel vacancyApiModel) async {
     var bodyMessage = jsonEncode(vacancyApiModel);
 
-    await RequestUtils.injectJwtToHeaders(flutterSecureStorage);
+    var userToken = await oauth2service.getAccessToken();
+    RequestUtils.injectTokenToRequest(userToken);
 
     final requestUri = Uri.parse(fellowWorkerHost + vacancyEditUserAPI);
 
@@ -220,6 +232,7 @@ class FellowWorkerService {
         headers: defaultHeaders,
         body: bodyMessage
     );
+
     RequestUtils.clearRequestHeadersContext();
 
     if (response.statusCode == 200) {
@@ -229,6 +242,102 @@ class FellowWorkerService {
           "Не все поля заполнены или заполнены в неправильном формате");
     } else {
       return jsonDecode(utf8.decode(response.bodyBytes))['message'];
+    }
+  }
+
+  /// get all vacancies, GET
+  Future<FellowWorkerResponseModel> searchAllVacancies() async {
+    final uriRequest = Uri.parse(fellowWorkerHost + searchVacanciesAPI);
+
+    var response = await http.get(uriRequest,headers: defaultHeaders);
+
+    if (response.statusCode == 200) {
+      return FellowWorkerResponseModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      return FellowWorkerResponseModel(
+          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+          resumeResponse: null,
+          resumes: null,
+          vacancyResponse: null,
+          vacancies: null
+      );
+    }
+  }
+
+  /// filter vacancy, POST
+  Future<FellowWorkerResponseModel> filterVacancy(
+      SearchVacancyApiModel searchVacancyApiModel
+  ) async{
+    var bodyMessage = jsonEncode(searchVacancyApiModel);
+    final uriRequest = Uri.parse(fellowWorkerHost + filterVacanciesAPI);
+
+    var response = await http.post(
+        uriRequest,
+        headers: defaultHeaders,
+        body: bodyMessage
+    );
+
+    if (response.statusCode == 200) {
+      return FellowWorkerResponseModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))
+      );
+    } else {
+      return FellowWorkerResponseModel(
+          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+          resumeResponse: null,
+          resumes: null,
+          vacancyResponse: null,
+          vacancies: null
+      );
+    }
+  }
+
+  /// get all resume, GET
+  Future<FellowWorkerResponseModel> searchAllResume() async {
+    final uriRequest = Uri.parse(fellowWorkerHost + searchResumesAPI);
+
+    var response = await http.get(uriRequest, headers: defaultHeaders);
+
+    if (response.statusCode == 200) {
+      return FellowWorkerResponseModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)));
+    } else {
+      return FellowWorkerResponseModel(
+          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+          resumeResponse: null,
+          resumes: null,
+          vacancyResponse: null,
+          vacancies: null
+      );
+    }
+  }
+
+  /// filter resumes, POST
+  Future<FellowWorkerResponseModel> filterResume(
+      SearchResumeApiModel searchVacancyApiModel
+  ) async{
+    var bodyMessage = jsonEncode(searchVacancyApiModel);
+    final uriRequest = Uri.parse(fellowWorkerHost + filterResumeAPI);
+
+    var response = await http.post(
+        uriRequest,
+        headers: defaultHeaders,
+        body: bodyMessage
+    );
+
+    if (response.statusCode == 200) {
+      return FellowWorkerResponseModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))
+      );
+    } else {
+      return FellowWorkerResponseModel(
+          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+          resumeResponse: null,
+          resumes: null,
+          vacancyResponse: null,
+          vacancies: null
+      );
     }
   }
 }

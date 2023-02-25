@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/10/23, 11:08 PM
+ * Copyright (c) 12-3/6/23, 10:57 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -53,6 +53,9 @@ public class ResumeApiModel {
     @NotEmpty
     @Schema(description = "Желаемая должность", example = "Начальник склада")
     private String job;
+
+    @Schema(description = "Город", example = "Новосибирск")
+    private String city;
 
     @Schema(description = "Ожидаемая заработная плата", example = "40000")
     private String expectedSalary;

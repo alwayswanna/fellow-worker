@@ -1,11 +1,10 @@
 /*
- * Copyright (c) 1-2/19/23, 11:28 PM
+ * Copyright (c) 1-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/service/client_manager_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../service/account_utils.dart';
@@ -20,7 +19,6 @@ const String backSuccessMessageCheck =
 
 class _EditCurrentAccount extends State<EditCurrentAccount>
     with SingleTickerProviderStateMixin {
-  late FlutterSecureStorage securityStorage;
   late ClientManagerService clientManagerService;
   late AnimationController _animationController;
 
@@ -36,7 +34,6 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
   @override
   void initState() {
     super.initState();
-    securityStorage = widget.securityStorage;
     clientManagerService = widget.clientManagerService;
     typeAccount = null;
     _animationController = AnimationController(
@@ -222,7 +219,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
           controllerLastName.text,
           type,
           requestDate,
-          securityStorage);
+      );
 
       var message = messageResponse == backSuccessMessageCheck
           ? backSuccessMessageCheck
@@ -241,14 +238,12 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
 }
 
 class EditCurrentAccount extends StatefulWidget {
-  late final FlutterSecureStorage securityStorage;
   late final ClientManagerService clientManagerService;
 
-  EditCurrentAccount(
-      {required FlutterSecureStorage sS,
-      required ClientManagerService cM,
-      super.key}) {
-    securityStorage = sS;
+  EditCurrentAccount({
+    required ClientManagerService cM,
+    super.key
+  }) {
     clientManagerService = cM;
   }
 

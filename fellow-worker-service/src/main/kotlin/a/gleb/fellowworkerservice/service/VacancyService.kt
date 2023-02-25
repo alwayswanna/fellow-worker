@@ -1,23 +1,27 @@
 /*
- * Copyright (c) 12-1/24/23, 10:30 PM
+ * Copyright (c) 12-3/7/23, 10:06 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.fellowworkerservice.service
 
+import a.gleb.apicommon.fellowworker.model.request.vacancy.SearchVacancyApiModel
+import a.gleb.apicommon.fellowworker.model.request.vacancy.TypeOfWorkPlacement
 import a.gleb.apicommon.fellowworker.model.request.vacancy.VacancyApiModel
-import a.gleb.apicommon.fellowworker.model.request.vacancy.VacancyApiModel.TypeOfWorkPlacement
-import a.gleb.apicommon.fellowworker.model.request.vacancy.VacancyApiModel.TypeOfWorkPlacement.OFFICE
-import a.gleb.apicommon.fellowworker.model.request.vacancy.VacancyApiModel.TypeOfWorkPlacement.REMOTE
+import a.gleb.apicommon.fellowworker.model.request.vacancy.WorkType
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
 import a.gleb.fellowworkerservice.db.dao.TypeOfWork
 import a.gleb.fellowworkerservice.db.dao.TypeOfWork.FULL_EMPLOYMENT
 import a.gleb.fellowworkerservice.db.dao.TypeOfWork.PART_TIME_EMPLOYMENT
+import a.gleb.fellowworkerservice.db.dao.TypePlacement
+import a.gleb.fellowworkerservice.db.dao.Vacancy
 import a.gleb.fellowworkerservice.db.repository.VacancyRepository
 import a.gleb.fellowworkerservice.exception.InvalidUserDataException
 import a.gleb.fellowworkerservice.exception.UnexpectedErrorException
 import a.gleb.fellowworkerservice.mapper.VacancyModelMapper
+import kotlinx.coroutines.flow.asFlow
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.BAD_GATEWAY
 import org.springframework.stereotype.Service
 import org.springframework.util.CollectionUtils
 import java.util.*
@@ -50,7 +54,7 @@ class VacancyService(
             )
         } catch (e: Exception) {
             throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
+                BAD_GATEWAY,
                 "Ошибка при создании вакансии, попробуйте повторить попытку позже"
             )
         }
@@ -87,7 +91,7 @@ class VacancyService(
             )
         } catch (e: Exception) {
             throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
+                BAD_GATEWAY,
                 "Ошибка при редактировании вакансии, попробуйте повторить попытку позже"
             )
         }
@@ -107,7 +111,7 @@ class VacancyService(
             return vacancyModelMapper.toFellowWorkerResponseModel(vacancy, null)
         } catch (e: Exception) {
             throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
+                BAD_GATEWAY,
                 "Ошибка при получении вакансии, попробуйте повторить попытку позже"
             )
         }
@@ -138,7 +142,7 @@ class VacancyService(
             }
         } catch (e: Exception) {
             throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
+                BAD_GATEWAY,
                 "Ошибка при удалении вакансии, попробуйте повторить попытку позже."
             )
         }
@@ -149,109 +153,15 @@ class VacancyService(
      */
     suspend fun getAllVacancy(): FellowWorkerResponseModel {
         try {
-            return vacancyModelMapper.toVacancyResponseFromFlow(vacancyRepository.findAll())
+            val vacanciesResponse = vacancyModelMapper.toVacancyResponseFromFlow(vacancyRepository.findAll())
+            vacanciesResponse.apply {
+                message = "Все доступные вакансии"
+            }
+            return vacanciesResponse
         } catch (e: Exception) {
             throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
+                BAD_GATEWAY,
                 "Ошибка при получении всех вакансий, попробуйте повторить попытку позже"
-            )
-        }
-    }
-
-    /**
-     * Method returns all vacancies which contains key skill.
-     * @param skill key skill for query in database.
-     */
-    suspend fun findVacancyByKeySkills(skill: String): FellowWorkerResponseModel {
-        try {
-            val vacanciesInDb = vacancyRepository.findVacancyByKeySkillsContains(skill)
-            if (vacanciesInDb.isEmpty()) {
-                return FellowWorkerResponseModel()
-                    .apply {
-                        message = NOT_FOUND_QUERY
-                    }
-            }
-            return vacancyModelMapper.toVacancyResponseFromList(vacanciesInDb)
-        } catch (e: Exception) {
-            throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
-                UNEXPECTED_ERROR
-            )
-        }
-    }
-
-    /**
-     * Method returns all vacancies which contains type.
-     * @param typeOfWorkPlacement key skill for query in database.
-     */
-    suspend fun findVacancyByTypePlacement(typeOfWorkPlacement: String): FellowWorkerResponseModel {
-        val request = mapTypeOfWorkPlacement(typeOfWorkPlacement) ?: throw InvalidUserDataException(
-            HttpStatus.BAD_REQUEST,
-            NOT_FOUND_VACANCY
-        )
-
-        try {
-            val vacanciesInDb = vacancyRepository.findVacancyByTypeOfWorkPlacement(request)
-            if (vacanciesInDb.isEmpty()) {
-                return FellowWorkerResponseModel()
-                    .apply {
-                        message = NOT_FOUND_QUERY
-                    }
-            }
-            return vacancyModelMapper.toVacancyResponseFromList(vacanciesInDb)
-        } catch (e: Exception) {
-            throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
-                UNEXPECTED_ERROR
-            )
-        }
-    }
-
-    /**
-     * Method returns all vacancies which contains city.
-     * @param city city for query in database.
-     */
-    suspend fun findVacancyByCity(city: String): FellowWorkerResponseModel {
-        try {
-            val vacanciesInDb = vacancyRepository.findVacancyByCityName(city)
-            if (vacanciesInDb.isEmpty()) {
-                return FellowWorkerResponseModel()
-                    .apply {
-                        message = NOT_FOUND_QUERY
-                    }
-            }
-            return vacancyModelMapper.toVacancyResponseFromList(vacanciesInDb)
-        } catch (e: Exception) {
-            throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
-                UNEXPECTED_ERROR
-            )
-        }
-    }
-
-    /**
-     * Method returns all vacancies which contains type.
-     * @param type for query in database.
-     */
-    suspend fun findVacancyByType(type: String): FellowWorkerResponseModel {
-        val request = mapTypeOfWork(type) ?: throw InvalidUserDataException(
-            HttpStatus.BAD_REQUEST,
-            NOT_FOUND_VACANCY
-        )
-
-        try {
-            val vacanciesInDb = vacancyRepository.findVacancyByTypeWork(request)
-            if (vacanciesInDb.isEmpty()) {
-                return FellowWorkerResponseModel()
-                    .apply {
-                        message = NOT_FOUND_QUERY
-                    }
-            }
-            return vacancyModelMapper.toVacancyResponseFromList(vacanciesInDb)
-        } catch (e: Exception) {
-            throw UnexpectedErrorException(
-                HttpStatus.BAD_GATEWAY,
-                UNEXPECTED_ERROR
             )
         }
     }
@@ -281,30 +191,72 @@ class VacancyService(
     }
 
     /**
-     * Method mapper.
-     * @param type data from request.
+     * Method find vacancies with specific option.
+     * @param request object with filter option
      */
-    suspend fun mapTypeOfWork(type: String): TypeOfWork? {
-        if (FULL_EMPLOYMENT.name == type) {
+    suspend fun filter(request: SearchVacancyApiModel): FellowWorkerResponseModel {
+        try {
+            val result = mutableListOf<Vacancy>()
+
+            with(request) {
+                if (!city.isNullOrBlank()) {
+                    result.addAll(vacancyRepository.findVacancyByCityName(city))
+                }
+
+                if (typeOfWorkPlacement != null) {
+                    val type = mapTypeOfWorkPlacement(typeOfWorkPlacement)
+                    result.addAll(vacancyRepository.findVacancyByTypeOfWorkPlacement(type))
+                }
+
+                if (typeOfWork != null) {
+                    val type = mapTypeOfWork(typeOfWork)
+                    result.addAll(vacancyRepository.findVacancyByTypeWork(type))
+                }
+
+                if (!keySkills.isNullOrBlank()) {
+                    val partsOfKeySkills = keySkills.split(" ")
+                    for (i in partsOfKeySkills) {
+                        result.addAll(vacancyRepository.findVacancyByKeySkillsContains(i))
+                    }
+                }
+            }
+
+            val identicalVacancies = result.asSequence().map { it.id }.toSet()
+
+            val finalResult = result.filter { identicalVacancies.contains(it.id) }.asFlow()
+
+            val vacanciesResponse = vacancyModelMapper.toVacancyResponseFromFlow(finalResult)
+            vacanciesResponse.apply {
+                message = "Вот что мы нашли"
+            }
+
+            return vacanciesResponse
+
+        } catch (e: Exception) {
+            throw UnexpectedErrorException(
+                BAD_GATEWAY,
+                "Ошибка при фильтрации попробуйте повторить попытку позже"
+            )
+        }
+    }
+
+    private fun mapTypeOfWork(typeOfWork: WorkType): TypeOfWork {
+        return if (FULL_EMPLOYMENT.name == typeOfWork.name) {
             return FULL_EMPLOYMENT
-        } else if (PART_TIME_EMPLOYMENT.name == type) {
+        } else {
             return PART_TIME_EMPLOYMENT
         }
-
-        return null
     }
 
     /**
      * Method mapper.
      * @param type data from request.
      */
-    suspend fun mapTypeOfWorkPlacement(type: String): TypeOfWorkPlacement? {
-        if (OFFICE.name == type) {
-            return OFFICE
-        } else if (REMOTE.name == type) {
-            return REMOTE
+    suspend fun mapTypeOfWorkPlacement(type: TypeOfWorkPlacement): TypePlacement {
+        return if (TypePlacement.OFFICE.name == type.name) {
+            TypePlacement.OFFICE
+        } else {
+            TypePlacement.REMOTE
         }
-
-        return null
     }
 }
