@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/16/23, 11:12 PM
+ * Copyright (c) 1-3/6/23, 10:57 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -15,6 +15,7 @@ class ResumeApiModel {
   final String? lastName;
   final String? birthDate;
   final String? job;
+  final String? city;
   final String? expectedSalary;
   final String? about;
   final List<dynamic>? education;
@@ -32,6 +33,7 @@ class ResumeApiModel {
       required this.birthDate,
       required this.job,
       required this.expectedSalary,
+      required this.city,
       required this.about,
       required this.education,
       required this.professionalSkills,

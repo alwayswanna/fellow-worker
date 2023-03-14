@@ -46,4 +46,19 @@ Frontend module for all microservices.
 http://127.0.0.1:8888/
 
 
-Final qualifying work for the university.
+Final qualifying work for the university. Application for creating, editing and deleting resumes or vacancies. 
+Job search site. For authorization, the OAuth2 standard is used. When creating a resume, a PDF document is created,
+which the user can download. 
+ - Flutter is used to display user data.
+ - JVM, Spring Boot is used for realize backend-logic.
+
+<img alt="Application architecture" src="/assets/application-architecture.png" title="Application architecture"/>
+
+All microservices build to Docker images, created docker-compose manifest for demo.
+
+Main page of user view service:
+<img alt="Application architecture" src="/assets/frontend-main-view.png" title="Main view"/>
+
+For monitoring is used stack Prometheus & Grafana:
+
+<img alt="Application architecture" src="/assets/monitoring-dashboards.png" title="Dashboards"/>

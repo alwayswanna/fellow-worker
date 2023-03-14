@@ -5,3 +5,5 @@
 /fellow_worker_response_model.g.dart
 /resume_request_model.g.dart
 /vacancy_request_model.g.dart
+/search_vacancy_model.g.dart
+/search_resume_model.g.dart

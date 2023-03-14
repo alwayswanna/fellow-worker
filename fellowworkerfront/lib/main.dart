@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/19/23, 11:28 PM
+ * Copyright (c) 1-3/9/23, 11:54 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -15,40 +15,46 @@ import 'package:fellowworkerfront/views/account/profile_view.dart';
 import 'package:fellowworkerfront/views/account/registration_view.dart';
 import 'package:fellowworkerfront/views/main_view.dart';
 import 'package:fellowworkerfront/views/resume/create_resume_view.dart';
+import 'package:fellowworkerfront/views/resume/search_resume.dart';
 import 'package:fellowworkerfront/views/vacancy/create_vacancy.dart';
+import 'package:fellowworkerfront/views/vacancy/search_vacancies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-const jwtTokenKey = "jwtToken";
+const accessToken = "access_token";
+const refreshToken = "refresh_token";
+const refreshTokenTimeToLive = 90;
+
+const securityStorage = FlutterSecureStorage();
 
 void main() {
-  var securityStorage = const FlutterSecureStorage();
-  var clientManagerService = ClientManagerService();
-  var fellowWorkerService = FellowWorkerService();
-  var cvGeneratorService = CvGeneratorService();
+  var oauth2Service = Oauth2Service(securityStorage);
+  var clientManagerService = ClientManagerService(oauth2Service);
+  var fellowWorkerService = FellowWorkerService(oauth2Service);
+  var cvGeneratorService = CvGeneratorService(oauth2Service);
   setPathUrlStrategy();
-  securityStorage.delete(key: jwtTokenKey);
   runApp(MyApp(
-      sS: securityStorage,
+      oauth2: oauth2Service,
       aS: clientManagerService,
       rS: fellowWorkerService,
-      cG: cvGeneratorService));
+      cG: cvGeneratorService
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  late final FlutterSecureStorage flutterSecureStorage;
+  late final Oauth2Service oauth2service;
   late final ClientManagerService clientManagerService;
   late final FellowWorkerService fellowWorkerService;
   late final CvGeneratorService cvGeneratorService;
 
   MyApp(
-      {required FlutterSecureStorage sS,
+      {required Oauth2Service oauth2,
       required ClientManagerService aS,
       required FellowWorkerService rS,
       required CvGeneratorService cG,
       super.key}) {
-    flutterSecureStorage = sS;
+    oauth2service = oauth2;
     clientManagerService = aS;
     fellowWorkerService = rS;
     cvGeneratorService = cG;
@@ -60,60 +66,58 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fellow worker',
       routes: {
-        '/registration': (context) => const Registration(),
+        '/registration': (context) => Registration(
+              aS: clientManagerService,
+            ),
         '/profile': (context) => Profile(
-          sS: flutterSecureStorage,
-          aS: clientManagerService,
-          rS: fellowWorkerService,
-          cG: cvGeneratorService
-        ),
+            aS: clientManagerService,
+            rS: fellowWorkerService,
+            cG: cvGeneratorService),
         '/change-password': (context) => ChangePassword(
-          sS: flutterSecureStorage,
-          aS: clientManagerService,
-        ),
-        '/edit-account': (context) => EditCurrentAccount(
-          sS: flutterSecureStorage,
-          cM: clientManagerService
-        ),
-        '/create-resume': (context) => CreateResume(
-          fS: flutterSecureStorage,
-          fW: fellowWorkerService
-        ),
+              aS: clientManagerService,
+            ),
+        '/edit-account': (context) =>
+            EditCurrentAccount(cM: clientManagerService),
+        '/create-resume': (context) => CreateResume(fW: fellowWorkerService),
         '/create-vacancy': (context) => CreateVacancy(
-            fWS: fellowWorkerService,
-            fSS: flutterSecureStorage
-        )
+              fWS: fellowWorkerService,
+            ),
+        '/search-vacancy': (context) =>
+            SearchVacancies(fWS: fellowWorkerService),
+        '/search-resume': (context) => SearchResume(
+              fWS: fellowWorkerService,
+            )
       },
       theme: ThemeData(
         primarySwatch: GradientEnchanted.kToDark,
       ),
-      home: MyHomePage(title: 'Fellow worker', flutterSS: flutterSecureStorage),
+      home: MyHomePage(title: 'Fellow worker', oauth2service: oauth2service),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.flutterSS});
+  const MyHomePage(
+      {super.key,
+      required this.title,
+      required this.oauth2service});
 
   final String title;
-  final FlutterSecureStorage flutterSS;
+  final Oauth2Service oauth2service;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState(flutterSS);
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late FlutterSecureStorage securityStorage;
-
-  _MyHomePageState(FlutterSecureStorage flutterSS) {
-    securityStorage = flutterSS;
-  }
+  late Oauth2Service _oauth2service;
 
   @override
   void initState() {
     super.initState();
+    _oauth2service = widget.oauth2service;
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
@@ -122,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   Future<Widget> buildButtonProfile(ButtonStyle style) async {
-    if (await securityStorage.containsKey(key: jwtTokenKey)) {
+    if (await _oauth2service.userContainSession()) {
       return TextButton(
           onPressed: () {
             Navigator.pushNamed(context, '/profile');
@@ -140,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void loginAction() {
-    Oauth2Service().login(securityStorage).then((value) => Future.delayed(
+    _oauth2service.getAccessToken().then((value) => Future.delayed(
         const Duration(seconds: 1),
         () => {
               Navigator.pushReplacement(
@@ -194,8 +198,9 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void logout() async {
-    if (await securityStorage.containsKey(key: jwtTokenKey)) {
-      securityStorage.delete(key: jwtTokenKey);
+    if (await _oauth2service.userContainSession()) {
+      await _oauth2service.clearStorage();
+
       Future.delayed(
           const Duration(seconds: 1),
           () => {
@@ -204,6 +209,7 @@ class _MyHomePageState extends State<MyHomePage>
                     MaterialPageRoute(
                         builder: (BuildContext context) => super.widget))
               });
+
       UtilityWidgets.dialogBuilderMessage(
           context, "Вы успешно вышли из аккаунта");
     } else {

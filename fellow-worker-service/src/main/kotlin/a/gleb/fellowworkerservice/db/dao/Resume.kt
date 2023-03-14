@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-2/7/23, 10:48 PM
+ * Copyright (c) 07-3/7/23, 12:08 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -31,7 +31,9 @@ data class Resume(
 
     var job: String,
 
-    var expectedSalary: String?,
+    var expectedSalary: Int?,
+
+    var city: String?,
 
     var about: String,
 

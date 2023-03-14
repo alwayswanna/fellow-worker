@@ -1,9 +1,8 @@
 /*
- * Copyright (c) 1-2/24/23, 12:08 AM
+ * Copyright (c) 1-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
-import 'package:fellowworkerfront/main.dart';
 import 'package:fellowworkerfront/models/account_response_model.dart';
 import 'package:fellowworkerfront/models/fellow_worker_response_model.dart';
 import 'package:fellowworkerfront/service/account_utils.dart';
@@ -14,7 +13,6 @@ import 'package:fellowworkerfront/views/resume/about_resume.dart';
 import 'package:fellowworkerfront/views/resume/create_resume_view.dart';
 import 'package:fellowworkerfront/views/vacancy/about_vacancy.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
@@ -26,7 +24,6 @@ const paddingButtons = EdgeInsets.fromLTRB(0, 0, 5, 0);
 
 class _ProfileWidget extends State<Profile>
     with SingleTickerProviderStateMixin {
-  late FlutterSecureStorage _securityStorage;
   late ClientManagerService _accountService;
   late FellowWorkerService _fellowWorkerService;
   late CvGeneratorService _cvGeneratorService;
@@ -37,14 +34,14 @@ class _ProfileWidget extends State<Profile>
   @override
   void initState() {
     super.initState();
-    _securityStorage = widget.securityStorage;
     _accountService = widget.accountService;
     _fellowWorkerService = widget.resumeService;
     _cvGeneratorService = widget.cvGeneratorService;
     _clientManagerResponseModel =
-        _accountService.getCurrentAccountData(_securityStorage);
+        _accountService.getCurrentAccountData();
     _fellowWorkerResponseModel = _fellowWorkerService.getCurrenUserEntities(
-        _securityStorage, _clientManagerResponseModel);
+        _clientManagerResponseModel
+    );
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -186,14 +183,10 @@ class _ProfileWidget extends State<Profile>
                                       color: Colors.red,
                                       size: 60,
                                     )),
-                                    ResponsiveGridCol(
-                                        child: Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: Text(account.role ==
-                                              employeeResponse
-                                          ? "Ошибка при получении активных резюме"
-                                          : "Ошибка при получении активных вакансий"),
-                                    ))
+                                    UtilityWidgets.buildResponsiveGridCartText(account.role ==
+                                        employeeResponse
+                                        ? "Ошибка при получении активных резюме"
+                                        : "Ошибка при получении активных вакансий", Colors.black, 15)
                                   ]);
                                 } else {
                                   children = ResponsiveGridRow(children: [
@@ -239,8 +232,7 @@ class _ProfileWidget extends State<Profile>
   }
 
   void removeAccount() {
-    _accountService.removeAccount(_securityStorage);
-    _securityStorage.delete(key: jwtTokenKey);
+    _accountService.removeAccount();
     Navigator.pushNamed(context, "/");
   }
 
@@ -323,8 +315,10 @@ class _ProfileWidget extends State<Profile>
                     MaterialPageRoute(
                         builder: (context) => AboutResume(
                             resume: resume,
-                            fS: _fellowWorkerService,
-                            fSS: _securityStorage)));
+                            fS: _fellowWorkerService
+                        )
+                    )
+                );
               }, "Подробнее", 15)),
           ResponsiveGridCol(
             md: 3,
@@ -334,8 +328,7 @@ class _ProfileWidget extends State<Profile>
               onPressed: () {
                 UtilityWidgets.dialogBuilderApi(
                     context,
-                    _cvGeneratorService.downloadResume(
-                        _securityStorage, resume.resumeId),
+                    _cvGeneratorService.downloadResume(resume.resumeId),
                     "Загрузка резюме",
                     "/profile");
               },
@@ -396,7 +389,6 @@ class _ProfileWidget extends State<Profile>
                   MaterialPageRoute(
                       builder: (context) => AboutVacancy(
                           fWS: _fellowWorkerService,
-                          fSS: _securityStorage,
                           vacancy: v
                       )));
             }, "Подробнее", 15)));
@@ -405,8 +397,7 @@ class _ProfileWidget extends State<Profile>
             child: IconButton(onPressed: (){
               UtilityWidgets.dialogBuilderApi(
                   context,
-                  _fellowWorkerService.deleteVacancy(
-                      _securityStorage, v.resumeId),
+                  _fellowWorkerService.deleteVacancy(v.resumeId),
                   "Удаление вакансии",
                   "/profile");
             },
@@ -447,18 +438,16 @@ class _ProfileWidget extends State<Profile>
 }
 
 class Profile extends StatefulWidget {
-  late final FlutterSecureStorage securityStorage;
   late final ClientManagerService accountService;
   late final FellowWorkerService resumeService;
   late final CvGeneratorService cvGeneratorService;
 
-  Profile(
-      {required FlutterSecureStorage sS,
-      required ClientManagerService aS,
-      required FellowWorkerService rS,
-      required CvGeneratorService cG,
-      super.key}) {
-    securityStorage = sS;
+  Profile({
+    required ClientManagerService aS,
+    required FellowWorkerService rS,
+    required CvGeneratorService cG,
+    super.key
+  }) {
     accountService = aS;
     resumeService = rS;
     cvGeneratorService = cG;

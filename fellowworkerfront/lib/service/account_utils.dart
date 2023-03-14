@@ -1,16 +1,12 @@
 /*
- * Copyright (c) 1-2/20/23, 11:22 PM
+ * Copyright (c) 1-3/9/23, 11:54 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
-
-import '../main.dart';
-import '../security/oauth2.dart';
 
 const employeeResponse = "EMPLOYEE";
 const companyResponse = "COMPANY";
@@ -56,11 +52,8 @@ class RequestUtils {
     defaultHeaders.remove("Authorization");
   }
 
-  static Future<void> injectJwtToHeaders(FlutterSecureStorage flutterSecureStorage) async {
-    String? userToken = await flutterSecureStorage.read(key: jwtTokenKey);
-    var tokenMap = Oauth2Service.convertTokenToMap(userToken!);
-    String accessToken = tokenMap["access_token"]!;
-    defaultHeaders["Authorization"] = "Bearer $accessToken";
+  static void injectTokenToRequest(String userToken){
+    defaultHeaders["Authorization"] = "Bearer $userToken";
   }
 
   static String? buildBase64Image(PlatformFile? file) {

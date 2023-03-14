@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/20/23, 11:22 PM
+ * Copyright (c) 1-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,7 +7,6 @@ import 'package:fellowworkerfront/models/resume_request_model.dart';
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../service/account_utils.dart';
@@ -20,7 +19,6 @@ const String createResume = "Создание резюме";
 
 class _CreateResume extends State<CreateResume>
     with SingleTickerProviderStateMixin {
-  late FlutterSecureStorage _flutterSecureStorage;
   late FellowWorkerService _fellowWorkerService;
   late AnimationController _animationController;
 
@@ -57,6 +55,7 @@ class _CreateResume extends State<CreateResume>
   var controllerAbout = TextEditingController();
   var controllerBase64Image = TextEditingController();
   var controllerExtensionPostfix = TextEditingController();
+  var controllerCity = TextEditingController();
 
   // contact api model controllers;
   var controllerContactPhone = TextEditingController();
@@ -66,7 +65,6 @@ class _CreateResume extends State<CreateResume>
   void initState() {
     super.initState();
     _fellowWorkerService = widget.workerService;
-    _flutterSecureStorage = widget.securityStorage;
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -147,6 +145,11 @@ class _CreateResume extends State<CreateResume>
                               _selectDateBirth(context);
                             }),
                       )),
+                  // city:
+                  ResponsiveGridCol(
+                      md: 6,
+                      child: UtilityWidgets.buildTextField(
+                          controllerCity, "Город:")),
                   // about:
                   ResponsiveGridCol(
                       md: 12,
@@ -431,6 +434,8 @@ class _CreateResume extends State<CreateResume>
             responsibilities: responsibilitiesTec[work]!.text));
       }
 
+      var cityValue = controllerCity.text.isEmpty? null : controllerCity.text;
+
       var requestBodyMessage = ResumeApiModel(
           resumeId: null,
           firstName: firstName,
@@ -438,6 +443,7 @@ class _CreateResume extends State<CreateResume>
           lastName: lastName,
           birthDate: requestDate,
           job: job,
+          city: cityValue,
           expectedSalary: expectedSalary,
           about: about,
           education: education.isNotEmpty ? education : null,
@@ -448,8 +454,7 @@ class _CreateResume extends State<CreateResume>
               ContactResumeApiModel(phone: contactPhone, email: contactEmail),
           base64Image: RequestUtils.buildBase64Image(platformFile),
           extensionPostfix: RequestUtils.buildExtension(platformFile));
-      var response = _fellowWorkerService.createResume(
-          _flutterSecureStorage, requestBodyMessage);
+      var response = _fellowWorkerService.createResume(requestBodyMessage);
       UtilityWidgets.dialogBuilderApi(
           context, response, createResume, '/profile');
     }
@@ -457,14 +462,12 @@ class _CreateResume extends State<CreateResume>
 }
 
 class CreateResume extends StatefulWidget {
-  late final FlutterSecureStorage securityStorage;
   late final FellowWorkerService workerService;
 
-  CreateResume(
-      {required FlutterSecureStorage fS,
-      required FellowWorkerService fW,
-      super.key}) {
-    securityStorage = fS;
+  CreateResume({
+    required FellowWorkerService fW,
+    super.key
+  }) {
     workerService = fW;
   }
 

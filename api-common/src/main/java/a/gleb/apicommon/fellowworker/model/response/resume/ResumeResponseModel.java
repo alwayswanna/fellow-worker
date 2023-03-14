@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-2/2/23, 11:43 PM
+ * Copyright (c) 07-3/6/23, 10:57 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -60,6 +60,9 @@ public class ResumeResponseModel {
 
     @Schema(description = "О себе", example = "Увлекаюсь ... Хобби")
     private String about;
+
+    @Schema(description = "Город", example = "Новосибирск")
+    private String city;
 
     @Valid
     @Schema(description = "Информация об образовании")

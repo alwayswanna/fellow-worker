@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-3/12/23, 5:21 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -50,8 +50,11 @@ public class OAuth2ServerConfiguration {
         });
 
         http
-                .authorizeHttpRequests(authorize ->
-                        authorize.anyRequest().authenticated()
+                .authorizeHttpRequests(authorize -> {
+                            authorize.requestMatchers("/actuator/**").permitAll();
+                            authorize.anyRequest().authenticated();
+                        }
+
                 )
                 .formLogin(withDefaults());
         return http.build();

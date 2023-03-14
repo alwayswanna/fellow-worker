@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-2/15/23, 11:40 PM
+ * Copyright (c) 12-3/12/23, 1:00 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -57,6 +57,7 @@ class ResumeModelMapper {
                 middleName = resume.middleName
                 lastName = resume.lastName
                 birthDate = resume.birthDate
+                city = resume.city
                 job = resume.job
                 expectedSalary = resume.expectedSalary.toString()
                 about = resume.about
@@ -117,6 +118,8 @@ class ResumeModelMapper {
      * @param userId from JWT token.
      */
     suspend fun toResumeDtoModel(userId: UUID, request: ResumeApiModel, resumeId: UUID?): Resume {
+        val salary = if (request.expectedSalary.isNullOrEmpty()){ null } else request.expectedSalary.toInt()
+
         return Resume(
             id = resumeId ?: UUID.randomUUID(),
             ownerRecordId = userId,
@@ -125,8 +128,9 @@ class ResumeModelMapper {
             lastName = request.lastName,
             birthDate = request.birthDate,
             job = request.job,
-            expectedSalary = request.expectedSalary,
+            expectedSalary = salary,
             about = request.about ?: "",
+            city = request.city,
             education = toEducationDtoModel(request),
             professionalSkills = request.professionalSkills,
             workHistory = toWorkHistoryDto(request),

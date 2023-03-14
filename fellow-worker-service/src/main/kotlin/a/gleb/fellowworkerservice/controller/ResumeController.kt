@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-3/7/23, 10:06 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.fellowworkerservice.controller
 
 import a.gleb.apicommon.fellowworker.model.request.resume.ResumeApiModel
+import a.gleb.apicommon.fellowworker.model.request.resume.SearchResumeApiModel
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
 import a.gleb.fellowworkerservice.configuration.OAUTH2_SECURITY_SCHEMA
 import a.gleb.fellowworkerservice.service.ResumeService
@@ -33,8 +34,7 @@ class ResumeController(
 
     @Operation(
         summary = "Создать резюме",
-        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)],
-        tags = [EMPLOYEE_TAG_NAME]
+        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)]
     )
     @ApiResponses(
         value = [
@@ -56,8 +56,7 @@ class ResumeController(
 
     @Operation(
         summary = "Редактировать резюме",
-        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)],
-        tags = [EMPLOYEE_TAG_NAME]
+        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)]
     )
     @ApiResponses(
         value = [
@@ -79,8 +78,7 @@ class ResumeController(
 
     @Operation(
         summary = "Удалить резюме",
-        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)],
-        tags = [EMPLOYEE_TAG_NAME]
+        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)]
     )
     @ApiResponses(
         value = [
@@ -102,8 +100,7 @@ class ResumeController(
 
     @Operation(
         summary = "Получить резюме по авторизованного пользователя",
-        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)],
-        tags = [EMPLOYEE_TAG_NAME]
+        security = [SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)]
     )
     @ApiResponses(
         value = [
@@ -124,8 +121,7 @@ class ResumeController(
     }
 
     @Operation(
-        summary = "Получить все резюме",
-        tags = [EMPLOYEE_TAG_NAME]
+        summary = "Получить все резюме"
     )
     @ApiResponses(
         value = [
@@ -146,8 +142,7 @@ class ResumeController(
     }
 
     @Operation(
-        summary = "Получить резюме по ID",
-        tags = [EMPLOYEE_TAG_NAME]
+        summary = "Получить резюме по ID"
     )
     @ApiResponses(
         value = [
@@ -165,5 +160,26 @@ class ResumeController(
     @GetMapping("/get-resume-id")
     suspend fun getSingleResume(@NotNull @RequestParam id: UUID): FellowWorkerResponseModel {
         return resumeService.findResumeModelById(id)
+    }
+
+    @Operation(
+        summary = "Поиск резюме по определенным фильтрам"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                description = "OK", responseCode = "200",
+                content = [Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    schema = Schema(implementation = FellowWorkerResponseModel::class)
+                )]
+            ),
+            ApiResponse(description = "Bad request", responseCode = "400"),
+            ApiResponse(description = "Internal server error", responseCode = "500")
+        ]
+    )
+    @PostMapping("/filter-resumes")
+    suspend fun filterResumes(@RequestBody @Valid request: SearchResumeApiModel): FellowWorkerResponseModel{
+        return resumeService.filter(request)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-2/25/23, 11:54 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -36,6 +36,9 @@ public class VacancyResponseApiModel {
     @NotEmpty
     @Schema(description = "Название вакансии", example = "Сварщик")
     private String vacancyName;
+
+    @Schema(description = "Заработная плата", example = "150000")
+    private String salary;
 
     @NotNull
     @Schema(description = "Тип работы", example = "FULL_EMPLOYMENT")

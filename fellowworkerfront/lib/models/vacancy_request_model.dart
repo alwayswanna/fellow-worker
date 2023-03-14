@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-2/19/23, 11:28 PM
+ * Copyright (c) 2-2/25/23, 11:54 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,6 +11,7 @@ part '../generated/vacancy_request_model.g.dart';
 class VacancyApiModel {
   final String? vacancyId;
   final String? vacancyName;
+  final String? salary;
   final String? typeOfWork;
   final String? typeOfWorkPlacement;
   final String? companyName;
@@ -21,8 +22,10 @@ class VacancyApiModel {
   final List<String>? companyBonuses;
   final dynamic contactApiModel;
 
-  const VacancyApiModel({required this.vacancyId,
+  const VacancyApiModel({
+    required this.vacancyId,
     required this.vacancyName,
+    required this.salary,
     required this.typeOfWork,
     required this.typeOfWorkPlacement,
     required this.companyName,

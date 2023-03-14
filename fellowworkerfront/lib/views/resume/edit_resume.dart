@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-2/24/23, 10:12 PM
+ * Copyright (c) 2-3/9/23, 8:15 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,7 +7,6 @@ import 'package:fellowworkerfront/models/fellow_worker_response_model.dart';
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../models/resume_request_model.dart';
@@ -21,7 +20,6 @@ class _EditResume extends State<EditResume>
     with SingleTickerProviderStateMixin {
   late ResumeResponseModel _resumeResponseModel;
   late FellowWorkerService _fellowWorkerService;
-  late FlutterSecureStorage _flutterSecureStorage;
   late AnimationController _animationController;
   bool isNeedInfo = true;
 
@@ -58,6 +56,7 @@ class _EditResume extends State<EditResume>
   var controllerAbout = TextEditingController();
   var controllerBase64Image = TextEditingController();
   var controllerExtensionPostfix = TextEditingController();
+  var controllerCity = TextEditingController();
 
   // contact api model controllers;
   var controllerContactPhone = TextEditingController();
@@ -67,7 +66,6 @@ class _EditResume extends State<EditResume>
   void initState() {
     _resumeResponseModel = widget.resumeResponseModel;
     _fellowWorkerService = widget.fellowWorkerService;
-    _flutterSecureStorage = widget.flutterSecureStorage;
     _animationController = AnimationController(
         vsync: this,
         duration: const Duration(seconds: 5),
@@ -102,12 +100,13 @@ class _EditResume extends State<EditResume>
     var contact = ContactResponseModel.fromJson(_resumeResponseModel.contact);
     controllerFirstName.text = _resumeResponseModel.firstName;
     controllerMiddleName.text = _resumeResponseModel.middleName;
-    controllerLastName.text = _resumeResponseModel.lastName;
+    controllerLastName.text = _resumeResponseModel.lastName ?? "";
     controllerJob.text = _resumeResponseModel.job;
-    controllerExpectedSalary.text = _resumeResponseModel.expectedSalary;
-    controllerAbout.text = _resumeResponseModel.about;
+    controllerExpectedSalary.text = _resumeResponseModel.expectedSalary ?? "";
+    controllerAbout.text = _resumeResponseModel.about ?? "";
     controllerContactPhone.text = contact.phone;
     controllerContactEmail.text = contact.email;
+    controllerCity.text = _resumeResponseModel.city ?? "";
     return Center(
         child: SingleChildScrollView(
             child: SizedBox(
@@ -168,6 +167,11 @@ class _EditResume extends State<EditResume>
                               _selectDateBirth(context);
                             }),
                       )),
+                  // city:
+                  ResponsiveGridCol(
+                      md: 6,
+                      child: UtilityWidgets.buildTextField(
+                          controllerCity, "Город:")),
                   // about:
                   ResponsiveGridCol(
                       md: 12,
@@ -452,6 +456,8 @@ class _EditResume extends State<EditResume>
             responsibilities: responsibilitiesTec[work]!.text));
       }
 
+      var cityValue = controllerCity.text.isEmpty ? null : controllerCity.text;
+
       var requestBodyMessage = ResumeApiModel(
           resumeId: _resumeResponseModel.resumeId,
           firstName: firstName,
@@ -460,6 +466,7 @@ class _EditResume extends State<EditResume>
           birthDate: requestDate,
           job: job,
           expectedSalary: expectedSalary,
+          city: cityValue,
           about: about,
           education: education.isNotEmpty ? education : null,
           professionalSkills:
@@ -469,8 +476,7 @@ class _EditResume extends State<EditResume>
               ContactResumeApiModel(phone: contactPhone, email: contactEmail),
           base64Image: RequestUtils.buildBase64Image(platformFile),
           extensionPostfix: RequestUtils.buildExtension(platformFile));
-      var response = _fellowWorkerService.editResume(
-          _flutterSecureStorage, requestBodyMessage);
+      var response = _fellowWorkerService.editResume(requestBodyMessage);
       UtilityWidgets.dialogBuilderApi(
           context, response, createResume, '/profile');
     }
@@ -480,16 +486,14 @@ class _EditResume extends State<EditResume>
 class EditResume extends StatefulWidget {
   late final ResumeResponseModel resumeResponseModel;
   late final FellowWorkerService fellowWorkerService;
-  late final FlutterSecureStorage flutterSecureStorage;
 
-  EditResume(
-      {required ResumeResponseModel rM,
-      required FellowWorkerService fWS,
-      required FlutterSecureStorage fSS,
-      super.key}) {
+  EditResume({
+    required ResumeResponseModel rM,
+    required FellowWorkerService fWS,
+    super.key
+  }) {
     resumeResponseModel = rM;
     fellowWorkerService = fWS;
-    flutterSecureStorage = fSS;
   }
 
   @override

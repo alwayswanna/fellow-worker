@@ -60,6 +60,19 @@ client-manager:
     - /api/v1/account/create
     - /api/v1/account/data
 
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 logging:
   level:
     web: INFO

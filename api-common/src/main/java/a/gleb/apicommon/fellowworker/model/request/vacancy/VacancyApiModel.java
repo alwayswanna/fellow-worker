@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-3/1/23, 12:14 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -30,9 +30,12 @@ public class VacancyApiModel {
     @Schema(description = "Название вакансии", example = "Сварщик")
     private String vacancyName;
 
+    @Schema(description = "Заработная плата", example = "150000")
+    private String salary;
+
     @NotNull
     @Schema(description = "Тип работы", example = "FULL_EMPLOYMENT")
-    private TypeOfWork typeOfWork;
+    private WorkType typeOfWork;
 
     @NotNull
     @Schema(description = "Тип расположение", example = "OFFICE")
@@ -63,18 +66,4 @@ public class VacancyApiModel {
 
     @Schema(description = "Контактные данные")
     private ContactApiModel contactApiModel;
-
-    @Schema(description = "Тип работы (по занятости)")
-    public enum TypeOfWork {
-
-        FULL_EMPLOYMENT,
-        PART_TIME_EMPLOYMENT,
-    }
-
-    @Schema(description = "Тип работы (по месту)")
-    public enum TypeOfWorkPlacement {
-
-        OFFICE,
-        REMOTE,
-    }
 }

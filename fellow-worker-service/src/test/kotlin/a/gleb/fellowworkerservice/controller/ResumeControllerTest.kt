@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-2/7/23, 10:48 PM
+ * Copyright (c) 07-3/7/23, 12:08 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -271,7 +271,8 @@ class ResumeControllerTest : BaseFellowWorkerServiceTest() {
             null,
             LocalDate.now(),
             "Worker",
-            "2000$",
+            200000,
+            "Новосибирск",
             "About me",
             listOf(
                 Education(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-1/27/23, 10:22 PM
+ * Copyright (c) 1-3/3/23, 10:01 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -67,15 +67,28 @@ class FullScreenWidget extends StatelessWidget {
               md: 6,
               child: Padding(
                 padding: const EdgeInsets.all(30),
-                child: buildCard(context, "Соискателям", "assets/working.png",
-                    "/employee", employeeText),
-              )),
+                child: buildCard(
+                    context,
+                    "Соискателям",
+                    "assets/working.png",
+                    "/search-vacancy",
+                    employeeText
+                ),
+              )
+          ),
           ResponsiveGridCol(
               md: 6,
               child: Padding(
                   padding: const EdgeInsets.all(30),
-                  child: buildCard(context, "Работодателям",
-                      "assets/recruitment.png", "/recruiter", recruiterText)))
+                  child: buildCard(
+                      context,
+                      "Работодателям",
+                      "assets/recruitment.png",
+                      "/search-resume",
+                      recruiterText
+                  )
+              )
+          )
         ]),
       ),
     );
@@ -111,7 +124,7 @@ class FullScreenWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 100, 0, 20),
               child: UtilityWidgets.buildCardButton(() {
-                Navigator.pushNamed(context, "/");
+                Navigator.pushNamed(context, routePath);
               }, "Перейти", 30),
             )
           ],

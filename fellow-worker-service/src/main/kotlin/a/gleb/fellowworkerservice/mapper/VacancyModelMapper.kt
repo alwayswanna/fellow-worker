@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-07.01.2023, 20:21
+ * Copyright (c) 12-3/1/23, 12:14 AM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,7 +7,6 @@ package a.gleb.fellowworkerservice.mapper
 
 import a.gleb.apicommon.fellowworker.model.request.vacancy.ContactApiModel
 import a.gleb.apicommon.fellowworker.model.request.vacancy.VacancyApiModel
-import a.gleb.apicommon.fellowworker.model.request.vacancy.VacancyApiModel.TypeOfWorkPlacement.OFFICE
 import a.gleb.apicommon.fellowworker.model.response.FellowWorkerResponseModel
 import a.gleb.apicommon.fellowworker.model.response.resume.ResumeResponseModel
 import a.gleb.apicommon.fellowworker.model.response.vacancy.VacancyResponseApiModel
@@ -51,7 +50,8 @@ class VacancyModelMapper {
             companyBonuses = request.companyBonuses,
             companyContact = convertContact(request),
             vacancyName = request.vacancyName,
-            lastUpdate = LocalDateTime.now()
+            lastUpdate = LocalDateTime.now(),
+            salary = request.salary
         )
     }
 
@@ -109,6 +109,7 @@ class VacancyModelMapper {
             companyBonuses = entity.companyBonuses
             contactApiModel = toCompanyContact(entity)
             lastUpdate = entity.lastUpdate
+            salary = entity.salary
         }
     }
 
@@ -154,7 +155,7 @@ class VacancyModelMapper {
      * @param request data from request.
      */
     private fun covertTypeWorkPlacement(request: VacancyApiModel): TypePlacement {
-        return if (request.typeOfWorkPlacement.name == OFFICE.name) {
+        return if (request.typeOfWorkPlacement.name == TypePlacement.OFFICE.name) {
             TypePlacement.OFFICE
         } else {
             TypePlacement.REMOTE

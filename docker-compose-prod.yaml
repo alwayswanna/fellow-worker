@@ -1,0 +1,128 @@
+version: '3'
+
+networks:
+  prod:
+
+services:
+  # environment containers
+  postgresql:
+    container_name: postgresql
+    image: postgres:15.2-alpine
+    environment:
+      POSTGRES_DB: authorization
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - prod
+  mongodb:
+    container_name: mongodb
+    image: mongo:6.0.3
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: fellow-worker
+    networks:
+      - prod
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.11-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - prod
+  prometheus:
+    container_name: prometheus
+    image: bitnami/prometheus:2.42.0
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    ports:
+      - "9090:9090"
+    networks:
+      - prod
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:9.4.3
+    ports:
+      - "3000:3000"
+    networks:
+      - prod
+
+  # application containers
+  oauth2-server-service:
+    container_name: oauth2-server-service
+    image: alwayswanna/fellow-worker:oauth2-server
+    ports:
+      - "9001:9001"
+    environment:
+      OAUTH2_SERVER_URL: oauth2-server-service
+      DATASOURCE_URL: postgresql
+      JAVA_MEM: -Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication
+    networks:
+      - prod
+    links:
+      - postgresql
+  client-manager-service:
+    container_name: client-manager-service
+    image: alwayswanna/fellow-worker:client-manager
+    ports:
+      - "8090:8090"
+    environment:
+      OAUTH2_SERVER_URL: oauth2-server-service
+      DATASOURCE_URL: postgresql
+      JAVA_MEM: -Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication
+    networks:
+      - prod
+    links:
+      - postgresql
+      - oauth2-server-service
+  fellow-worker-backend-service:
+    container_name: fellow-worker-backend-service
+    image: alwayswanna/fellow-worker:fellow-worker-service
+    ports:
+      - "4334:4334"
+    environment:
+      OAUTH2_SERVER_URL: oauth2-server-service
+      DATASOURCE_URL: mongodb
+      RABBITMQ_URL: rabbitmq
+      JAVA_MEM: -Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication
+    networks:
+      - prod
+    links:
+      - mongodb
+      - oauth2-server-service
+      - client-manager-service
+      - rabbitmq
+  cv-generator-service:
+    container_name: cv-generator-service
+    image: alwayswanna/fellow-worker:cv-generator
+    ports:
+      - "7044:7044"
+    environment:
+      OAUTH2_SERVER_URL: oauth2-server-service
+      RABBITMQ_URL: rabbitmq
+      JAVA_MEM: -Xms128m -Xmx256m -XX:+UseG1GC -XX:+UseStringDeduplication
+    networks:
+      - prod
+    links:
+      - rabbitmq
+      - oauth2-server-service
+  fellow-worker-fronted-service:
+    container_name: fellow-worker-fronted-service
+    image: alwayswanna/fellow-worker:frontend
+    ports:
+      - "8888:80"
+    networks:
+      - prod
+    links:
+      - fellow-worker-backend-service
+      - oauth2-server-service
+      - client-manager-service
+      - cv-generator-service
