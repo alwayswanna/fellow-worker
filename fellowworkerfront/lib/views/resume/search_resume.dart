@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 3-3/8/23, 10:19 AM
+ * Copyright (c) 3-3/22/23, 7:38 PM
  * Created by https://github.com/alwayswanna
  */
 import 'package:fellowworkerfront/models/fellow_worker_response_model.dart';
@@ -93,7 +93,7 @@ class _StateResume extends State<SearchResume>
                   "Заработная плата:", Colors.blueGrey, 10),
               ResponsiveGridCol(
                   child: UtilityWidgets.buildTextField(
-                      jobTitleTEC, "Заработная плата менее:")),
+                      salaryTEC, "Заработная плата менее:")),
               UtilityWidgets.emptyLine(),
               ResponsiveGridCol(
                   child: Padding(
@@ -112,15 +112,24 @@ class _StateResume extends State<SearchResume>
     var salaryValue = salaryTEC.text.isEmpty ? null : salaryTEC.text;
     var jobValue = jobTitleTEC.text.isEmpty ? null : jobTitleTEC.text;
 
-    var searchResumeModel = SearchResumeApiModel(
-        city: cityValue,
-        keySkills: skillValue,
-        job: jobValue,
-        salary: salaryValue);
+    if (cityValue == null &&
+        skillValue == null &&
+        salaryValue == null &&
+        jobValue == null) {
+      setState(() {
+        _response = _fellowWorkerService.searchAllResume();
+      });
+    } else {
+      var searchResumeModel = SearchResumeApiModel(
+          city: cityValue,
+          keySkills: skillValue,
+          job: jobValue,
+          salary: salaryValue);
 
-    setState(() {
-      _response = _fellowWorkerService.filterResume(searchResumeModel);
-    });
+      setState(() {
+        _response = _fellowWorkerService.filterResume(searchResumeModel);
+      });
+    }
   }
 
   Widget buildResumesView() {

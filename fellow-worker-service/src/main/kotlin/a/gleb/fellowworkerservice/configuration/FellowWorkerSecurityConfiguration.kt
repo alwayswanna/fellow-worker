@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/26/23, 11:40 PM
+ * Copyright (c) 12-3/25/23, 8:21 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -23,6 +23,9 @@ import reactor.core.publisher.Flux
 
 const val ROLE_PREFIX: String = "ROLE_"
 const val ROLE_KEY_CLAIM: String = "role"
+const val SCOPE_KEY_CLAIM: String = "scope"
+const val SCOPE_PREFIX: String = "SCOPE_"
+const val SCOPE_AUTHORITY: String = "SCOPE_openid"
 
 val unauthorizedPatterns = listOf(
     "/swagger-ui.html",
@@ -55,7 +58,7 @@ class FellowWorkerSecurityConfiguration(
 
                 it.jwtAuthenticationConverter(reactiveJwtConverter)
             }
-        httpSecurity.cors{
+        httpSecurity.cors {
             it.configurationSource(corsConfiguration(properties))
         }
 
@@ -63,7 +66,7 @@ class FellowWorkerSecurityConfiguration(
     }
 
     @Bean
-    fun corsConfiguration(properties: FellowWorkerConfigurationProperties): CorsConfigurationSource{
+    fun corsConfiguration(properties: FellowWorkerConfigurationProperties): CorsConfigurationSource {
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", properties.cors)
         return source
@@ -80,6 +83,9 @@ class FellowWorkerSecurityConfiguration(
             }
         }
 
+        val scopedPaths = properties.scopedPaths.toTypedArray()
+        authorizeExchangeSpec.pathMatchers(*scopedPaths).hasAuthority(SCOPE_AUTHORITY)
+
         val unprotectedPaths = properties.unprotectedPaths
         val permitAllMappings = (unprotectedPaths + unauthorizedPatterns).toTypedArray()
 
@@ -90,15 +96,25 @@ class FellowWorkerSecurityConfiguration(
 class SpringBootReactiveJwtConverter : Converter<Jwt, Flux<GrantedAuthority>> {
 
     override fun convert(source: Jwt): Flux<GrantedAuthority> {
-        return Flux.fromIterable(
-            sequenceOf(
-                replaceUnnecessarySymbols(source.claims[ROLE_KEY_CLAIM].toString()).split(",")
+        val rolesClaimValues = source.claims[ROLE_KEY_CLAIM] as ArrayList<*>
+        return if (rolesClaimValues.isNotEmpty()) {
+            Flux.fromIterable(
+                sequenceOf(rolesClaimValues)
+                    .map { "$ROLE_PREFIX$it" }
+                    .map { replaceUnnecessarySymbols(it) }
+                    .map { SimpleGrantedAuthority(it) }
+                    .toList()
             )
-                .map { "$ROLE_PREFIX$it" }
-                .map { replaceUnnecessarySymbols(it) }
-                .map { SimpleGrantedAuthority(it) }
-                .toList()
-        )
+        } else {
+            val scopesClaimValues = source.claims[SCOPE_KEY_CLAIM] as ArrayList<*>
+            Flux.fromIterable(
+                sequenceOf(scopesClaimValues)
+                    .map { "$SCOPE_PREFIX$it" }
+                    .map { replaceUnnecessarySymbols(it) }
+                    .map { SimpleGrantedAuthority(it) }
+                    .toList()
+            )
+        }
     }
 
     private fun replaceUnnecessarySymbols(role: String): String {

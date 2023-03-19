@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-3/3/23, 10:01 PM
+ * Copyright (c) 1-3/22/23, 7:38 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -39,7 +39,8 @@ class FullScreenWidget extends StatelessWidget {
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20)),
+                            borderRadius: BorderRadius.circular(20)
+                        ),
                         hintText: searchFieldHint,
                       ),
                     ),
@@ -47,7 +48,7 @@ class FullScreenWidget extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(0, 5, 0, 15),
                       child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, "/");
+                            Navigator.pushNamed(context, "/search-resume");
                           },
                           child: const Padding(
                               padding: EdgeInsets.all(10),

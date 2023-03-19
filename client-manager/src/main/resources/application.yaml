@@ -22,6 +22,17 @@ spring:
       resource-server:
         jwt:
           issuer-uri: http://${OAUTH2_SERVER_URL}:9001
+      client:
+        registration:
+          default:
+            client-id: message
+            authorization-grant-type: client_credentials
+            client-secret: c29tZXNlY3Rlcg==
+            scope:
+              - openid
+        provider:
+          default:
+            token-uri: http://127.0.0.1:9001/oauth2/token
   datasource:
     driver-class-name: org.postgresql.Driver
     username: postgres
@@ -29,6 +40,16 @@ spring:
     url: jdbc:postgresql://${DATASOURCE_URL}:5432/authorization
 
 client-manager:
+  deleted-account-clear-task:
+    cron: 0 0 0 * * *
+  feign-config:
+    logger-level: BASIC
+    registration-id: default
+    period: 3000
+    max-period: 12000
+    attempts: 5
+    resume-vacancy-client:
+      url: http://localhost:4334
   cors:
     enabled: true
     allowed-origins:
