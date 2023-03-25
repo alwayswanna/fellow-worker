@@ -94,6 +94,8 @@ fellow-worker:
     - /api/v1/vacancy/vacancy-all
     - /api/v1/vacancy/id
     - /api/v1/vacancy/filter-vacancies
+  scoped-paths:
+    - /api/v1/support/**
 
 management:
   endpoint:

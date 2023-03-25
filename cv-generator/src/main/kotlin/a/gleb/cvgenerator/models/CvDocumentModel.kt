@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-2/15/23, 11:40 PM
+ * Copyright (c) 1-3/22/23, 8:02 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -10,6 +10,7 @@ import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseMode
 import a.gleb.apicommon.fellowworker.model.response.resume.EducationResponseModel.EducationLevel.SPECIALTY
 import a.gleb.apicommon.fellowworker.model.response.resume.WorkExperienceResponseModel
 import a.gleb.apicommon.fellowworker.model.rmq.ResumeMessageCreate
+import mu.KotlinLogging
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
@@ -21,10 +22,11 @@ import org.imgscalr.Scalr
 import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.nio.file.Files
+import java.io.File.createTempFile
 import java.util.*
 import javax.imageio.ImageIO
 
+private val logger = KotlinLogging.logger { }
 
 const val PAGE_SIZE = 880
 const val LEFT_BORDER_X_COORDINATE = 20
@@ -77,14 +79,12 @@ class CvDocumentModel(
      */
     private fun addImageToDocument(resumeResponseModel: ResumeMessageCreate) {
         val avatar: File = if (resumeResponseModel.base64Image.isNullOrEmpty()) {
-            File(
-                Objects.requireNonNull(
-                    javaClass.classLoader.getResource(AVATAR_TEMPLATE_DEFAULT_PATH)!!.file
-                )
-            )
+            logger.info { "Create default image for document" }
+            extractFile(createTempFile("avatar-temp", ".png"), AVATAR_TEMPLATE_DEFAULT_PATH)
         } else {
+            logger.info { "Create image from request for document" }
             val imageBytes = Base64.getDecoder().decode(resumeResponseModel.base64Image)
-            val file = File("avatar.${resumeResponseModel.imageExtension}")
+            val file = createTempFile("avatar", ".${resumeResponseModel.imageExtension}")
             file.writeBytes(imageBytes)
             file
         }
@@ -120,7 +120,6 @@ class CvDocumentModel(
         )
 
         /* remove file and close stream of pdf file */
-        Files.delete(avatar.toPath())
         contentStream.close()
     }
 
@@ -131,13 +130,11 @@ class CvDocumentModel(
     fun addResumeTitle(message: String) {
         val page = pdDocument.getPage(pageIndex)
         val contentStream = PDPageContentStream(pdDocument, page, APPEND, false)
+        val fileFont: File = extractFile(createTempFile("Nunito-Bold", ".ttf"), BOLD_FONT_PATH)
+
         val fondPd = PDType0Font.load(
             pdDocument,
-            File(
-                Objects.requireNonNull(
-                    javaClass.classLoader.getResource(BOLD_FONT_PATH)!!.file
-                )
-            )
+            fileFont
         )
 
         addText(
@@ -149,6 +146,7 @@ class CvDocumentModel(
             null,
             null
         )
+
 
         contentStream.stroke()
         contentStream.close()
@@ -346,5 +344,16 @@ class CvDocumentModel(
         contentStream.newLineAtOffset(xCoordinate.toFloat(), yCoordinate.toFloat())
         contentStream.showText(targetText)
         contentStream.endText()
+    }
+
+    private fun extractFile(file: File, pathToFile: String): File {
+        val inputStreamFont = javaClass.classLoader.getResourceAsStream(pathToFile)
+        inputStreamFont.use { input ->
+            file.outputStream().use { output ->
+                input!!.copyTo(output)
+            }
+        }
+
+        return file
     }
 }

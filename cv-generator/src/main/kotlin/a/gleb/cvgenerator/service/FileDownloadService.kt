@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-2/7/23, 10:13 PM
+ * Copyright (c) 07-3/22/23, 8:02 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -23,7 +23,7 @@ class FileDownloadService {
      */
     fun download(resumeId: UUID): File {
         try {
-            return File("/tmp/resume/$resumeId.pdf")
+            return File("/resume/$resumeId.pdf")
         } catch (e: FileNotFoundException) {
             logger.info { "Error while download resume file with ID: $resumeId, error: $e" }
             throw FileException(HttpStatusCode.valueOf(500), "Error while get file from disk.")

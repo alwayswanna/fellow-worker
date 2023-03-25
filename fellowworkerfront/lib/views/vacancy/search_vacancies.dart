@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-3/7/23, 12:08 AM
+ * Copyright (c) 2-3/22/23, 8:22 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -106,8 +106,7 @@ class _SearchVacancies extends State<SearchVacancies>
   ResponsiveGridCol buildDropDown(
       String message,
       Map<String, TextEditingController> mapTec,
-      Map<String, String> dropDownValues
-  ) {
+      Map<String, String> dropDownValues) {
     return ResponsiveGridCol(
         child: StateDropdownButtonWidget(
             tec: mapTec,
@@ -155,8 +154,7 @@ class _SearchVacancies extends State<SearchVacancies>
   }
 
   Widget buildVacancyEntities(
-      FellowWorkerResponseModel fellowWorkerResponseModel
-  ) {
+      FellowWorkerResponseModel fellowWorkerResponseModel) {
     var vacancies = fellowWorkerResponseModel.vacancies;
     var columns = <ResponsiveGridCol>[];
     if (vacancies != null && vacancies.isNotEmpty) {
@@ -197,8 +195,7 @@ class _SearchVacancies extends State<SearchVacancies>
   }
 
   Future<void> buildAboutVacancy(
-      VacancyResponseApiModel vacancy, BuildContext context
-  ) {
+      VacancyResponseApiModel vacancy, BuildContext context) {
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -316,7 +313,6 @@ class _SearchVacancies extends State<SearchVacancies>
   void filterAllLoadedVacancies() {
     var cityValue = cityNameTEC.text.isEmpty ? null : cityNameTEC.text;
     var keySkillValue = keySkillTEC.text.isEmpty ? null : keySkillTEC.text;
-
     var typeOfWorkValue = typeTimeMap.values.first.text.isEmpty
         ? null
         : typeTimeMap.values.first.text;
@@ -324,16 +320,28 @@ class _SearchVacancies extends State<SearchVacancies>
         ? null
         : typePlacementMap.values.first.text;
 
-    var searchVacancyModel = SearchVacancyApiModel(
-        city: cityValue,
-        typeOfWork: typeOfWorkValue,
-        typeOfWorkPlacement: typeOfPlacementValue,
-        keySkills: keySkillValue);
+    if (cityValue == null &&
+        keySkillValue == null &&
+        typeOfWorkValue == null &&
+        typeOfPlacementValue == null) {
+      setState(() {
+        _fellowWorkerResponseModel = _fellowWorkerService.searchAllVacancies();
+      });
+    } else {
+      var typeWorkValue = typeOfWorkMap[typeOfWorkValue];
+      var typePlacementValue = placementType[typeOfPlacementValue];
 
-    setState(() {
-      _fellowWorkerResponseModel =
-          _fellowWorkerService.filterVacancy(searchVacancyModel);
-    });
+      var searchVacancyModel = SearchVacancyApiModel(
+          city: cityValue,
+          typeOfWork: typeWorkValue,
+          typeOfWorkPlacement: typePlacementValue,
+          keySkills: keySkillValue);
+
+      setState(() {
+        _fellowWorkerResponseModel =
+            _fellowWorkerService.filterVacancy(searchVacancyModel);
+      });
+    }
   }
 }
 

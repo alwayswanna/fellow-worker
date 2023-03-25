@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-1/28/23, 2:59 PM
+ * Copyright (c) 12-3/25/23, 11:14 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static a.gleb.clientmanager.utils.AccountChangeUtils.changeAccountData;
 
@@ -28,10 +29,11 @@ import static a.gleb.clientmanager.utils.AccountChangeUtils.changeAccountData;
 @Slf4j
 public class AccountService {
 
+    private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
     private final AccountModelMapper accountModelMapper;
+    private final AccountEntitiesService accountEntitiesService;
     private final OAuth2SecurityContextService oAuth2SecurityContextService;
-    private final PasswordEncoder passwordEncoder;
 
     /**
      * Method creates new account.
@@ -75,7 +77,7 @@ public class AccountService {
      * @return {@link ApiResponseModel} response for user.
      */
     public ApiResponseModel editAccount(AccountRequestModel requestModel) {
-        if(requestModel.getUsername() != null || requestModel.getEmail() != null){
+        if (requestModel.getUsername() != null || requestModel.getEmail() != null) {
             validateAccountDataInDataBase(requestModel);
         }
         var account = accountRepository.findAccountById(oAuth2SecurityContextService.getUserId())
@@ -106,6 +108,12 @@ public class AccountService {
         var userId = oAuth2SecurityContextService.getUserId();
         try {
             accountRepository.deleteById(userId);
+
+            /* async call service with user entities */
+            CompletableFuture.runAsync(() -> {
+                accountEntitiesService.removeUserEntities(userId);
+            });
+
             return ApiResponseModel.builder()
                     .message("Ваш аккаунт был успешно удален.")
                     .build();

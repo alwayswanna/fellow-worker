@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/12/23, 11:58 PM
+ * Copyright (c) 07-3/22/23, 10:57 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -14,7 +14,6 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.springframework.stereotype.Service
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
@@ -27,25 +26,18 @@ class CvBuilderService(
         logger.info { "Start create resume: ${resumeResponseModel.resume.resumeId}" }
         val resume = resumeResponseModel.resume
 
-
-        val template = File(
-            Objects.requireNonNull(
-                javaClass.classLoader.getResource("templates/template.pdf")
-            ).file
+        val template: File = extractFile(
+            File.createTempFile("template", ".pdf"),
+            "templates/template.pdf"
         )
 
         var document: PDDocument? = null
         val out = ByteArrayOutputStream()
         try {
             document = PDDocument.load(template)
-            val pdFont = PDType0Font.load(
-                document,
-                File(
-                    Objects.requireNonNull(
-                        javaClass.classLoader.getResource(FONT_PATH)!!.file
-                    )
-                )
-            )
+
+            val fontFile: File = extractFile(File.createTempFile("Nunito-Regular", ".ttf"), FONT_PATH)
+            val pdFont = PDType0Font.load(document, fontFile)
             val cvDocument = CvDocumentModel(document, resumeResponseModel, pdFont)
 
             // добавляем должность
@@ -92,15 +84,21 @@ class CvBuilderService(
             // добавляем данные об образовании
             cvDocument.addSpacerByRightBorder()
             cvDocument.addInfoRightBorder(messageService.getMessage("education.label.text"))
-            resume.education.forEach {
-                cvDocument.addEducationInformation(it)
+
+            if (resume.education != null && resume.education.isNotEmpty()){
+                resume.education.forEach {
+                    cvDocument.addEducationInformation(it)
+                }
             }
 
             // добавляем данные об опыте работы
             cvDocument.addSpacerByRightBorder()
             cvDocument.addInfoRightBorder(messageService.getMessage("work.experience.title.text"))
-            resume.workingHistory.forEach {
-                cvDocument.addWorkExperienceInformation(it)
+
+            if (resume.workingHistory !== null && resume.workingHistory.isNotEmpty()) {
+                resume.workingHistory.forEach {
+                    cvDocument.addWorkExperienceInformation(it)
+                }
             }
 
             document.save(out)
@@ -111,6 +109,18 @@ class CvBuilderService(
             document?.close()
         }
 
-        File("/tmp/resume/${resumeResponseModel.resume.resumeId}.pdf").writeBytes(out.toByteArray())
+        File("/resume/${resumeResponseModel.resume.resumeId}.pdf").writeBytes(out.toByteArray())
+    }
+
+    private fun extractFile(file: File, pathToFile: String): File {
+        logger.info { "Extract resource file with path: $pathToFile" }
+        val inputStreamFont = javaClass.classLoader.getResourceAsStream(pathToFile)
+        inputStreamFont.use { input ->
+            file.outputStream().use { output ->
+                input!!.copyTo(output)
+            }
+        }
+
+        return file
     }
 }
