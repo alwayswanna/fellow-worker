@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-3/9/23, 8:15 PM
+ * Copyright (c) 2-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
-import '../../styles/gradient_color.dart';
 import '../../utils/utility_widgets.dart';
 
 class _AboutResume extends State<AboutResume>
@@ -39,14 +38,14 @@ class _AboutResume extends State<AboutResume>
   @override
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(
+        UtilityWidgets.buildGradient(
             buildPageLayout(), _animationController),
         context);
   }
 
   Widget buildPageLayout() {
     return Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: edgeInsets8,
         child: Center(
             child: SingleChildScrollView(
                 child: ResponsiveGridRow(children: [

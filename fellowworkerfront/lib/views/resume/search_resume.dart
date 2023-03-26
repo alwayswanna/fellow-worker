@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 3-3/22/23, 7:38 PM
+ * Copyright (c) 3-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 import 'package:fellowworkerfront/models/fellow_worker_response_model.dart';
@@ -9,9 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
-import '../../styles/gradient_color.dart';
 import '../../utils/utility_widgets.dart';
-import '../account/edit_account_view.dart';
 
 class _StateResume extends State<SearchResume>
     with SingleTickerProviderStateMixin {
@@ -44,13 +42,13 @@ class _StateResume extends State<SearchResume>
   @override
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        UtilityWidgets.buildGradient(buildLayout(), _animationController),
         context);
   }
 
   Widget buildLayout() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: edgeInsets8,
       child: Center(
           child: SingleChildScrollView(
               child: ResponsiveGridRow(children: [
@@ -97,7 +95,7 @@ class _StateResume extends State<SearchResume>
               UtilityWidgets.emptyLine(),
               ResponsiveGridCol(
                   child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: edgeInsets8,
                       child: UtilityWidgets.buildCardButton(() {
                         filterAllLoadedResume();
                       }, "Искать", 15)))
@@ -160,7 +158,7 @@ class _StateResume extends State<SearchResume>
               ResponsiveGridCol(
                 child: Center(
                   child: Padding(
-                      padding: padding,
+                      padding: edgeInsets10,
                       child: UtilityWidgets.sizedProgressiveBar(100, 100)),
                 ),
               ),
@@ -200,7 +198,7 @@ class _StateResume extends State<SearchResume>
               ResponsiveGridCol(
                   md: 3,
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: edgeInsets8,
                     child: UtilityWidgets.buildCardButton(() {
                       buildAboutResume(v, context);
                     }, "Подробнее", 13),
@@ -229,7 +227,7 @@ class _StateResume extends State<SearchResume>
                     ResponsiveGridCol(
                         md: 1,
                         child: Padding(
-                          padding: const EdgeInsets.all(10),
+                          padding: edgeInsets10,
                           child: IconButton(
                             onPressed: () {
                               Navigator.of(context).pop();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-3/9/23, 8:15 PM
+ * Copyright (c) 2-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,12 +7,11 @@ import 'package:fellowworkerfront/models/vacancy_request_model.dart';
 import 'package:fellowworkerfront/service/account_utils.dart';
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
+import 'package:fellowworkerfront/utils/validation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
-import '../../styles/gradient_color.dart';
 import '../../utils/value_pickers.dart';
-import '../account/edit_account_view.dart';
 
 const createVacancy = "Создание вакансии";
 
@@ -64,7 +63,7 @@ class _CreateVacancy extends State<CreateVacancy>
   @override
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        UtilityWidgets.buildGradient(buildLayout(), _animationController),
         context);
   }
 
@@ -77,7 +76,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       child: Center(
                           child: Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: edgeInsets10,
                     child: Text("Создать вакансию",
                         style: UtilityWidgets.pageTitleStyle()),
                   ))),
@@ -88,10 +87,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: UtilityWidgets.buildTextField(
-                          salaryTEC,
-                          "Заработная плата"
-                      )
-                  ),
+                          salaryTEC, "Заработная плата")),
                   ResponsiveGridCol(
                       md: 6,
                       child: UtilityWidgets.buildTextField(
@@ -107,7 +103,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Требуемые профессиональные навыки:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -116,7 +112,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             professionalSkillsFrames.add(buildInputSkills(
@@ -134,7 +130,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Рабочие обязанности:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -143,7 +139,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             workingResponsibilitiesFrames.add(buildInputSkills(
@@ -165,7 +161,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Условия:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -174,7 +170,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             conditionsFrames.add(buildInputSkills(
@@ -204,7 +200,7 @@ class _CreateVacancy extends State<CreateVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: padding,
+                        padding: edgeInsets10,
                         child: ElevatedButton(
                             onPressed: () {
                               sendRequestToCreateVacancy();
@@ -214,7 +210,7 @@ class _CreateVacancy extends State<CreateVacancy>
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(5)))),
                             child: const Padding(
-                                padding: padding,
+                                padding: edgeInsets10,
                                 child: Text(
                                   "Создать вакансию",
                                   style: TextStyle(
@@ -269,13 +265,7 @@ class _CreateVacancy extends State<CreateVacancy>
       }
     }
 
-    if (vacancyName.isEmpty ||
-        companyName.isEmpty ||
-        companyAddress.isEmpty ||
-        cityName.isEmpty ||
-        contactFullName.isEmpty ||
-        emailAddress.isEmpty ||
-        phone.isEmpty ||
+    if (ValidationUtils.validateValue([vacancyName, companyName, companyAddress, cityName, contactFullName, emailAddress, phone]) ||
         conditions.isEmpty ||
         responsibilities.isEmpty ||
         profSkills.isEmpty) {
@@ -291,31 +281,23 @@ class _CreateVacancy extends State<CreateVacancy>
               : placementType[placementType.keys.last];
 
       var vacancy = VacancyApiModel(
-        vacancyId: null,
-        vacancyName: vacancyName,
-        salary: salaryTEC.text,
-        typeOfWork: typeTime,
-        typeOfWorkPlacement: typePlacement,
-        companyName: companyName,
-        companyFullAddress: companyAddress,
-        keySkills: profSkills,
-        cityName: cityName,
-        workingResponsibilities: responsibilities,
-        companyBonuses: conditions,
-        contactApiModel: CompanyContactApiModel(
-            fio: contactFullName,
-            phone: phone,
-            email: emailAddress
-        )
-      );
+          vacancyId: null,
+          vacancyName: vacancyName,
+          salary: salaryTEC.text,
+          typeOfWork: typeTime,
+          typeOfWorkPlacement: typePlacement,
+          companyName: companyName,
+          companyFullAddress: companyAddress,
+          keySkills: profSkills,
+          cityName: cityName,
+          workingResponsibilities: responsibilities,
+          companyBonuses: conditions,
+          contactApiModel: CompanyContactApiModel(
+              fio: contactFullName, phone: phone, email: emailAddress));
 
       var response = _fellowWorkerService.createVacancy(vacancy);
       UtilityWidgets.dialogBuilderApi(
-          context,
-          response,
-          createVacancy,
-          '/profile'
-      );
+          context, response, createVacancy, '/profile');
     }
   }
 
@@ -330,7 +312,7 @@ class _CreateVacancy extends State<CreateVacancy>
     var controller = TextEditingController();
     tec.add(controller);
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: edgeInsets10,
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
@@ -358,10 +340,7 @@ class _CreateVacancy extends State<CreateVacancy>
 class CreateVacancy extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
 
-  CreateVacancy({
-    required FellowWorkerService fWS,
-    super.key
-  }) {
+  CreateVacancy({required FellowWorkerService fWS, super.key}) {
     fellowWorkerService = fWS;
   }
 

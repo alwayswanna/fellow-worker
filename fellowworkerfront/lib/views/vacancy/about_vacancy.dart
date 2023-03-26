@@ -1,9 +1,8 @@
 /*
- * Copyright (c) 2-3/9/23, 8:15 PM
+ * Copyright (c) 2-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
-import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/vacancy/edit_vacancy.dart';
 import 'package:flutter/material.dart';
@@ -40,13 +39,13 @@ class _AboutVacancy extends State<AboutVacancy>
   @override
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        UtilityWidgets.buildGradient(buildLayout(), _animationController),
         context);
   }
 
   Widget buildLayout() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: edgeInsets8,
       child: Center(
         child: SingleChildScrollView(
           child: ResponsiveGridRow(children: [

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-3/9/23, 8:15 PM
+ * Copyright (c) 1-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -9,10 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../service/account_utils.dart';
-import '../../styles/gradient_color.dart';
 
 const accountCreateMessageToUser = "Создание аккаунта";
-const padding = EdgeInsets.all(10);
 
 class _Registration extends State<Registration>
     with SingleTickerProviderStateMixin {
@@ -59,7 +57,7 @@ class _Registration extends State<Registration>
   @override
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        UtilityWidgets.buildGradient(buildLayout(), _animationController),
         context);
   }
 
@@ -70,7 +68,6 @@ class _Registration extends State<Registration>
   }
 
   Widget buildLayout() {
-    var padding = const EdgeInsets.all(10);
     return Center(
         child: SingleChildScrollView(
             child: SizedBox(
@@ -82,13 +79,13 @@ class _Registration extends State<Registration>
               ResponsiveGridCol(
                   child: Center(
                       child: Padding(
-                          padding: padding,
+                          padding: edgeInsets10,
                           child: Text("Создать аккаунт",
                               style: UtilityWidgets.pageTitleStyle())))),
               ResponsiveGridCol(
                   child: Container(
                       width: 400,
-                      padding: padding,
+                      padding: edgeInsets10,
                       child: TextField(
                         controller: usernameController,
                         decoration: InputDecoration(
@@ -101,7 +98,7 @@ class _Registration extends State<Registration>
                       ))),
               ResponsiveGridCol(
                   child: Container(
-                      padding: padding,
+                      padding: edgeInsets10,
                       child: TextField(
                         controller: passwordController,
                         enableSuggestions: false,
@@ -146,7 +143,7 @@ class _Registration extends State<Registration>
               ResponsiveGridCol(
                   md: 6,
                   child: Container(
-                      margin: const EdgeInsets.all(10.0),
+                      margin: edgeInsets10,
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20.0),
@@ -154,13 +151,13 @@ class _Registration extends State<Registration>
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                             hint: const Text("  Тип аккаунта:"),
-                            value: accountTypes.first,
+                            value: accountTypesMap.keys.first,
                             onChanged: (value) {
                               setState(() {
                                 typeAccount = value!;
                               });
                             },
-                            items: accountTypes.map((String text) {
+                            items: accountTypesMap.keys.map((String text) {
                               return DropdownMenuItem<String>(
                                 value: text,
                                 child: Text(
@@ -173,7 +170,7 @@ class _Registration extends State<Registration>
               ResponsiveGridCol(
                   md: 6,
                   child: Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: edgeInsets10,
                     child: TextField(
                         controller: dateController,
                         //editing controller of this TextField
@@ -198,7 +195,7 @@ class _Registration extends State<Registration>
               ResponsiveGridCol(
                   md: 6,
                   child: Padding(
-                    padding: padding,
+                    padding: edgeInsets10,
                     child: ElevatedButton(
                         onPressed: () {
                           sendRequestCreateAccount();
@@ -207,9 +204,9 @@ class _Registration extends State<Registration>
                             shape: const RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(5)))),
-                        child: Padding(
-                            padding: padding,
-                            child: const Text(
+                        child: const Padding(
+                            padding: edgeInsets10,
+                            child: Text(
                               "Создать аккаунт",
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),

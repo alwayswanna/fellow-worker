@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-3/9/23, 11:54 PM
+ * Copyright (c) 1-3/27/23, 8:01 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -35,7 +35,6 @@ const searchResumesAPI = "/api/v1/employee/get-all-resume";
 const filterResumeAPI = "/api/v1/employee/filter-resumes";
 
 class FellowWorkerService {
-
   final Oauth2Service oauth2service;
 
   FellowWorkerService(this.oauth2service);
@@ -49,17 +48,16 @@ class FellowWorkerService {
 
     var response = await http.get(requestUri, headers: defaultHeaders);
     RequestUtils.clearRequestHeadersContext();
-    if (response.statusCode == 200) {
-      return FellowWorkerResponseModel.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes)));
-    } else {
-      return FellowWorkerResponseModel(
-          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
-          resumeResponse: null,
-          resumes: null,
-          vacancyResponse: null,
-          vacancies: null);
-    }
+
+    return response.statusCode == 200
+        ? FellowWorkerResponseModel.fromJson(
+            jsonDecode(utf8.decode(response.bodyBytes)))
+        : FellowWorkerResponseModel(
+            message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+            resumeResponse: null,
+            resumes: null,
+            vacancyResponse: null,
+            vacancies: null);
   }
 
   /// get current user vacancies, GET
@@ -71,23 +69,21 @@ class FellowWorkerService {
 
     var response = await http.get(requestUri, headers: defaultHeaders);
     RequestUtils.clearRequestHeadersContext();
-    if (response.statusCode == 200) {
-      return FellowWorkerResponseModel.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes)));
-    } else {
-      return FellowWorkerResponseModel(
-          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
-          resumeResponse: null,
-          resumes: null,
-          vacancyResponse: null,
-          vacancies: null);
-    }
+
+    return response.statusCode == 200
+        ? FellowWorkerResponseModel.fromJson(
+            jsonDecode(utf8.decode(response.bodyBytes)))
+        : FellowWorkerResponseModel(
+            message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+            resumeResponse: null,
+            resumes: null,
+            vacancyResponse: null,
+            vacancies: null);
   }
 
   /// get current user vacancy or resume, GET
   Future<FellowWorkerResponseModel> getCurrenUserEntities(
-      Future<ApiResponseModel> response
-  ) async {
+      Future<ApiResponseModel> response) async {
     var accountModel = await response;
 
     if (accountModel.accountDataModel?.role == companyResponse) {
@@ -105,9 +101,7 @@ class FellowWorkerService {
   }
 
   /// create resume method, POST
-  Future<String> createResume(
-      ResumeApiModel requestBodyMessage
-  ) async {
+  Future<String> createResume(ResumeApiModel requestBodyMessage) async {
     var bodyMessage = jsonEncode(requestBodyMessage);
 
     var userToken = await oauth2service.getAccessToken();
@@ -115,11 +109,8 @@ class FellowWorkerService {
 
     final requestUri = Uri.parse(fellowWorkerHost + createResumeUserAPI);
 
-    var response = await http.post(
-        requestUri,
-        headers: defaultHeaders,
-        body: bodyMessage
-    );
+    var response =
+        await http.post(requestUri, headers: defaultHeaders, body: bodyMessage);
 
     RequestUtils.clearRequestHeadersContext();
 
@@ -134,10 +125,7 @@ class FellowWorkerService {
   }
 
   /// edit resume method, PUT
-  Future<String> editResume(
-      
-      ResumeApiModel requestBodyMessage
-  ) async {
+  Future<String> editResume(ResumeApiModel requestBodyMessage) async {
     var bodyMessage = jsonEncode(requestBodyMessage);
 
     var userToken = await oauth2service.getAccessToken();
@@ -160,9 +148,7 @@ class FellowWorkerService {
   }
 
   /// delete resume by id, DELETE
-  Future<String> deleteResume(
-      String resumeId
-  ) async {
+  Future<String> deleteResume(String resumeId) async {
     var userToken = await oauth2service.getAccessToken();
     RequestUtils.injectTokenToRequest(userToken);
 
@@ -176,9 +162,7 @@ class FellowWorkerService {
   }
 
   /// create vacancy, POST
-  Future<String> createVacancy(
-      VacancyApiModel vacancyApiModel
-  ) async {
+  Future<String> createVacancy(VacancyApiModel vacancyApiModel) async {
     var bodyMessage = jsonEncode(vacancyApiModel);
 
     var userToken = await oauth2service.getAccessToken();
@@ -186,11 +170,8 @@ class FellowWorkerService {
 
     final requestUri = Uri.parse(fellowWorkerHost + createVacancyUserAPI);
 
-    var response = await http.post(
-        requestUri,
-        headers: defaultHeaders,
-        body: bodyMessage
-    );
+    var response =
+        await http.post(requestUri, headers: defaultHeaders, body: bodyMessage);
     RequestUtils.clearRequestHeadersContext();
 
     if (response.statusCode == 200) {
@@ -208,8 +189,8 @@ class FellowWorkerService {
     var userToken = await oauth2service.getAccessToken();
     RequestUtils.injectTokenToRequest(userToken);
 
-    final requestUri =
-    Uri.parse("$fellowWorkerHost$vacancyDeleteUserAPI?vacancyId=$vacancyId");
+    final requestUri = Uri.parse(
+        "$fellowWorkerHost$vacancyDeleteUserAPI?vacancyId=$vacancyId");
 
     var response = await http.delete(requestUri, headers: defaultHeaders);
 
@@ -227,11 +208,8 @@ class FellowWorkerService {
 
     final requestUri = Uri.parse(fellowWorkerHost + vacancyEditUserAPI);
 
-    var response = await http.put(
-        requestUri,
-        headers: defaultHeaders,
-        body: bodyMessage
-    );
+    var response =
+        await http.put(requestUri, headers: defaultHeaders, body: bodyMessage);
 
     RequestUtils.clearRequestHeadersContext();
 
@@ -249,48 +227,37 @@ class FellowWorkerService {
   Future<FellowWorkerResponseModel> searchAllVacancies() async {
     final uriRequest = Uri.parse(fellowWorkerHost + searchVacanciesAPI);
 
-    var response = await http.get(uriRequest,headers: defaultHeaders);
+    var response = await http.get(uriRequest, headers: defaultHeaders);
 
-    if (response.statusCode == 200) {
-      return FellowWorkerResponseModel.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes)));
-    } else {
-      return FellowWorkerResponseModel(
-          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
-          resumeResponse: null,
-          resumes: null,
-          vacancyResponse: null,
-          vacancies: null
-      );
-    }
+    return response.statusCode == 200
+        ? FellowWorkerResponseModel.fromJson(
+            jsonDecode(utf8.decode(response.bodyBytes)))
+        : FellowWorkerResponseModel(
+            message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+            resumeResponse: null,
+            resumes: null,
+            vacancyResponse: null,
+            vacancies: null);
   }
 
   /// filter vacancy, POST
   Future<FellowWorkerResponseModel> filterVacancy(
-      SearchVacancyApiModel searchVacancyApiModel
-  ) async{
+      SearchVacancyApiModel searchVacancyApiModel) async {
     var bodyMessage = jsonEncode(searchVacancyApiModel);
     final uriRequest = Uri.parse(fellowWorkerHost + filterVacanciesAPI);
 
-    var response = await http.post(
-        uriRequest,
-        headers: defaultHeaders,
-        body: bodyMessage
-    );
+    var response =
+        await http.post(uriRequest, headers: defaultHeaders, body: bodyMessage);
 
-    if (response.statusCode == 200) {
-      return FellowWorkerResponseModel.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes))
-      );
-    } else {
-      return FellowWorkerResponseModel(
-          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
-          resumeResponse: null,
-          resumes: null,
-          vacancyResponse: null,
-          vacancies: null
-      );
-    }
+    return response.statusCode == 200
+        ? FellowWorkerResponseModel.fromJson(
+            jsonDecode(utf8.decode(response.bodyBytes)))
+        : FellowWorkerResponseModel(
+            message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+            resumeResponse: null,
+            resumes: null,
+            vacancyResponse: null,
+            vacancies: null);
   }
 
   /// get all resume, GET
@@ -299,45 +266,34 @@ class FellowWorkerService {
 
     var response = await http.get(uriRequest, headers: defaultHeaders);
 
-    if (response.statusCode == 200) {
-      return FellowWorkerResponseModel.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes)));
-    } else {
-      return FellowWorkerResponseModel(
-          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
-          resumeResponse: null,
-          resumes: null,
-          vacancyResponse: null,
-          vacancies: null
-      );
-    }
+    return response.statusCode == 200
+        ? FellowWorkerResponseModel.fromJson(
+            jsonDecode(utf8.decode(response.bodyBytes)))
+        : FellowWorkerResponseModel(
+            message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+            resumeResponse: null,
+            resumes: null,
+            vacancyResponse: null,
+            vacancies: null);
   }
 
   /// filter resumes, POST
   Future<FellowWorkerResponseModel> filterResume(
-      SearchResumeApiModel searchVacancyApiModel
-  ) async{
+      SearchResumeApiModel searchVacancyApiModel) async {
     var bodyMessage = jsonEncode(searchVacancyApiModel);
     final uriRequest = Uri.parse(fellowWorkerHost + filterResumeAPI);
 
-    var response = await http.post(
-        uriRequest,
-        headers: defaultHeaders,
-        body: bodyMessage
-    );
+    var response =
+        await http.post(uriRequest, headers: defaultHeaders, body: bodyMessage);
 
-    if (response.statusCode == 200) {
-      return FellowWorkerResponseModel.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes))
-      );
-    } else {
-      return FellowWorkerResponseModel(
-          message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
-          resumeResponse: null,
-          resumes: null,
-          vacancyResponse: null,
-          vacancies: null
-      );
-    }
+    return response.statusCode == 200
+        ? FellowWorkerResponseModel.fromJson(
+            jsonDecode(utf8.decode(response.bodyBytes)))
+        : FellowWorkerResponseModel(
+            message: jsonDecode(utf8.decode(response.bodyBytes))['message'],
+            resumeResponse: null,
+            resumes: null,
+            vacancyResponse: null,
+            vacancies: null);
   }
 }
