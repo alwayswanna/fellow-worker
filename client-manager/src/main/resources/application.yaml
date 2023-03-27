@@ -74,9 +74,7 @@ client-manager:
         - ADMIN
       security-collections:
         - patterns:
-            - /api/v1/support/disable-account
-            - /api/v1/support/accounts
-            - /api/v1/support/account-by-username
+            - /api/v1/support/**
   unprotected-patterns:
     - /api/v1/account/create
     - /api/v1/account/data

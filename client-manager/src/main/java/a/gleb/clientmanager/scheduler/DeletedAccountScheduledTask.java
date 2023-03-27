@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 3-3/25/23, 11:14 PM
+ * Copyright (c) 3-3/27/23, 10:58 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,18 +8,34 @@ package a.gleb.clientmanager.scheduler;
 
 import a.gleb.clientmanager.service.AccountEntitiesService;
 import a.gleb.clientmanager.service.DeletedAccountService;
-import lombok.AllArgsConstructor;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@AllArgsConstructor
 public class DeletedAccountScheduledTask {
+
+    /**
+     * Metric name for clean failed user entities.
+     */
+    private static final String SCHEDULED_TASK_STATE_METRIC_NAME = "failure.clean.user.entities.scheduled.task";
 
     private final DeletedAccountService deletedAccountService;
     private final AccountEntitiesService accountEntitiesService;
+    private final Counter scheduledTaskStateMetric;
+
+    public DeletedAccountScheduledTask(
+            DeletedAccountService deletedAccountService,
+            AccountEntitiesService accountEntitiesService,
+            MeterRegistry meterRegistry
+    ){
+        this.deletedAccountService = deletedAccountService;
+        this.accountEntitiesService = accountEntitiesService;
+        this.scheduledTaskStateMetric = meterRegistry.counter(SCHEDULED_TASK_STATE_METRIC_NAME);
+    }
 
     /**
      * Cron-job for clean deleted account cache.
@@ -34,6 +50,8 @@ public class DeletedAccountScheduledTask {
                 accountEntitiesService.remove(it.getId());
                 deletedAccountService.delete(it);
             } catch (Exception e) {
+                /* if API call throws exception increment custom metric */
+                scheduledTaskStateMetric.increment();
                 log.error("Error while remove user entities.", e);
             }
         });
