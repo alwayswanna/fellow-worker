@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-3/9/23, 8:15 PM
+ * Copyright (c) 1-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,11 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../service/account_utils.dart';
-import '../../service/validation_service.dart';
-import '../../styles/gradient_color.dart';
 import '../../utils/utility_widgets.dart';
+import '../../utils/validation_service.dart';
 
-const padding = EdgeInsets.all(10);
 const String editAccountUserMessage = "Изменение аккаунта";
 const String backSuccessMessageCheck =
     "Данные вашего аккаунт успешно обновлены.";
@@ -45,7 +43,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
   @override
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        UtilityWidgets.buildGradient(buildLayout(), _animationController),
         context
     );
   }
@@ -62,13 +60,13 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
                   ResponsiveGridCol(
                       child: Center(
                           child: Padding(
-                              padding: padding,
+                              padding: edgeInsets10,
                               child: Text("Редактировать аккаунт",
                                   style: UtilityWidgets.pageTitleStyle())))),
                   ResponsiveGridCol(
                       child: Container(
                           width: 400,
-                          padding: padding,
+                          padding: edgeInsets10,
                           child: TextField(
                             controller: usernameController,
                             decoration: InputDecoration(
@@ -98,7 +96,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
                   ResponsiveGridCol(
                       md: 6,
                       child: Container(
-                          margin: const EdgeInsets.all(10.0),
+                          margin: edgeInsets10,
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20.0),
@@ -112,7 +110,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
                                     typeAccount = value!;
                                   });
                                 },
-                                items: accountTypes.map((String text) {
+                                items: accountTypesMap.keys.map((String text) {
                                   return DropdownMenuItem<String>(
                                     value: text,
                                     child: Text(
@@ -126,7 +124,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: edgeInsets10,
                         child: TextField(
                             controller: dateController,
                             //editing controller of this TextField
@@ -151,7 +149,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: padding,
+                        padding: edgeInsets10,
                         child: ElevatedButton(
                             onPressed: () {
                               sendRequestToEditAccount();
@@ -161,7 +159,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(5)))),
                             child: const Padding(
-                                padding: padding,
+                                padding: edgeInsets10,
                                 child: Text(
                                   "Изменить аккаунт",
                                   style: TextStyle(
@@ -194,7 +192,7 @@ class _EditCurrentAccount extends State<EditCurrentAccount>
   Future<void> sendRequestToEditAccount() async {
     var type = UtilityWidgets.extractAccountRoleDataFromWidget(typeAccount);
 
-    String? requestDate = ValidationService.isValidBirthDate(selectedDate)
+    String? requestDate = ValidationUtils.isValidBirthDate(selectedDate)
         ? selectedDate.toIso8601String()
         : null;
 

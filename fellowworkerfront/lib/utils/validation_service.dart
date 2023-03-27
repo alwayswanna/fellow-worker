@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2-2/2/23, 11:04 PM
+ * Copyright (c) 2-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
-class ValidationService {
+class ValidationUtils {
 
   /// Validate selected date before send request
   static bool isValidBirthDate(DateTime selectedDate) {
@@ -19,5 +19,9 @@ class ValidationService {
     } else {
       return true;
     }
+  }
+
+  static bool validateValue(List<String> values) {
+    return values.any((element) => element.isEmpty);
   }
 }

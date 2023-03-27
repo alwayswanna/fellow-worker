@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-3/9/23, 8:15 PM
+ * Copyright (c) 1-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -17,7 +17,6 @@ import 'package:intl/intl.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../service/cv_generator_service.dart';
-import '../../styles/gradient_color.dart';
 
 const deleteActionAccount = "Вы действительно хотите удалить аккаунт?";
 const paddingButtons = EdgeInsets.fromLTRB(0, 0, 5, 0);
@@ -62,7 +61,7 @@ class _ProfileWidget extends State<Profile>
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 var apiResponse = snapshot.data as ApiResponseModel;
-                return GradientEnchanted.buildGradient(
+                return UtilityWidgets.buildGradient(
                     buildPageLayout(apiResponse), _animationController);
               } else {
                 return UtilityWidgets.sizedProgressiveBar(100, 100);
@@ -74,7 +73,7 @@ class _ProfileWidget extends State<Profile>
   Widget buildPageLayout(ApiResponseModel responseModel) {
     var account = responseModel.accountDataModel!;
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: edgeInsets8,
       child: Center(
         child: SingleChildScrollView(
           child: ResponsiveGridRow(children: [
@@ -136,7 +135,7 @@ class _ProfileWidget extends State<Profile>
                       ResponsiveGridCol(
                           md: 4,
                           child: Padding(
-                            padding: const EdgeInsets.all(10.0),
+                            padding: edgeInsets10,
                             child: UtilityWidgets.buildCardButton(() {
                               dialogBuilderMessage(context,
                                   "Вы действительно хотите удалить аккаунт?");
@@ -145,7 +144,7 @@ class _ProfileWidget extends State<Profile>
                       ResponsiveGridCol(
                           md: 4,
                           child: Padding(
-                            padding: const EdgeInsets.all(10.0),
+                            padding: edgeInsets10,
                             child: UtilityWidgets.buildCardButton(() {
                               Navigator.pushNamed(context, "/edit-account");
                             }, "Редактировать", 15),
@@ -153,7 +152,7 @@ class _ProfileWidget extends State<Profile>
                       ResponsiveGridCol(
                           md: 4,
                           child: Padding(
-                            padding: const EdgeInsets.all(10.0),
+                            padding: edgeInsets10,
                             child: UtilityWidgets.buildCardButton(() {
                               Navigator.pushNamed(context, "/change-password");
                             }, "Сменить пароль", 15),
@@ -346,7 +345,7 @@ class _ProfileWidget extends State<Profile>
           ResponsiveGridCol(
               md: 4,
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: edgeInsets10,
                 child: UtilityWidgets.buildCardButtonPadding(() {
                   Navigator.pushNamed(context, "/create-resume");
                 }, "Создать резюме", 15, 3),
@@ -407,7 +406,7 @@ class _ProfileWidget extends State<Profile>
       responsiveGridCol.add(ResponsiveGridCol(
           md: 4,
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: edgeInsets10,
             child: UtilityWidgets.buildCardButtonPadding(() {
               Navigator.pushNamed(context, "/create-vacancy");
             }, "Добавить новую вакансию", 15, 3),
@@ -425,7 +424,7 @@ class _ProfileWidget extends State<Profile>
             ResponsiveGridCol(
                 md: 4,
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: edgeInsets10,
                   child: UtilityWidgets.buildCardButtonPadding(() {
                     Navigator.pushNamed(context, "/create-vacancy");
                   }, "Создать вакансию", 15, 3),

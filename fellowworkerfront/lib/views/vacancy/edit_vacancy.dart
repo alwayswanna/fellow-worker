@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-3/9/23, 8:15 PM
+ * Copyright (c) 2-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -10,10 +10,9 @@ import 'package:responsive_grid/responsive_grid.dart';
 import '../../models/fellow_worker_response_model.dart';
 import '../../models/vacancy_request_model.dart';
 import '../../service/account_utils.dart';
-import '../../styles/gradient_color.dart';
 import '../../utils/utility_widgets.dart';
+import '../../utils/validation_service.dart';
 import '../../utils/value_pickers.dart';
-import '../account/edit_account_view.dart';
 
 const editVacancy = "Редактирование вакансии";
 
@@ -76,7 +75,7 @@ class _EditVacancy extends State<EditVacancy>
     }
 
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(
+        UtilityWidgets.buildGradient(
             buildPageLayout(),
             _animationController
         ),
@@ -102,7 +101,7 @@ class _EditVacancy extends State<EditVacancy>
                   ResponsiveGridCol(
                       child: Center(
                           child: Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: edgeInsets10,
                     child: Text("Редактировать вакансию",
                         style: UtilityWidgets.pageTitleStyle()),
                   ))),
@@ -129,7 +128,7 @@ class _EditVacancy extends State<EditVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Требуемые профессиональные навыки:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -138,7 +137,7 @@ class _EditVacancy extends State<EditVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             professionalSkillsFrames.add(buildInputSkills(
@@ -156,7 +155,7 @@ class _EditVacancy extends State<EditVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Рабочие обязанности:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -165,7 +164,7 @@ class _EditVacancy extends State<EditVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             workingResponsibilitiesFrames.add(buildInputSkills(
@@ -187,7 +186,7 @@ class _EditVacancy extends State<EditVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Условия:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -196,7 +195,7 @@ class _EditVacancy extends State<EditVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             conditionsFrames.add(buildInputSkills(
@@ -226,7 +225,7 @@ class _EditVacancy extends State<EditVacancy>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: padding,
+                        padding: edgeInsets10,
                         child: ElevatedButton(
                             onPressed: () {
                               sendRequestToEditVacancy();
@@ -236,7 +235,7 @@ class _EditVacancy extends State<EditVacancy>
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(5)))),
                             child: const Padding(
-                                padding: padding,
+                                padding: edgeInsets10,
                                 child: Text(
                                   "Редактировать вакансию",
                                   style: TextStyle(
@@ -277,7 +276,7 @@ class _EditVacancy extends State<EditVacancy>
     var controller = TextEditingController();
     tec.add(controller);
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: edgeInsets10,
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
@@ -332,13 +331,7 @@ class _EditVacancy extends State<EditVacancy>
       }
     }
 
-    if (vacancyName.isEmpty ||
-        companyName.isEmpty ||
-        companyAddress.isEmpty ||
-        cityName.isEmpty ||
-        contactFullName.isEmpty ||
-        emailAddress.isEmpty ||
-        phone.isEmpty ||
+    if (ValidationUtils.validateValue([vacancyName, companyName, companyAddress, cityName, contactFullName, emailAddress, phone]) ||
         conditions.isEmpty ||
         responsibilities.isEmpty ||
         profSkills.isEmpty) {

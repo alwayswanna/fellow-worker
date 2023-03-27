@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-3/9/23, 11:54 PM
+ * Copyright (c) 1-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -7,7 +7,6 @@ import 'package:fellowworkerfront/security/oauth2.dart';
 import 'package:fellowworkerfront/service/client_manager_service.dart';
 import 'package:fellowworkerfront/service/cv_generator_service.dart';
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
-import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:fellowworkerfront/views/account/change_password_view.dart';
 import 'package:fellowworkerfront/views/account/edit_account_view.dart';
@@ -89,7 +88,7 @@ class MyApp extends StatelessWidget {
             )
       },
       theme: ThemeData(
-        primarySwatch: GradientEnchanted.kToDark,
+        primarySwatch: kToDark,
       ),
       home: MyHomePage(title: 'Fellow worker', oauth2service: oauth2service),
     );
@@ -192,7 +191,7 @@ class _MyHomePageState extends State<MyHomePage>
               child: const Text("Регистрация"))
         ],
       ),
-      body: GradientEnchanted.buildGradient(
+      body: UtilityWidgets.buildGradient(
           const FullScreenWidget(), _animationController),
     );
   }

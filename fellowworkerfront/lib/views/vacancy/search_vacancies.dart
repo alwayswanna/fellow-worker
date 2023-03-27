@@ -1,11 +1,10 @@
 /*
- * Copyright (c) 2-3/22/23, 8:22 PM
+ * Copyright (c) 2-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/models/search_vacancy_model.dart';
 import 'package:fellowworkerfront/service/fellow_worker_service.dart';
-import 'package:fellowworkerfront/styles/gradient_color.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
@@ -13,7 +12,6 @@ import 'package:responsive_grid/responsive_grid.dart';
 import '../../models/fellow_worker_response_model.dart';
 import '../../service/account_utils.dart';
 import '../../utils/value_pickers.dart';
-import '../account/edit_account_view.dart';
 
 class _SearchVacancies extends State<SearchVacancies>
     with SingleTickerProviderStateMixin {
@@ -46,13 +44,13 @@ class _SearchVacancies extends State<SearchVacancies>
   @override
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        UtilityWidgets.buildGradient(buildLayout(), _animationController),
         context);
   }
 
   Widget buildLayout() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: edgeInsets8,
       child: Center(
           child: SingleChildScrollView(
               child: ResponsiveGridRow(children: [
@@ -94,7 +92,7 @@ class _SearchVacancies extends State<SearchVacancies>
               buildDropDown("Полная/Частичная", typeTimeMap, typeOfWorkMap),
               ResponsiveGridCol(
                   child: Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: edgeInsets8,
                       child: UtilityWidgets.buildCardButton(() {
                         filterAllLoadedVacancies();
                       }, "Искать", 15)))
@@ -143,7 +141,7 @@ class _SearchVacancies extends State<SearchVacancies>
               ResponsiveGridCol(
                 child: Center(
                   child: Padding(
-                      padding: padding,
+                      padding: edgeInsets10,
                       child: UtilityWidgets.sizedProgressiveBar(100, 100)),
                 ),
               ),
@@ -180,7 +178,7 @@ class _SearchVacancies extends State<SearchVacancies>
               ResponsiveGridCol(
                   md: 3,
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: edgeInsets8,
                     child: UtilityWidgets.buildCardButton(() {
                       buildAboutVacancy(v, context);
                     }, "Подробнее", 13),
@@ -209,7 +207,7 @@ class _SearchVacancies extends State<SearchVacancies>
                     ResponsiveGridCol(
                         md: 1,
                         child: Padding(
-                          padding: const EdgeInsets.all(10),
+                          padding: edgeInsets10,
                           child: IconButton(
                             onPressed: () {
                               Navigator.of(context).pop();

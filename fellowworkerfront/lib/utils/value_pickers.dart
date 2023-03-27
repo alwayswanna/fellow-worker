@@ -1,8 +1,9 @@
 /*
- * Copyright (c) 2-2/23/23, 10:10 PM
+ * Copyright (c) 2-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
+import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 
 class StateTextFieldWidget extends StatefulWidget {
@@ -109,7 +110,7 @@ class _StateDropdownButtonWidget extends State<StateDropdownButtonWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.all(10.0),
+        margin: edgeInsets10,
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20.0),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-3/9/23, 11:54 PM
+ * Copyright (c) 1-3/27/23, 8:01 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -10,25 +10,30 @@ import 'package:uuid/uuid.dart';
 
 const employeeResponse = "EMPLOYEE";
 const companyResponse = "COMPANY";
-const employeeType = 'Соискатель';
-const companyType = 'Работодатель';
-const adminType = 'Администратор';
-const undergraduate = 'BACHELOR';
-const specialist = 'SPECIALTY';
-const master = 'MAGISTRACY';
+
+const typeOfAccount = {
+  'EMPLOYEE': 'Соискатель',
+  'COMPANY': 'Работодатель',
+  'ADMIN': 'Администратор'
+};
 
 const typeOfWorkMap = {
-  '  Полная занятость' : 'FULL_EMPLOYMENT',
-  '  Частичная занятость':'PART_TIME_EMPLOYMENT'
+  '  Полная занятость': 'FULL_EMPLOYMENT',
+  '  Частичная занятость': 'PART_TIME_EMPLOYMENT'
 };
 
-const placementType = {
-  '  Офис':'OFFICE',
-  '  Удаленная':'REMOTE'
+const placementType = {'  Офис': 'OFFICE', '  Удаленная': 'REMOTE'};
+
+const accountTypesMap = {
+  "  Соискатель": "EMPLOYEE",
+  "  Работодатель": "COMPANY"
 };
 
-const accountTypes = ["  Соискатель", "  Работодатель"];
-const educationLevels = ["  Специалитет", "  Бакалавриат", "  Магистрант"];
+const educationLevelMap = {
+  "  Специалитет": "SPECIALTY",
+  "  Бакалавриат": "BACHELOR",
+  "  Магистрант": "MAGISTRACY"
+};
 
 const uuid = Uuid();
 
@@ -38,37 +43,24 @@ final defaultHeaders = {
 };
 
 class RequestUtils {
+
   static String extractAccountType(String responseEnum) {
-    if (responseEnum == employeeResponse) {
-      return employeeType;
-    } else if (responseEnum == companyResponse) {
-      return companyType;
-    } else {
-      return adminType;
-    }
+    return typeOfAccount[responseEnum]!;
   }
 
   static void clearRequestHeadersContext() {
     defaultHeaders.remove("Authorization");
   }
 
-  static void injectTokenToRequest(String userToken){
+  static void injectTokenToRequest(String userToken) {
     defaultHeaders["Authorization"] = "Bearer $userToken";
   }
 
   static String? buildBase64Image(PlatformFile? file) {
-    if (file == null) {
-      return null;
-    }
-
-    return base64Encode(file.bytes!);
+    return file == null ? null : base64Encode(file.bytes!);
   }
 
   static String? buildExtension(PlatformFile? file) {
-    if (file == null) {
-      return null;
-    }
-
-    return file.extension;
+    return file?.extension;
   }
 }

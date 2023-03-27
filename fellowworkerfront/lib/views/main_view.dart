@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1-3/22/23, 7:38 PM
+ * Copyright (c) 1-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -31,7 +31,7 @@ class FullScreenWidget extends StatelessWidget {
                   child: SizedBox(
             width: 500,
             child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: edgeInsets10,
                 child: Column(
                   children: [
                     TextField(
@@ -51,7 +51,7 @@ class FullScreenWidget extends StatelessWidget {
                             Navigator.pushNamed(context, "/search-resume");
                           },
                           child: const Padding(
-                              padding: EdgeInsets.all(10),
+                              padding: edgeInsets10,
                               child: Icon(
                                 Icons.search,
                                 shadows: [

@@ -1,15 +1,13 @@
 /*
- * Copyright (c) 1-3/9/23, 8:15 PM
+ * Copyright (c) 1-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
 import 'package:fellowworkerfront/service/client_manager_service.dart';
 import 'package:fellowworkerfront/utils/utility_widgets.dart';
-import 'package:fellowworkerfront/views/account/registration_view.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
-import '../../styles/gradient_color.dart';
 
 class _ChangePassword extends State<ChangePassword>
     with SingleTickerProviderStateMixin {
@@ -38,7 +36,7 @@ class _ChangePassword extends State<ChangePassword>
   @override
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(buildLayout(), _animationController),
+        UtilityWidgets.buildGradient(buildLayout(), _animationController),
         context
     );
   }
@@ -53,13 +51,13 @@ class _ChangePassword extends State<ChangePassword>
               ResponsiveGridCol(
                   child: Center(
                       child: Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: edgeInsets10,
                 child: Text("Сменить пароль",
                     style: UtilityWidgets.pageTitleStyle()),
               ))),
               ResponsiveGridCol(
                   child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: edgeInsets8,
                 child: TextField(
                   controller: oldPasswordCont,
                   enableSuggestions: false,
@@ -88,7 +86,7 @@ class _ChangePassword extends State<ChangePassword>
               )),
               ResponsiveGridCol(
                   child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: edgeInsets8,
                 child: TextField(
                   controller: newPasswordController,
                   enableSuggestions: false,
@@ -117,7 +115,7 @@ class _ChangePassword extends State<ChangePassword>
               )),
               ResponsiveGridCol(
                   child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: edgeInsets8,
                 child: TextField(
                   controller: newPasswordVerifyController,
                   enableSuggestions: false,
@@ -147,7 +145,7 @@ class _ChangePassword extends State<ChangePassword>
               )),
               ResponsiveGridCol(
                   child: Padding(
-                      padding: padding,
+                      padding: edgeInsets10,
                       child: UtilityWidgets.buildCardButton(() {
                         sendRequestCreateAccount();
                       }, "Сменить пароль", 25)))

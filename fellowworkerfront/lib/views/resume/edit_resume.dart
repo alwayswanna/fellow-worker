@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2-3/9/23, 8:15 PM
+ * Copyright (c) 2-3/26/23, 11:59 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,9 +11,8 @@ import 'package:responsive_grid/responsive_grid.dart';
 
 import '../../models/resume_request_model.dart';
 import '../../service/account_utils.dart';
-import '../../service/validation_service.dart';
-import '../../styles/gradient_color.dart';
 import '../../utils/utility_widgets.dart';
+import '../../utils/validation_service.dart';
 import 'create_resume_view.dart';
 
 class _EditResume extends State<EditResume>
@@ -91,8 +90,7 @@ class _EditResume extends State<EditResume>
     }
 
     return UtilityWidgets.buildTopBar(
-        GradientEnchanted.buildGradient(
-            buildPageLayout(), _animationController),
+        UtilityWidgets.buildGradient(buildPageLayout(), _animationController),
         context);
   }
 
@@ -115,7 +113,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       child: Center(
                           child: Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: edgeInsets10,
                     child: Text("Редактировать резюме",
                         style: UtilityWidgets.pageTitleStyle()),
                   ))),
@@ -149,7 +147,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: edgeInsets10,
                         child: TextField(
                             controller: birthDateController,
                             //editing controller of this TextField
@@ -181,7 +179,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Профессиональные навыки:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -190,7 +188,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             skillsFrames.add(buildInputSkills());
@@ -205,7 +203,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Образование:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -214,7 +212,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             educationFrames
@@ -230,7 +228,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Опыт работы:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -239,7 +237,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             workExperienceFrames
@@ -254,7 +252,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: Text("Контактная информация:",
                             style:
                                 UtilityWidgets.cardTextStyle(Colors.white, 20)),
@@ -272,7 +270,7 @@ class _EditResume extends State<EditResume>
                   ResponsiveGridCol(
                       md: 6,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: edgeInsets8,
                         child: UtilityWidgets.buildCardButton(() {
                           setState(() {
                             _attachResumeFilePhone();
@@ -341,7 +339,7 @@ class _EditResume extends State<EditResume>
     var skillController = TextEditingController();
     professionalSkillsTec.add(skillController);
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: edgeInsets10,
       child: TextField(
         controller: skillController,
         decoration: InputDecoration(
@@ -400,18 +398,20 @@ class _EditResume extends State<EditResume>
     var contactPhone = controllerContactPhone.text;
     var contactEmail = controllerContactEmail.text;
 
-    String? requestDate = ValidationService.isValidBirthDate(selectedBirthDate)
+    String? requestDate = ValidationUtils.isValidBirthDate(selectedBirthDate)
         ? selectedBirthDate.toIso8601String()
         : null;
 
-    if (firstName.isEmpty ||
-        middleName.isEmpty ||
-        lastName.isEmpty ||
-        job.isEmpty ||
-        expectedSalary.isEmpty ||
-        about.isEmpty ||
-        contactEmail.isEmpty ||
-        contactPhone.isEmpty ||
+    if (ValidationUtils.validateValue([
+          firstName,
+          middleName,
+          lastName,
+          job,
+          expectedSalary,
+          about,
+          contactEmail,
+          contactPhone
+        ]) ||
         requestDate == null) {
       UtilityWidgets.dialogBuilderMessage(context, 'Заполнены не все поля');
     } else {
@@ -428,14 +428,7 @@ class _EditResume extends State<EditResume>
       List<EducationApiModel> education = [];
       for (var institution in educationHistoryUUIDs) {
         var selectedLvl = educationWidgetLevel[institution]!.text;
-        String level;
-        if (selectedLvl == educationLevels[0]) {
-          level = specialist;
-        } else if (selectedLvl == educationLevels[1]) {
-          level = undergraduate;
-        } else {
-          level = master;
-        }
+        String level = educationLevelMap[selectedLvl]!;
 
         education.add(EducationApiModel(
             startTime: educationWidgetStartTime[institution]!.toIso8601String(),
@@ -487,11 +480,10 @@ class EditResume extends StatefulWidget {
   late final ResumeResponseModel resumeResponseModel;
   late final FellowWorkerService fellowWorkerService;
 
-  EditResume({
-    required ResumeResponseModel rM,
-    required FellowWorkerService fWS,
-    super.key
-  }) {
+  EditResume(
+      {required ResumeResponseModel rM,
+      required FellowWorkerService fWS,
+      super.key}) {
     resumeResponseModel = rM;
     fellowWorkerService = fWS;
   }
