@@ -13,13 +13,16 @@ Shared module for multiple services, contains classes and models for API & Swagg
 
 ## _client-manager_
 
-Client management module.
+Client management module. Custom metrics are implemented for the user data management service. This service is 
+designed to create, delete, modify accounts.
+SwaggerUI uri:
 
 http://127.0.0.1:8090/swagger-ui.html
 
 ## _fellow-worker-service_
 
-Vacancies & resume management module.
+Vacancies & resume management module. This service is designed to create, delete and modify resumes or vacancies.
+SwaggerUI uri:
 
 http://127.0.0.1:4334/swagger-ui.html
 
