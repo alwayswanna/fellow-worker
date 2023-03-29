@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-1/22/23, 11:59 PM
+ * Copyright (c) 07-3/28/23, 10:13 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -67,7 +67,6 @@ public class AccountController {
 
     @Operation(
             summary = "Изменить данные учетной записи.",
-            tags = CLIENT_MANAGER_CONTROLLER,
             security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
     )
     @ApiResponses(
@@ -91,7 +90,6 @@ public class AccountController {
 
     @Operation(
             summary = "Удалить данные учетной записи.",
-            tags = CLIENT_MANAGER_CONTROLLER,
             security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
     )
     @ApiResponses(
@@ -136,7 +134,7 @@ public class AccountController {
 
     @Operation(
             summary = "Сменить пароль пользователя.",
-            tags = CLIENT_MANAGER_CONTROLLER,
+            
             security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
     )
     @ApiResponses(
@@ -159,7 +157,6 @@ public class AccountController {
 
     @Operation(
             summary = "Получить данные текущего аккаунта.",
-            tags = CLIENT_MANAGER_CONTROLLER,
             security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
     )
     @ApiResponses(
