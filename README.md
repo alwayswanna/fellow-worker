@@ -1,3 +1,6 @@
+ [![Java CI with Maven](https://github.com/alwayswanna/fellow-worker/actions/workflows/maven.yml/badge.svg)](https://github.com/alwayswanna/fellow-worker/actions/workflows/maven.yml)
+ 
+ 
  fellow-worker
 =================
 
