@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 3-3/25/23, 11:14 PM
+ * Copyright (c) 3-3/30/23, 11:14 PM
  * Created by https://github.com/alwayswanna
  */
 
 package a.gleb.clientmanager.service;
 
 import a.gleb.clientmanager.feign.ResumeVacancyFeignClient;
+import a.gleb.clientmanager.service.db.DeletedAccountDatabaseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AccountEntitiesService {
 
-    private final DeletedAccountService deletedAccountService;
+    private final DeletedAccountDatabaseService deletedAccountDatabaseService;
     private final ResumeVacancyFeignClient resumeVacancyFeignClient;
 
     /**
@@ -30,7 +31,7 @@ public class AccountEntitiesService {
             resumeVacancyFeignClient.removeUserEntities(userId);
             result = true;
         } catch (Exception e) {
-            deletedAccountService.safe(userId);
+            deletedAccountDatabaseService.safe(userId);
             log.error("Error while remove user entities. [id: {}]", userId, e);
         }
         log.info("End attempts to remove. Result delete: {}, [id: {}]", result, userId);

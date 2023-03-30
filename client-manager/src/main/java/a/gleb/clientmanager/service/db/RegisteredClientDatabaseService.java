@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 3-3/29/23, 8:31 PM
+ * Copyright (c) 3-3/30/23, 11:14 PM
  * Created by https://github.com/alwayswanna
  */
 
-package a.gleb.clientmanager.service;
+package a.gleb.clientmanager.service.db;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -21,10 +21,13 @@ import java.util.stream.Stream;
 import static a.gleb.clientmanager.constants.RegisteredClientsSqlConstant.*;
 import static java.lang.String.format;
 
+/**
+ * Service for make changes in oauth2_registered_client table, which usage {@link JdbcTemplate}
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
-public class RegisteredClientService {
+public class RegisteredClientDatabaseService {
 
     private static final String COMMA_DELIMITER = ",";
 

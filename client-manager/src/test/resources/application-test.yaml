@@ -29,6 +29,7 @@ client-manager:
             - /api/v1/account/edit
             - /api/v1/account/delete
             - /api/v1/account/change-password
+            - /api/v1/account/current
     - roles:
         - ADMIN
       security-collections:

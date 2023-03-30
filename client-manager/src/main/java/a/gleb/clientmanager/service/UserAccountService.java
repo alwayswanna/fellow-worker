@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-3/25/23, 11:14 PM
+ * Copyright (c) 12-3/30/23, 11:14 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,11 +11,12 @@ import a.gleb.apicommon.clientmanager.model.ChangePasswordModel;
 import a.gleb.clientmanager.exception.InvalidUserDataException;
 import a.gleb.clientmanager.exception.UnexpectedErrorException;
 import a.gleb.clientmanager.mapper.AccountModelMapper;
+import a.gleb.clientmanager.service.db.AccountDatabaseService;
 import a.gleb.oauth2persistence.db.dao.Account;
-import a.gleb.oauth2persistence.db.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +25,13 @@ import java.util.concurrent.CompletableFuture;
 
 import static a.gleb.clientmanager.utils.AccountChangeUtils.changeAccountData;
 
+@Slf4j
 @Service
 @AllArgsConstructor
-@Slf4j
-public class AccountService {
+public class UserAccountService {
 
+    private final AccountDatabaseService accountDatabaseService;
     private final PasswordEncoder passwordEncoder;
-    private final AccountRepository accountRepository;
     private final AccountModelMapper accountModelMapper;
     private final AccountEntitiesService accountEntitiesService;
     private final OAuth2SecurityContextService oAuth2SecurityContextService;
@@ -41,7 +42,7 @@ public class AccountService {
      * @param requestModel user request with data for new account.
      * @return {@link ApiResponseModel} response with message.
      */
-    public ApiResponseModel createAccount(AccountRequestModel requestModel) {
+    public ApiResponseModel createAccount(@NonNull AccountRequestModel requestModel) {
         if (requestModel.getPassword().isEmpty()) {
             throw new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Невозможно создать пользователя без пароля.");
         }
@@ -57,7 +58,7 @@ public class AccountService {
         validateAccountDataInDataBase(requestModel);
 
         try {
-            accountRepository.save(accountModelMapper.mapToAccount(requestModel));
+            accountDatabaseService.saveAccount(accountModelMapper.mapToAccount(requestModel));
             return ApiResponseModel.builder()
                     .message("Ваш аккаунт успешно создан")
                     .build();
@@ -76,17 +77,16 @@ public class AccountService {
      * @param requestModel request from frontend
      * @return {@link ApiResponseModel} response for user.
      */
-    public ApiResponseModel editAccount(AccountRequestModel requestModel) {
+    public ApiResponseModel editAccount(@NonNull AccountRequestModel requestModel) {
         if (requestModel.getUsername() != null || requestModel.getEmail() != null) {
             validateAccountDataInDataBase(requestModel);
         }
-        var account = accountRepository.findAccountById(oAuth2SecurityContextService.getUserId())
-                .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Неверно введены данные."));
+        var account = accountDatabaseService.findAccountById(oAuth2SecurityContextService.getUserId());
         /* fill data from request in the account fields  */
         changeAccountData(account, requestModel);
 
         try {
-            accountRepository.save(account);
+            accountDatabaseService.saveAccount(account);
             return ApiResponseModel.builder()
                     .message("Данные вашего аккаунт успешно обновлены.")
                     .build();
@@ -107,7 +107,7 @@ public class AccountService {
     public ApiResponseModel deleteAccount() {
         var userId = oAuth2SecurityContextService.getUserId();
         try {
-            accountRepository.deleteById(userId);
+            accountDatabaseService.deleteAccountById(userId);
 
             /* async call service with user entities */
             CompletableFuture.runAsync(() -> {
@@ -135,12 +135,8 @@ public class AccountService {
      * @param userId id from user request.
      * @return {@link ApiResponseModel} with data for user by id.
      */
-    public ApiResponseModel getAccountData(UUID userId) {
-        var account = accountRepository.findAccountById(userId)
-                .orElseThrow(
-                        () -> new InvalidUserDataException(
-                                HttpStatus.BAD_REQUEST, "Пользователь с таким id не найден")
-                );
+    public ApiResponseModel getAccountData(@NonNull UUID userId) {
+        var account = accountDatabaseService.findAccountById(userId);
         return accountModelMapper.toApiResponseModel("Данные аккаунта успешно получены", account);
     }
 
@@ -152,10 +148,8 @@ public class AccountService {
      */
     public ApiResponseModel changeUserPassword(ChangePasswordModel changePasswordModel) {
         var userId = oAuth2SecurityContextService.getUserId();
-        var account = accountRepository.findAccountById(userId).orElseThrow(
-                () -> new InvalidUserDataException(
-                        HttpStatus.BAD_REQUEST, "Пользователь с таким id не найден")
-        );
+        var account = accountDatabaseService.findAccountById(userId);
+
         /* compare current password in database with password from request */
         if (passwordEncoder.matches(changePasswordModel.getOldPassword(), account.getPassword())) {
             account.setPassword(passwordEncoder.encode(changePasswordModel.getNewPassword()));
@@ -170,7 +164,7 @@ public class AccountService {
         }
 
         try {
-            accountRepository.save(account);
+            accountDatabaseService.saveAccount(account);
             return ApiResponseModel.builder()
                     .message("Ваш пароль успешно изменен")
                     .build();
@@ -186,24 +180,31 @@ public class AccountService {
         }
     }
 
-    private void validateAccountDataInDataBase(AccountRequestModel accountRequestModel) {
-        var userFromDatabase = accountRepository
-                .findAccountByUsernameOrEmail(accountRequestModel.getUsername(), accountRequestModel.getEmail());
-        if (userFromDatabase.isPresent()) {
-            var reason = userFromDatabase.get().getUsername().equalsIgnoreCase(accountRequestModel.getUsername()) ?
-                    "Пользователь с данным username существует." : "Пользователь с данным email существует.";
-            throw new InvalidUserDataException(HttpStatus.BAD_REQUEST, reason);
-        }
-    }
-
     /**
      * Method extract from request JWT token {@link Account#getId()} and return current account data.
      *
      * @return {@link ApiResponseModel}
      */
     public ApiResponseModel getCurrentAccountData() {
-        var account = accountRepository.findAccountById(oAuth2SecurityContextService.getUserId())
-                .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Неверно введены данные."));
+        var account = accountDatabaseService.findAccountById(oAuth2SecurityContextService.getUserId());
         return accountModelMapper.toApiResponseModel("Данные аккаунта успешно получены", account);
+    }
+
+    /**
+     * Method validate user data on duplicates, attempts to find account with similar user data.
+     *
+     * @param accountRequestModel model with user data
+     */
+    private void validateAccountDataInDataBase(@NonNull AccountRequestModel accountRequestModel) {
+        var userFromDatabase = accountDatabaseService.findAccountByUsernameOrEmail(
+                accountRequestModel.getUsername(),
+                accountRequestModel.getEmail()
+        );
+
+        if (userFromDatabase != null) {
+            var reason = userFromDatabase.getUsername().equalsIgnoreCase(accountRequestModel.getUsername()) ?
+                    "Пользователь с данным username существует." : "Пользователь с данным email существует.";
+            throw new InvalidUserDataException(HttpStatus.BAD_REQUEST, reason);
+        }
     }
 }

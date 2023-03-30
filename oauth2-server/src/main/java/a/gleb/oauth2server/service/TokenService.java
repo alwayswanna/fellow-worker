@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-2/5/23, 11:50 PM
+ * Copyright (c) 07-3/30/23, 10:34 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -38,7 +38,7 @@ public class TokenService {
                     USERNAME_CLAIM, account.getUsername(),
                     FIRSTNAME_CLAIM, account.getFirstName(),
                     MIDDLE_NAME_CLAIM, account.getMiddleName(),
-                    ISSUER_URI, properties.getIssueUrl()
+                    ISSUER_URI, properties.getIssuerUrl()
             );
         }
         return Map.of();

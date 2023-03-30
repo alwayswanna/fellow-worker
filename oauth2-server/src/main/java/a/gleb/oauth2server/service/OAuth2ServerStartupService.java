@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-2/5/23, 11:50 PM
+ * Copyright (c) 07-3/31/23, 9:26 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -23,8 +23,8 @@ import static a.gleb.oauth2persistence.db.dao.Account.builder;
 @AllArgsConstructor
 public class OAuth2ServerStartupService implements ApplicationRunner {
 
-    private final PasswordEncoder passwordEncoder;
     private final AccountService accountService;
+    private final PasswordEncoder passwordEncoder;
     private final OAuth2ServerProperties oAuth2ServerProperties;
 
 

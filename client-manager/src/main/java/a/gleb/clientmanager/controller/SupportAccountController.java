@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-3/28/23, 11:06 PM
+ * Copyright (c) 07-3/31/23, 9:26 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -58,7 +58,7 @@ public class SupportAccountController {
             }
     )
     @GetMapping("/disable-account")
-    public ApiResponseModel getAccountInfo(@RequestParam @NotNull UUID userId) {
+    public ApiResponseModel disableAccount(@RequestParam @NotNull UUID userId) {
         return supportService.disable(userId);
     }
 
@@ -82,12 +82,12 @@ public class SupportAccountController {
             }
     )
     @GetMapping("/accounts")
-    public ApiResponseModel getAllAccounts() {
+    public ApiResponseModel getAccountByUsername() {
         return supportService.getAllAccounts();
     }
 
     @Operation(
-            summary = "Получить все аккаунты.",
+            summary = "Получить аккаунт по username.",
             security = @SecurityRequirement(name = OAUTH2_SECURITY_SCHEMA)
     )
     @ApiResponses(
@@ -106,7 +106,7 @@ public class SupportAccountController {
             }
     )
     @GetMapping("/account-by-username")
-    public ApiResponseModel getAllAccounts(@RequestParam @NotEmpty String username) {
+    public ApiResponseModel getAccountByUsername(@RequestParam @NotEmpty String username) {
         return supportService.getAccountByUserName(username);
     }
 

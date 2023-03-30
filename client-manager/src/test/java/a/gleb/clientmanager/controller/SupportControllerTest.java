@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-3/31/23, 9:26 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -13,15 +13,15 @@ import org.junit.jupiter.api.Test;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 class SupportControllerTest extends BaseClientManagerTest {
 
     @Test
-    @DisplayName("Disable existing user account")
+    @DisplayName("Disable existing user account.")
     void disableExistingAccountTest() throws Exception {
         var savedAccount = repository.save(buildTestAccount());
 
@@ -61,6 +61,17 @@ class SupportControllerTest extends BaseClientManagerTest {
                         .param("username", "Test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Аккаунт по запросу"));
+    }
+
+    @Test
+    @DisplayName("Remove account by id.")
+    void removeAccountById() throws Exception {
+        var result = repository.save(buildTestAccount());
+
+        mockMvc.perform(delete(buildPath.apply("/remove-account-by-id"))
+                        .param("accountId", result.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Данные успешно удалены"));
     }
 
     /* convert request paths */

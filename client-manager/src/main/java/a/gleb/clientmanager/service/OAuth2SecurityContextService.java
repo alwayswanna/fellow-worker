@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-3/30/23, 11:14 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -18,9 +18,10 @@ import java.util.UUID;
 @Service
 public class OAuth2SecurityContextService {
 
+    private static final String USER_ID_CLAIM = "user_id";
 
     public UUID getUserId() {
-        return UUID.fromString(extractUserOAuth2Principal().get("user_id").toString());
+        return UUID.fromString(extractUserOAuth2Principal().get(USER_ID_CLAIM).toString());
     }
 
     private Map<String, Object> extractUserOAuth2Principal() {
@@ -31,5 +32,4 @@ public class OAuth2SecurityContextService {
                         HttpStatus.UNAUTHORIZED, "Error while extract params from token")
                 );
     }
-
 }
