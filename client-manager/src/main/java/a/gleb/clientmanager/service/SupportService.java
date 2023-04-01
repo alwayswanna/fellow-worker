@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-3/28/23, 11:06 PM
+ * Copyright (c) 07-3/30/23, 11:14 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,7 +11,8 @@ import a.gleb.apicommon.clientmanager.model.ChangeClientCredentialsModel;
 import a.gleb.clientmanager.exception.InvalidUserDataException;
 import a.gleb.clientmanager.exception.UnexpectedErrorException;
 import a.gleb.clientmanager.mapper.AccountModelMapper;
-import a.gleb.oauth2persistence.db.repository.AccountRepository;
+import a.gleb.clientmanager.service.db.AccountDatabaseService;
+import a.gleb.clientmanager.service.db.RegisteredClientDatabaseService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,24 +27,23 @@ import static java.lang.String.format;
 @AllArgsConstructor
 public class SupportService {
 
-    private final AccountRepository accountRepository;
+    private final AccountDatabaseService accountDatabaseService;
     private final AccountModelMapper accountModelMapper;
     private final AccountEntitiesService accountEntitiesService;
-    private final RegisteredClientService registeredClientService;
+    private final RegisteredClientDatabaseService registeredClientDatabaseService;
 
     /**
-     * Method which disable user account.
+     * Method disable user account.
      *
      * @param userId id from request.
      * @return {@link ApiResponseModel} with message
      */
     public ApiResponseModel disable(UUID userId) {
-        var account = accountRepository.findAccountById(userId)
-                .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Аккаунт не найден"));
+        var account = accountDatabaseService.findAccountById(userId);
         account.setEnabled(false);
 
         try {
-            accountRepository.save(account);
+            accountDatabaseService.saveAccount(account);
             return ApiResponseModel.builder()
                     .message("Аккаунт был успешно отключен.")
                     .build();
@@ -65,7 +65,7 @@ public class SupportService {
      * @return {@link ApiResponseModel} with message & all accounts.
      */
     public ApiResponseModel getAllAccounts() {
-        var accounts = accountRepository.findAll();
+        var accounts = accountDatabaseService.findAllAccounts();
         var accountDataModels = accounts.stream().map(accountModelMapper::toAccountDataModel)
                 .toList();
 
@@ -82,8 +82,8 @@ public class SupportService {
      * @return {@link ApiResponseModel} with message & account data.
      */
     public ApiResponseModel getAccountByUserName(String username) {
-        var account = accountRepository.findAccountByUsernameOrEmail(username, username)
-                .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Аккаунт не найден"));
+        var account = accountDatabaseService.findAccountByUsernameOrEmail(username, username);
+        if (account == null) throw new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Аккаунт не найден");
 
         return accountModelMapper.toApiResponseModel("Аккаунт по запросу", account);
     }
@@ -95,11 +95,10 @@ public class SupportService {
      * @return {@link ApiResponseModel} with message.
      */
     public ApiResponseModel removeUserAndUserEntitiesById(UUID accountId) {
-        var account = accountRepository.findAccountById(accountId)
-                .orElseThrow(() -> new InvalidUserDataException(HttpStatus.BAD_REQUEST, "Аккаунт не найден"));
+        var account = accountDatabaseService.findAccountById(accountId);
 
         try {
-            accountRepository.delete(account);
+            accountDatabaseService.deleteAccountById(account.getId());
             accountEntitiesService.removeUserEntities(account.getId());
 
             return ApiResponseModel.builder().message("Данные успешно удалены").build();
@@ -122,7 +121,7 @@ public class SupportService {
      */
     public ApiResponseModel updateRegisteredClientSecret(ChangeClientCredentialsModel request) {
         try {
-            registeredClientService.changeUserSecretForClient(request.getClientId(), request.getNewSecret());
+            registeredClientDatabaseService.changeUserSecretForClient(request.getClientId(), request.getNewSecret());
             return ApiResponseModel.builder()
                     .message(format(
                             "Секретный ключ клиента %s, был успешно сменен. Новый ключ: %s",
@@ -148,8 +147,8 @@ public class SupportService {
      * @param request request model with new redirect URIs {@link AddRedirectUriModel}
      */
     public ApiResponseModel addNewRedirectUrisToClient(AddRedirectUriModel request) {
-        try{
-            registeredClientService.addedNewRedirectUrisForClient(request.getClientId(), request.getRedirectUris());
+        try {
+            registeredClientDatabaseService.addedNewRedirectUrisForClient(request.getClientId(), request.getRedirectUris());
             return ApiResponseModel.builder()
                     .message(format(
                             "Секретный ключ клиента %s, был успешно сменен. Добавлены пути: %s",
@@ -157,7 +156,7 @@ public class SupportService {
                             request.getRedirectUris()
                     ))
                     .build();
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error while add new redirect uris for client. [clientId = {}]", request.getClientId());
             throw new UnexpectedErrorException(
                     HttpStatus.SERVICE_UNAVAILABLE,

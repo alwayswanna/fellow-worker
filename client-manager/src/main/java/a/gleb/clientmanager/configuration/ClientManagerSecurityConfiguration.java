@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-2/7/23, 10:13 PM
+ * Copyright (c) 12-3/30/23, 10:34 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -29,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@EnableScheduling
 @EnableWebSecurity
 @AllArgsConstructor
 @Configuration(proxyBeanMethods = false)

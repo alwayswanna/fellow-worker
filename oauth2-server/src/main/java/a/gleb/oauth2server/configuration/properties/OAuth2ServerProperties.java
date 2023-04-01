@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-3/30/23, 10:34 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -22,12 +22,18 @@ import java.util.List;
 public class OAuth2ServerProperties {
 
     @NotBlank
-    private String issueUrl;
+    private String issuerUrl;
+
     @NotNull
     private List<DefaultClient> defaultClients;
+
     @NotNull
     private DefaultUser defaultUser;
+
     private Cors cors;
+
+    @NotNull
+    private ScheduledTaskParams removeExpiredSessionTask;
 
     @Setter
     @Getter
@@ -60,5 +66,12 @@ public class OAuth2ServerProperties {
     }
 
     public static class Cors extends CorsConfiguration {
+    }
+
+    @Getter
+    @Setter
+    public static class ScheduledTaskParams{
+
+        int dayOffset;
     }
 }

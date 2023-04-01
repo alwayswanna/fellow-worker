@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-4/1/23, 2:29 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,6 +8,7 @@ package a.gleb.clientmanager.controller;
 import a.gleb.clientmanager.BaseClientManagerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.function.Function;
 
@@ -117,9 +118,10 @@ class AccountControllerTest extends BaseClientManagerTest {
 
     @Test
     @DisplayName("Test get info about user account.")
-    void getInfoAboutUserAccountTest() throws Exception {
+    void successfullyGetInfoAboutUserAccountTest() throws Exception {
         /* prepare data */
         var savedAccount = repository.save(buildTestAccount());
+        when(oAuth2SecurityContextService.getUserId()).thenReturn(savedAccount.getId());
 
         mockMvc.perform(get(buildPath.apply("/data"))
                         .param("userId", savedAccount.getId().toString()))
@@ -128,8 +130,20 @@ class AccountControllerTest extends BaseClientManagerTest {
     }
 
     @Test
-    @DisplayName("Test on delete existing account")
-    void deleteExistingUserAccountTest() throws Exception {
+    @DisplayName("Test to get current account data.")
+    void successfullyGetCurrentAccountDataTest() throws Exception{
+        /* prepare data */
+        var savedAccount = repository.save(buildTestAccount());
+        when(oAuth2SecurityContextService.getUserId()).thenReturn(savedAccount.getId());
+
+        mockMvc.perform(get(buildPath.apply("/current")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Данные аккаунта успешно получены"));
+    }
+
+    @Test
+    @DisplayName("Test on delete existing account.")
+    void successfullyDeleteExistingUserAccountTest() throws Exception {
         var savedAccount = repository.save(buildTestAccount());
         when(oAuth2SecurityContextService.getUserId()).thenReturn(savedAccount.getId());
 
@@ -140,6 +154,115 @@ class AccountControllerTest extends BaseClientManagerTest {
         assertTrue(repository.findAll().isEmpty());
     }
 
+    @Test
+    @DisplayName("Test on create account with duplicated username.")
+    void failureCreateAccountWithAlreadyExistingUsernameTest() throws Exception {
+        /* prepare data */
+        repository.save(buildTestAccount());
+
+        mockMvc.perform(post(buildPath.apply("/create"))
+                        .content("""
+                                {
+                                  "username": "Test",
+                                  "password": "password",
+                                  "email": "olegIv@mail.ru",
+                                  "firstName": "Олег",
+                                  "middleName": "Иванов",
+                                  "lastName": "Игоревич",
+                                  "accountType": "COMPANY",
+                                  "birthDate": "2023-01-04"
+                                }
+                                """)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(it -> assertEquals(
+                        "Пользователь с данным username существует.",
+                        extractErrorMessage(it))
+                );
+    }
+
+    @Test
+    @DisplayName("Test on change password with incorrect old password.")
+    void failureChangePasswordTest() throws Exception {
+        /* prepare data */
+        var savedAccount = repository.save(buildTestAccount());
+        when(oAuth2SecurityContextService.getUserId()).thenReturn(savedAccount.getId());
+
+        mockMvc.perform(put(buildPath.apply("/change-password"))
+                        .content("""
+                                {
+                                  "oldPassword": "TestPassword111",
+                                  "newPassword": "new-password"
+                                }
+                                """)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(it -> assertEquals(
+                        "Текущий пароль не совпадает с текущим, введенный пароль: TestPassword111",
+                        extractErrorMessage(it))
+                );
+    }
+
+    @Test
+    @DisplayName("Test to create account without required data.")
+    void failureCreateAccountWithoutUsernameTest() throws Exception{
+        mockMvc.perform(post(buildPath.apply("/create"))
+                        .content("""
+                                {
+                                  "username": "",
+                                  "password": "password",
+                                  "email": "olegIv@mail.ru",
+                                  "firstName": "Олег",
+                                  "middleName": "Иванов",
+                                  "lastName": "Игоревич",
+                                  "accountType": "COMPANY",
+                                  "birthDate": "2023-01-04"
+                                }
+                                """)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(it -> assertEquals(
+                        "Невозможно создать пользователя, недостаточно данных.",
+                        extractErrorMessage(it))
+                );
+    }
+
+    @Test
+    @DisplayName("Test to change account username on existing username in database.")
+    void failureChangeAccountUsernameOnExistingTest() throws Exception{
+        /* prepare data */
+        var account1 = buildTestAccount();
+        account1.setUsername("exist");
+        var account2 = buildTestAccount();
+        repository.save(account1);
+        var savedAccount2 = repository.save(account2);
+        when(oAuth2SecurityContextService.getUserId()).thenReturn(savedAccount2.getId());
+
+        mockMvc.perform(put(buildPath.apply("/edit"))
+                        .content("""
+                                        {
+                                           "username": "exist",
+                                           "email": "olegIv@mail.ru",
+                                           "firstName": "Петр",
+                                           "middleName": "Есентуков",
+                                           "lastName": "Артемьевич",
+                                           "accountType": "EMPLOYEE",
+                                           "birthDate": "1995-01-09"
+                                         }
+                                """)
+                        .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(it -> assertEquals(
+                        "Пользователь с данным username существует.",
+                        extractErrorMessage(it))
+                );
+    }
+
     /* convert request paths */
     private final Function<String, String> buildPath = postfix -> String.format("%s%s", ACCOUNT_PREFIX, postfix);
+
+    /* extract error message for failure tests */
+    private static String extractErrorMessage(MvcResult mvcResult){
+        return mvcResult.getResponse().getErrorMessage();
+    }
 }

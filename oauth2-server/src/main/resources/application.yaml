@@ -11,7 +11,10 @@ spring:
     url: jdbc:postgresql://${DATASOURCE_URL}:5432/authorization
 
 oauth:
-  issue-url: http://${OAUTH2_SERVER_URL}:9001
+  remove-expired-session-task:
+    cron: 0 0 0 * * *
+    day-offset: 90
+  issuer-url: http://${OAUTH2_SERVER_URL}:9001
   defaultClients:
     -
       default-client-id: message

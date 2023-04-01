@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 12-3/7/23, 10:06 PM
+ * Copyright (c) 12-3/31/23, 9:26 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -26,18 +26,14 @@ import org.springframework.stereotype.Service
 import org.springframework.util.CollectionUtils
 import java.util.*
 
+const val NOT_FOUND_VACANCY = "Данной вакансии не существует."
+
 @Service
 class VacancyService(
     private val vacancyModelMapper: VacancyModelMapper,
     private val oauth2SecurityService: Oauth2SecurityService,
     private val vacancyRepository: VacancyRepository
 ) {
-
-    companion object {
-        const val NOT_FOUND_VACANCY = "Данной вакансии не существует."
-        const val NOT_FOUND_QUERY = "По вашему запросу не обнаружено вакансий."
-        const val UNEXPECTED_ERROR = "Ошибка при получении поиске вакансий, попробуйте повторить попытку позже"
-    }
 
     /**
      * Method create new vacancy from request data [VacancyApiModel].

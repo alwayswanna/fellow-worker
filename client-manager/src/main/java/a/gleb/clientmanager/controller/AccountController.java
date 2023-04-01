@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-3/28/23, 10:13 PM
+ * Copyright (c) 07-3/30/23, 11:08 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -8,7 +8,7 @@ package a.gleb.clientmanager.controller;
 import a.gleb.apicommon.clientmanager.model.AccountRequestModel;
 import a.gleb.apicommon.clientmanager.model.ApiResponseModel;
 import a.gleb.apicommon.clientmanager.model.ChangePasswordModel;
-import a.gleb.clientmanager.service.AccountService;
+import a.gleb.clientmanager.service.UserAccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,7 +35,7 @@ public class AccountController {
 
     public static final String CLIENT_MANAGER_CONTROLLER = "client.manager.controller";
 
-    private final AccountService accountService;
+    private final UserAccountService userAccountService;
 
     @Operation(
             summary = "Создать новую учетную запись.",
@@ -62,7 +62,7 @@ public class AccountController {
     )
     @PostMapping("/create")
     public ApiResponseModel create(@RequestBody AccountRequestModel requestModel) {
-        return accountService.createAccount(requestModel);
+        return userAccountService.createAccount(requestModel);
     }
 
     @Operation(
@@ -85,7 +85,7 @@ public class AccountController {
     )
     @PutMapping("/edit")
     public ApiResponseModel edit(@RequestBody AccountRequestModel requestModel) {
-        return accountService.editAccount(requestModel);
+        return userAccountService.editAccount(requestModel);
     }
 
     @Operation(
@@ -107,7 +107,7 @@ public class AccountController {
     )
     @DeleteMapping("/delete")
     public ApiResponseModel delete() {
-        return accountService.deleteAccount();
+        return userAccountService.deleteAccount();
     }
 
     @Operation(
@@ -129,7 +129,7 @@ public class AccountController {
     )
     @GetMapping("/data")
     public ApiResponseModel getAccountInfo(@RequestParam @NotNull UUID userId) {
-        return accountService.getAccountData(userId);
+        return userAccountService.getAccountData(userId);
     }
 
     @Operation(
@@ -152,7 +152,7 @@ public class AccountController {
     )
     @PutMapping("/change-password")
     public ApiResponseModel changePassword(@RequestBody @Valid ChangePasswordModel changePasswordModel) {
-        return accountService.changeUserPassword(changePasswordModel);
+        return userAccountService.changeUserPassword(changePasswordModel);
     }
 
     @Operation(
@@ -174,6 +174,6 @@ public class AccountController {
     )
     @GetMapping("/current")
     public ApiResponseModel getCurrentAccountData(){
-        return accountService.getCurrentAccountData();
+        return userAccountService.getCurrentAccountData();
     }
 }

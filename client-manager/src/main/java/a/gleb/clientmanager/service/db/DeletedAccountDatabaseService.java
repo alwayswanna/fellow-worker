@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 3-3/25/23, 11:14 PM
+ * Copyright (c) 3-3/30/23, 11:14 PM
  * Created by https://github.com/alwayswanna
  */
 
-package a.gleb.clientmanager.service;
+package a.gleb.clientmanager.service.db;
 
 import a.gleb.oauth2persistence.db.dao.Account;
 import a.gleb.oauth2persistence.db.dao.DeletedAccount;
@@ -16,10 +16,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Service wrap repository layer.
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
-public class DeletedAccountService {
+public class DeletedAccountDatabaseService {
 
     private final DeletedAccountRepository deletedAccountRepository;
 

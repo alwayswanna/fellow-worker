@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 07-07.01.2023, 20:21
+ * Copyright (c) 07-3/31/23, 9:26 PM
  * Created by https://github.com/alwayswanna
  */
 
@@ -78,3 +78,8 @@ CREATE TABLE accounts
 
 CREATE INDEX ON accounts (username);
 CREATE INDEX ON accounts (email);
+
+CREATE TABLE deleted_accounts
+(
+    id uuid NOT NULL PRIMARY KEY
+);
