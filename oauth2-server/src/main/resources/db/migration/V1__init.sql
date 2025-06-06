@@ -2,16 +2,6 @@
  * Copyright (c) 07-07.01.2023, 20:21
  * Created by https://github.com/alwayswanna
  */
-
-CREATE TABLE oauth2_authorization_consent
-(
-    registered_client_id varchar(100)  NOT NULL,
-    principal_name       varchar(200)  NOT NULL,
-    authorities          varchar(1000) NOT NULL,
-    PRIMARY KEY (registered_client_id, principal_name)
-);
-
-
 CREATE TABLE oauth2_authorization
 (
     id                            varchar(100) NOT NULL,
@@ -39,10 +29,16 @@ CREATE TABLE oauth2_authorization
     refresh_token_issued_at       timestamp     DEFAULT NULL,
     refresh_token_expires_at      timestamp     DEFAULT NULL,
     refresh_token_metadata        text          DEFAULT NULL,
+    user_code_value               text          DEFAULT NULL,
+    user_code_issued_at           timestamp     DEFAULT NULL,
+    user_code_expires_at          timestamp     DEFAULT NULL,
+    user_code_metadata            text          DEFAULT NULL,
+    device_code_value             text          DEFAULT NULL,
+    device_code_issued_at         timestamp     DEFAULT NULL,
+    device_code_expires_at        timestamp     DEFAULT NULL,
+    device_code_metadata          text          DEFAULT NULL,
     PRIMARY KEY (id)
 );
-
-
 
 CREATE TABLE oauth2_registered_client
 (
@@ -55,16 +51,16 @@ CREATE TABLE oauth2_registered_client
     client_authentication_methods varchar(1000)                           NOT NULL,
     authorization_grant_types     varchar(1000)                           NOT NULL,
     redirect_uris                 varchar(1000) DEFAULT NULL,
+    post_logout_redirect_uris     varchar(1000) DEFAULT NULL,
     scopes                        varchar(1000)                           NOT NULL,
     client_settings               varchar(2000)                           NOT NULL,
     token_settings                varchar(2000)                           NOT NULL,
     PRIMARY KEY (id)
 );
 
-
 CREATE TABLE accounts
 (
-    id          uuid         NOT NULL PRIMARY KEY,
+    id          uuid         NOT NULL,
     username    varchar(30)  NOT NULL,
     password    varchar(250) NOT NULL,
     first_name  varchar(30)  NOT NULL,
@@ -73,7 +69,9 @@ CREATE TABLE accounts
     email       varchar(30)  NOT NULL,
     birth_date  date         NOT NULL,
     role        varchar(30)  NOT NULL,
-    enabled     boolean      NOT NULL
+    enabled     boolean      NOT NULL,
+    last_update timestamp    DEFAULT current_timestamp,
+    PRIMARY KEY (id)
 );
 
 CREATE INDEX ON accounts (username);

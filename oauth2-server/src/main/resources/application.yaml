@@ -10,7 +10,7 @@ spring:
     password: postgres
     url: jdbc:postgresql://${DATASOURCE_URL}:5432/authorization
 
-oauth:
+fellow-worker-oauth2-server:
   remove-expired-session-task:
     cron: 0 0 0 * * *
     day-offset: 90
@@ -34,22 +34,19 @@ oauth:
     password: administrator
     email: a.gleb@yahoo.com
   cors:
-    enabled: true
     allowed-origins: "*"
-    allowed-origins-all: true
     allowed-methods:
       - "*"
     allowed-headers:
       - "*"
+    allowed-origin-patterns:
+      - "*"
+  encoder-strength: 13
 
 management:
   endpoint:
     health:
       show-details: when_authorized
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
   endpoints:
     web:
       exposure:

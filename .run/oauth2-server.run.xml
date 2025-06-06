@@ -1,10 +1,5 @@
-<!--
-  ~ Copyright (c) 2/5/23, 11:50 PM
-  ~ Created by https://github.com/alwayswanna
-  -->
-
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Oauth2ServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="oauth2-server" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <envs>
       <env name="DATASOURCE_URL" value="localhost" />
       <env name="OAUTH2_SERVER_URL" value="127.0.0.1" />

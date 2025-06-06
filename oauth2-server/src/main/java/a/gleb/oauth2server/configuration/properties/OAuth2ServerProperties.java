@@ -18,7 +18,7 @@ import java.util.List;
 @Setter
 @Getter
 @Validated
-@ConfigurationProperties("oauth")
+@ConfigurationProperties("fellow-worker-oauth2-server")
 public class OAuth2ServerProperties {
 
     @NotBlank
@@ -31,6 +31,9 @@ public class OAuth2ServerProperties {
     private DefaultUser defaultUser;
 
     private Cors cors;
+
+    @NotNull
+    private Integer encoderStrength;
 
     @NotNull
     private ScheduledTaskParams removeExpiredSessionTask;

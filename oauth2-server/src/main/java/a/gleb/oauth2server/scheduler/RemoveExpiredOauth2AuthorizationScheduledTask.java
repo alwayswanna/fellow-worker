@@ -15,15 +15,12 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+import static a.gleb.oauth2server.constant.OAuth2ServerConstants.SQL_REMOVE_EXPIRED_SESSIONS;
+
 @Slf4j
 @Component
 @AllArgsConstructor
 public class RemoveExpiredOauth2AuthorizationScheduledTask {
-
-    private static final String SQL_REMOVE_EXPIRED_SESSIONS =
-            """
-                delete from oauth2_authorization where refresh_token_expires_at < (?);
-            """;
 
     private final JdbcTemplate jdbcTemplate;
     private final OAuth2ServerProperties properties;
@@ -31,11 +28,11 @@ public class RemoveExpiredOauth2AuthorizationScheduledTask {
     /**
      * Cron job for remove expired session.
      */
-    @Scheduled(cron = "${oauth.remove-expired-session-task.cron}")
+    @Scheduled(cron = "${fellow-worker-oauth2-server.remove-expired-session-task.cron}")
     public void removeExpiredSessions() {
         log.info("Start scheduled task to remove expired sessions");
         var isBeforeParamSql = LocalDate.now()
-                .minus(properties.getRemoveExpiredSessionTask().getDayOffset(), ChronoUnit.DAYS)
+                .minusDays(properties.getRemoveExpiredSessionTask().getDayOffset())
                 .toString()
                 .lines()
                 .toArray();

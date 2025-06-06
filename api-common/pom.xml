@@ -13,7 +13,6 @@
         <artifactId>fellow-worker</artifactId>
     </parent>
 
-    <groupId>a.gleb</groupId>
     <artifactId>api-common</artifactId>
     <version>${services.version}</version>
     <name>api-common</name>

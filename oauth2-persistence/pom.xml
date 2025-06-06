@@ -7,16 +7,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>a.gleb</groupId>
         <version>1.0.0-RELEASE</version>
         <artifactId>fellow-worker</artifactId>
     </parent>
 
-    <groupId>a.gleb</groupId>
     <artifactId>oauth2-persistence</artifactId>
     <version>${services.version}</version>
     <name>oauth2-persistence</name>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
