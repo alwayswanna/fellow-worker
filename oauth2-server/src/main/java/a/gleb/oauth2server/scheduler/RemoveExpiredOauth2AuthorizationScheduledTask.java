@@ -5,7 +5,7 @@
 
 package a.gleb.oauth2server.scheduler;
 
-import a.gleb.oauth2server.configuration.properties.OAuth2ServerProperties;
+import a.gleb.oauth2server.configuration.properties.OAuth2ServerConfigurationProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 import static a.gleb.oauth2server.constant.OAuth2ServerConstants.SQL_REMOVE_EXPIRED_SESSIONS;
 
@@ -23,7 +22,7 @@ import static a.gleb.oauth2server.constant.OAuth2ServerConstants.SQL_REMOVE_EXPI
 public class RemoveExpiredOauth2AuthorizationScheduledTask {
 
     private final JdbcTemplate jdbcTemplate;
-    private final OAuth2ServerProperties properties;
+    private final OAuth2ServerConfigurationProperties properties;
 
     /**
      * Cron job for remove expired session.

@@ -4,7 +4,7 @@
  */
 CREATE TABLE oauth2_authorization
 (
-    id                            varchar(100) NOT NULL,
+    id                            uuid         NOT NULL,
     registered_client_id          varchar(100) NOT NULL,
     principal_name                varchar(200) NOT NULL,
     authorization_grant_type      varchar(100) NOT NULL,
@@ -23,6 +23,7 @@ CREATE TABLE oauth2_authorization
     access_token_scopes           varchar(1000) DEFAULT NULL,
     oidc_id_token_value           text          DEFAULT NULL,
     oidc_id_token_issued_at       timestamp     DEFAULT NULL,
+    oidc_id_token_claims          jsonb         DEFAULT NULL,
     oidc_id_token_expires_at      timestamp     DEFAULT NULL,
     oidc_id_token_metadata        text          DEFAULT NULL,
     refresh_token_value           text          DEFAULT NULL,
@@ -37,12 +38,13 @@ CREATE TABLE oauth2_authorization
     device_code_issued_at         timestamp     DEFAULT NULL,
     device_code_expires_at        timestamp     DEFAULT NULL,
     device_code_metadata          text          DEFAULT NULL,
+    date_create                   timestamp     DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE oauth2_registered_client
 (
-    id                            varchar(100)                            NOT NULL,
+    id                            uuid                                    NOT NULL,
     client_id                     varchar(100)                            NOT NULL,
     client_id_issued_at           timestamp     DEFAULT CURRENT_TIMESTAMP NOT NULL,
     client_secret                 varchar(200)  DEFAULT NULL,
@@ -58,21 +60,55 @@ CREATE TABLE oauth2_registered_client
     PRIMARY KEY (id)
 );
 
-CREATE TABLE accounts
+CREATE TABLE role
+(
+    id           uuid        NOT NULL,
+    role_name    varchar(30) NOT NULL UNIQUE,
+    display_name varchar(50) NOT NULL,
+    last_update  timestamp DEFAULT current_timestamp,
+    PRIMARY KEY (id)
+);
+
+CREATE INDEX ON role (role_name);
+
+CREATE TABLE account
 (
     id          uuid         NOT NULL,
-    username    varchar(30)  NOT NULL,
+    username    varchar(30)  NOT NULL UNIQUE,
     password    varchar(250) NOT NULL,
     first_name  varchar(30)  NOT NULL,
     middle_name varchar(30)  NOT NULL,
     last_name   varchar(30),
     email       varchar(30)  NOT NULL,
     birth_date  date         NOT NULL,
-    role        varchar(30)  NOT NULL,
     enabled     boolean      NOT NULL,
-    last_update timestamp    DEFAULT current_timestamp,
+    last_update timestamp DEFAULT current_timestamp,
     PRIMARY KEY (id)
 );
 
-CREATE INDEX ON accounts (username);
-CREATE INDEX ON accounts (email);
+CREATE INDEX ON account (username);
+CREATE INDEX ON account (email);
+
+CREATE TABLE account_role
+(
+    account_id      uuid        NOT NULL,
+    role_id         uuid        NOT NULL,
+    FOREIGN KEY (account_id) REFERENCES account (id),
+    FOREIGN KEY (role_id) REFERENCES role (id)
+);
+
+CREATE TABLE client_role (
+    client_id       uuid        NOT NULL,
+    role_id         uuid        NOT NULL,
+    FOREIGN KEY (client_id) REFERENCES oauth2_registered_client (id),
+    FOREIGN KEY (role_id) REFERENCES role (id)
+);
+
+CREATE TABLE outbox_message (
+    id          uuid        PRIMARY KEY,
+    message     jsonb       NOT NULL,
+    is_sent     boolean        DEFAULT FALSE,
+    created     timestamp   DEFAULT current_timestamp
+);
+
+CREATE INDEX ON outbox_message(is_sent);

@@ -5,12 +5,22 @@
 
 package a.gleb.oauth2server.exception;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-public class UsernameNotFoundException extends ResponseStatusException {
+@Slf4j
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class UsernameNotFoundException extends RuntimeException {
 
-    public UsernameNotFoundException(HttpStatusCode status, String reason) {
-        super(status, reason);
+    public UsernameNotFoundException(String message) {
+        super(message);
+    }
+
+    public static void nullableUsername() {
+        log.error("UsernameNotFoundException caught");
+        throw new UsernameNotFoundException("Username is empty or null.");
     }
 }

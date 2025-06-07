@@ -1,0 +1,37 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: oauth2-server-test
+  datasource:
+    url: jdbc:tc:postgresql:15.2:///postgres
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+fellow-worker-oauth2-server:
+  token-url: https://must-bu-unused.com/token
+  authorization-url: https://must-be-unused.com/auth
+  issuer-url: https://must-be-unused.com
+  defaultClients:
+    - default-client-id: message
+      default-client-secret: c29tZXNlY3Rlcg==
+      default-access-token-time-to-live: 30 # minutes
+      default-refreshToken-time-to-live: 3 # days
+      client-secret-days-ttl: 90
+      default-redirect-uris:
+        - "https://must-be-unused.com/redirect.html"
+  cors:
+    allowed-origins: "*"
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
+    allowed-origin-patterns:
+      - "*"
+  encoder-strength: 13
+  unprotected-patterns:
+    - "/assets"
+    - "/login"
+    - "/error"
+    - "/actuator/**"
+    - "/api/v1/account/register"

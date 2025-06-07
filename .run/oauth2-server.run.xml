@@ -2,7 +2,7 @@
   <configuration default="false" name="oauth2-server" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <envs>
       <env name="DATASOURCE_URL" value="localhost" />
-      <env name="OAUTH2_SERVER_URL" value="127.0.0.1" />
+      <env name="OAUTH2_SERVER_URL" value="localhost" />
     </envs>
     <module name="oauth2-server" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.oauth2server.Oauth2ServerApplication" />

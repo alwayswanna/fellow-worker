@@ -26,8 +26,6 @@
         <module>api-common</module>
         <module>cv-generator</module>
         <module>oauth2-server</module>
-        <module>client-manager</module>
-        <module>oauth2-persistence</module>
         <module>fellow-worker-service</module>
     </modules>
 
@@ -47,6 +45,9 @@
         <testcontainers.version>1.17.6</testcontainers.version>
         <pdfbox.version>2.0.22</pdfbox.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
+
+        <!-- plugin version -->
+        <maven-processor-plugin.version>5.1</maven-processor-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -60,11 +61,6 @@
             </dependency>
 
             <!-- Inner -->
-            <dependency>
-                <groupId>a.gleb</groupId>
-                <artifactId>oauth2-persistence</artifactId>
-                <version>${services.version}</version>
-            </dependency>
             <dependency>
                 <groupId>a.gleb</groupId>
                 <artifactId>api-common</artifactId>
@@ -136,4 +132,16 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <version>${maven-processor-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
