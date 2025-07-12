@@ -31,7 +31,7 @@ public class RemoveExpiredOauth2AuthorizationScheduledTask {
     public void removeExpiredSessions() {
         log.info("Start scheduled task to remove expired sessions");
         var isBeforeParamSql = LocalDate.now()
-                .minusDays(properties.getRemoveExpiredSessionTask().getDayOffset())
+                .minusDays(properties.removeExpiredSessionTask().dayOffset())
                 .toString()
                 .lines()
                 .toArray();

@@ -7,85 +7,27 @@ server:
 spring:
   application:
     name: oauth2-server
-  threads:
-    virtual:
-      enabled: true
-  rabbitmq:
-    publisher-returns: true
-    publisher-confirm-type: correlated
+  profiles:
+    active: local
+  config:
+    import: configserver:http://localhost:9099
   cloud:
-    stream:
-      default-binder: rabbit
-      binders:
-        rabbit:
-          type: rabbit
-      rabbit:
-        bindings:
-          remove-user-out-0:
-            producer:
-              use-confirm-header: true
-              routing-key-expression: '''remove-user-event'''
-              exchange-type: direct
-      bindings:
-        remove-user-out-0:
-          destination: fellow-worker
+    config:
+      enabled: true
+      uri: http://localhost:9099
+      fail-fast: true
+      retry:
+        initialInterval: 300
+        maxAttempts: 10
+        max-interval: 3000
+  jpa:
+    show-sql: true
   datasource:
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
-    url: jdbc:postgresql://${DATASOURCE_URL}:5432/authorization
+    username: postgres # TODO: move to Vault.
+    password: postgres # TODO: move to Vault.
 
 fellow-worker-oauth2-server:
-  rmq:
-    await-timeout: 40000
-  token-url: http://${OAUTH2_SERVER_URL}:9001/oauth2/token
-  authorization-url: http://${OAUTH2_SERVER_URL}:9001/oauth2/authorize
-  send-out-box-message:
-    cron: 0 0 * * * *
-  remove-expired-session-task:
-    cron: 0 0 0 * * *
-    day-offset: 90
-  issuer-url: http://${OAUTH2_SERVER_URL}:9001
-  defaultClients:
-    - default-client-id: message
-      default-client-secret: c29tZXNlY3Rlcg==
-      default-access-token-time-to-live: 30 # minutes
-      default-refreshToken-time-to-live: 3 # days
-      client-secret-days-ttl: 90
-      default-redirect-uris:
-        - "http://127.0.0.1:8090/swagger-ui.html"
-        - "http://127.0.0.1:8080/swagger-ui/oauth2-redirect.html"
-        - "http://127.0.0.1:7044/swagger-ui.html"
-        - "http://127.0.0.1:7044/swagger-ui/oauth2-redirect.html"
-        - "http://127.0.0.1:4334/webjars/swagger-ui.html"
-        - "http://127.0.0.1:4334/webjars/swagger-ui/oauth2-redirect.html"
-        - "http://127.0.0.1:8888/auth.html"
-        - "https://oauth.pstmn.io/v1/browser-callback"
-  cors:
-    allowed-origins: "*"
-    allowed-methods:
-      - "*"
-    allowed-headers:
-      - "*"
-    allowed-origin-patterns:
-      - "*"
-  encoder-strength: 13
-  unprotected-patterns:
-    - "/assets/**"
-    - "/login"
-    - "/actuator/**"
-    - "/error"
-    - "/swagger-ui/**"
-    - "/swagger-ui.html"
-    - "/v3/api-docs/**"
-    - "/api/v1/account/create" # create new account.
-  default-roles:
-    - role-name: SYSTEM
-      display-name: System
-      is-map-on-default-client: true
-    - role-name: ADMIN
-      display-name: Administrator
-      is-map-on-default-client: false
+  encoder-strength: 13 # TODO: move to Vault.
 
 management:
   endpoint:
@@ -98,5 +40,4 @@ management:
 
 logging:
   level:
-    org.springframework.security: TRACE
-    web: DEBUG
+    root: info

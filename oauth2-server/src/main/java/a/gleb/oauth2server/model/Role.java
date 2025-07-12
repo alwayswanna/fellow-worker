@@ -1,6 +1,7 @@
 package a.gleb.oauth2server.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,9 +15,11 @@ public class Role {
     @Schema(description = "Request for create new role.")
     public record RoleRequest(
 
+            @NotEmpty(message = "Role name can not be null.")
             @Schema(description = "Name of role.")
             String roleName,
 
+            @NotEmpty(message = "Role`s display name can not be null.")
             @Schema(description = "Display name of role.")
             String displayName
     ) {

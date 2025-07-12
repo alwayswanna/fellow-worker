@@ -34,4 +34,4 @@ fellow-worker-oauth2-server:
     - "/login"
     - "/error"
     - "/actuator/**"
-    - "/api/v1/account/register"
+    - "/api/v1/account/create"

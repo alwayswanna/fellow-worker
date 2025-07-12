@@ -1,7 +1,6 @@
 package a.gleb.oauth2server.service;
 
 import a.gleb.oauth2server.configuration.properties.OAuth2ServerConfigurationProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
@@ -26,7 +25,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public class MessagePublisherService {
 
     private final StreamBridge streamBridge;
-    private final ObjectMapper objectMapper;
     private final OAuth2ServerConfigurationProperties properties;
 
     public void send(@NonNull String bindingName, @NonNull Object messageToSend) {
@@ -42,7 +40,7 @@ public class MessagePublisherService {
     private void awaitForConfirm(@NonNull CorrelationData correlationData, @NonNull Message<?> message) {
         try {
             var confirm =
-                    correlationData.getFuture().get(properties.getRmq().getAwaitTimeout(), MILLISECONDS);
+                    correlationData.getFuture().get(properties.rmq().awaitTimeout(), MILLISECONDS);
 
             if (confirm == null) {
                 log.error("Confirm is null");

@@ -61,7 +61,7 @@ public class OAuth2ServerConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(properties.getEncoderStrength());
+        return new BCryptPasswordEncoder(properties.encoderStrength());
     }
 
     @Bean
@@ -73,7 +73,7 @@ public class OAuth2ServerConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(it -> {
                     var urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-                    urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", properties.getCors());
+                    urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", properties.cors());
                     it.configurationSource(urlBasedCorsConfigurationSource);
                 })
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
@@ -128,6 +128,17 @@ public class OAuth2ServerConfiguration {
         return new ImmutableJWKSet<>(jwkSet);
     }
 
+    @Bean
+    public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
+        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+    }
+
+    @Bean
+    public TokenSettings tokenSettings() {
+        return TokenSettings.builder()
+                .build();
+    }
+
     private static KeyPair generateRsaKey() {
         KeyPair keyPair;
         try {
@@ -138,16 +149,5 @@ public class OAuth2ServerConfiguration {
             throw new IllegalStateException(ex);
         }
         return keyPair;
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
-        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
-    }
-
-    @Bean
-    public TokenSettings tokenSettings() {
-        return TokenSettings.builder()
-                .build();
     }
 }

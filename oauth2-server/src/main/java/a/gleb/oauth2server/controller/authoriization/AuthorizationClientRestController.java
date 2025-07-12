@@ -1,11 +1,9 @@
 package a.gleb.oauth2server.controller.authoriization;
 
-import a.gleb.oauth2server.model.AuthorizationClient;
 import a.gleb.oauth2server.model.AuthorizationClient.AuthorizationClientRequest;
 import a.gleb.oauth2server.model.AuthorizationClient.AuthorizationClientResponse;
 import a.gleb.oauth2server.service.authorization.AuthorizationClientService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

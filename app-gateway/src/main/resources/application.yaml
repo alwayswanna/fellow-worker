@@ -1,0 +1,17 @@
+server:
+  port: 4443
+
+spring:
+  application:
+    name: gateway
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+

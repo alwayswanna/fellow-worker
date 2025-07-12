@@ -37,7 +37,7 @@ public class OAuth2SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(it -> {
                     var urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-                    urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", properties.getCors());
+                    urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", properties.cors());
                     it.configurationSource(urlBasedCorsConfigurationSource);
                 })
                 .authorizeHttpRequests(this::configureAuthorizeHttpRequests)
@@ -63,23 +63,23 @@ public class OAuth2SecurityConfiguration {
             AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authorize
     ) {
         /* configure unprotected patterns */
-        var unprotectedPatterns = properties.getUnprotectedPatterns().toArray(String[]::new);
+        var unprotectedPatterns = properties.unprotectedPatterns().toArray(String[]::new);
         authorize.requestMatchers(unprotectedPatterns).permitAll();
 
         /* protect methods & patterns */
-        var securityConstraints = properties.getSecurityConstraints();
+        var securityConstraints = properties.securityConstraints();
         if (!CollectionUtils.isEmpty(securityConstraints)) {
             securityConstraints.forEach(sc -> {
-                for (var secColl : sc.getSecurityCollections()) {
-                    var roles = sc.getRoles().toArray(String[]::new);
+                for (var secColl : sc.securityCollections()) {
+                    var roles = sc.roles().toArray(String[]::new);
 
-                    if (!CollectionUtils.isEmpty(secColl.getMethods())) {
-                        var patterns = secColl.getPatterns().toArray(String[]::new);
-                        secColl.getPatterns().forEach(method ->
+                    if (!CollectionUtils.isEmpty(secColl.methods())) {
+                        var patterns = secColl.patterns().toArray(String[]::new);
+                        secColl.patterns().forEach(method ->
                                 authorize.requestMatchers(HttpMethod.valueOf(method), patterns).hasAnyRole(roles)
                         );
                     } else {
-                        var patterns = secColl.getPatterns().toArray(String[]::new);
+                        var patterns = secColl.patterns().toArray(String[]::new);
                         authorize.requestMatchers(patterns).hasAnyRole(roles);
                     }
                 }

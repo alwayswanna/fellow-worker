@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static a.gleb.oauth2server.constant.OAuth2ServerConstants.OAUTH2_SERVER_DEFINITION;
 
@@ -38,6 +39,23 @@ public class RoleRestController {
     @PostMapping("/create")
     public RoleResponse create(@RequestBody @Valid RoleRequest request) {
         return roleService.create(request);
+    }
+
+    @Operation(
+            summary = "Update existed role.",
+            description = "Method for updated existing role.",
+            security = @SecurityRequirement(name = OAUTH2_SERVER_DEFINITION),
+            responses = {
+                    @ApiResponse(description = "OK", responseCode = "200"),
+                    @ApiResponse(description = "Bad request", responseCode = "400"),
+                    @ApiResponse(description = "Forbidden", responseCode = "403"),
+                    @ApiResponse(description = "Internal server error", responseCode = "500")
+            }
+    )
+    @ResponseBody
+    @PutMapping
+    public RoleResponse update(@RequestBody RoleRequest request, @RequestParam UUID id) {
+        return roleService.update(request, id);
     }
 
     @Operation(

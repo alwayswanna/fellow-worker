@@ -1,0 +1,10 @@
+server:
+  port: 9099
+
+spring:
+  application:
+    name: config-server
+
+logging:
+  level:
+    root: info

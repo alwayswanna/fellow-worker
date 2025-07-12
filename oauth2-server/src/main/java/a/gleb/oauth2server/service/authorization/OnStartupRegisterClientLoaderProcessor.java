@@ -43,15 +43,16 @@ public class OnStartupRegisterClientLoaderProcessor implements ApplicationRunner
      */
     @Override
     public void run(ApplicationArguments args) {
-        var rolesToAttractToDefaultClient = properties.getDefaultRoles()
+        var rolesToAttractToDefaultClient = properties.defaultRoles()
                 .stream()
+                .filter(it -> !roleRepository.existsByRoleName(it.roleName()))
                 .map(it -> Pair.of(it, toRole(it)))
                 .map(it -> Pair.of(it.getLeft(), roleRepository.save(it.getRight())))
                 .filter(it -> it.getLeft().isMapOnDefaultClient())
                 .map(Pair::getRight)
                 .collect(Collectors.toSet());
 
-        properties.getDefaultClients()
+        properties.defaultClients()
                 .stream()
                 .map(this::toClient)
                 .forEach(it -> this.save(it, rolesToAttractToDefaultClient));
@@ -67,40 +68,32 @@ public class OnStartupRegisterClientLoaderProcessor implements ApplicationRunner
 
     private RegisteredClient toClient(DefaultClient clientFromConfig) {
         return RegisteredClient.withId(UUID.randomUUID().toString())
-                .tokenSettings(
-                        TokenSettings.builder()
-                                .accessTokenTimeToLive(
-                                        Duration.ofMinutes(
-                                                clientFromConfig.getDefaultAccessTokenTimeToLive()
-                                        )
-                                )
-                                .refreshTokenTimeToLive(
-                                        Duration.ofDays(
-                                                clientFromConfig.getDefaultRefreshTokenTimeToLive()
-                                        )
-                                )
-                                .build()
-                )
-                .clientId(clientFromConfig.getDefaultClientId())
-                .clientSecret(passwordEncoder.encode(clientFromConfig.getDefaultClientSecret()))
+                .tokenSettings(toTokenSettings(clientFromConfig))
+                .clientId(clientFromConfig.defaultClientId())
+                .clientSecret(passwordEncoder.encode(clientFromConfig.defaultClientSecret()))
                 .clientAuthenticationMethod(CLIENT_SECRET_BASIC)
                 .clientAuthenticationMethod(CLIENT_SECRET_POST)
                 .clientAuthenticationMethod(CLIENT_SECRET_JWT)
                 .clientAuthenticationMethod(PRIVATE_KEY_JWT)
                 .clientAuthenticationMethod(NONE)
                 .clientIdIssuedAt(Instant.now())
-                .clientSecretExpiresAt(Instant.now().plus(clientFromConfig.getClientSecretDaysTtl(), DAYS))
+                .clientSecretExpiresAt(Instant.now().plus(clientFromConfig.clientSecretDaysTtl(), DAYS))
                 .authorizationGrantType(AUTHORIZATION_CODE)
                 .authorizationGrantType(REFRESH_TOKEN)
                 .authorizationGrantType(CLIENT_CREDENTIALS)
-                .redirectUris(redirectConf -> redirectConf.addAll(
-                        clientFromConfig.getDefaultRedirectUris())
-                )
+                .redirectUris(redirectConf -> redirectConf.addAll(clientFromConfig.defaultRedirectUris()))
                 .scope(OPENID)
                 .build();
     }
 
-    private void save (RegisteredClient client, Set<RoleEntity> roleEntities) {
+    private static TokenSettings toTokenSettings(DefaultClient clientFromConfig) {
+        return TokenSettings.builder()
+                .accessTokenTimeToLive(Duration.ofMinutes(clientFromConfig.defaultAccessTokenTimeToLive()))
+                .refreshTokenTimeToLive(Duration.ofDays(clientFromConfig.defaultRefreshTokenTimeToLive()))
+                .build();
+    }
+
+    private void save(RegisteredClient client, Set<RoleEntity> roleEntities) {
         if (!jpaRegisteredClientRepository.existByClientId(client.getClientId())) {
             jpaRegisteredClientRepository.saveWithRoles(client, roleEntities);
         }

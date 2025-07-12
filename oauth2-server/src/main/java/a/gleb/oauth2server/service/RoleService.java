@@ -1,6 +1,5 @@
 package a.gleb.oauth2server.service;
 
-import a.gleb.oauth2server.constant.OAuth2ServerConstants;
 import a.gleb.oauth2server.db.repository.RoleRepository;
 import a.gleb.oauth2server.db.scpecification.RoleEntitySpecification;
 import a.gleb.oauth2server.exception.BadRequestException;
@@ -9,13 +8,16 @@ import a.gleb.oauth2server.mapper.RoleMapper;
 import a.gleb.oauth2server.model.Role.RoleFilterRequest;
 import a.gleb.oauth2server.model.Role.RoleRequest;
 import a.gleb.oauth2server.model.Role.RoleResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 import static a.gleb.oauth2server.constant.OAuth2ServerConstants.MAX_ENTITIES_PER_PAGE;
 
@@ -59,6 +61,44 @@ public class RoleService {
                 .stream()
                 .map(roleMapper::toResponse)
                 .toList();
+    }
+
+    /**
+     * Method for update existing role.
+     *
+     * @param request data for update existing role.
+     * @param id      identifier of existing role.
+     * @return {@link RoleResponse} response with updated data of role.
+     */
+    @Transactional
+    public RoleResponse update(RoleRequest request, UUID id) {
+        if (StringUtils.isEmpty(request.roleName()) && StringUtils.isEmpty(request.displayName())) {
+            throw new BadRequestException("One of field should be filled.");
+        }
+
+        var entity = roleRepository.findById(id);
+
+        if (entity.isEmpty()) {
+            throw new BadRequestException("Role with current ID does not exists.");
+        }
+
+        var role = entity.get();
+
+        if (StringUtils.isNotEmpty(request.roleName())) {
+            if (roleRepository.existsByRoleName(request.roleName())) {
+                throw new BadRequestException(String.format("Role with roleName=%s already exist.", request.roleName()));
+            }
+
+            role.setRoleName(request.roleName());
+        }
+
+        if (StringUtils.isNotEmpty(request.displayName())) {
+            role.setDisplayName(request.displayName());
+        }
+
+        var updatedRole = roleRepository.save(role);
+
+        return roleMapper.toResponse(updatedRole);
     }
 
     /**

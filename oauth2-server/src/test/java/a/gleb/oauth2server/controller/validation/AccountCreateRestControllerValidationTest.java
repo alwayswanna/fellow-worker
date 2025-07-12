@@ -1,20 +1,21 @@
 package a.gleb.oauth2server.controller.validation;
 
 import a.gleb.oauth2server.Oauth2ServerApplicationTests;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WithMockUser(username = "user")
-public class AccountRestControllerValidationTest extends Oauth2ServerApplicationTests {
+@DisplayName("Create user [validation].")
+public class AccountCreateRestControllerValidationTest extends Oauth2ServerApplicationTests {
 
     @Test
     public void badRequestOnCreateWithEmptyUsername() throws Exception {
-        mockMvc.perform(
+        mockMvc
+                .perform(
                         post("/api/v1/account/create")
                                 .content("""
                                         {
@@ -31,12 +32,13 @@ public class AccountRestControllerValidationTest extends Oauth2ServerApplication
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void badRequestOnCreateWithEmptyPassword() throws Exception {
-        mockMvc.perform(
+        mockMvc
+                .perform(
                         post("/api/v1/account/create")
                                 .content("""
                                         {
@@ -53,12 +55,13 @@ public class AccountRestControllerValidationTest extends Oauth2ServerApplication
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void badRequestOnCreateWithEmptyFirstName() throws Exception {
-        mockMvc.perform(
+        mockMvc
+                .perform(
                         post("/api/v1/account/create")
                                 .content("""
                                         {
@@ -75,12 +78,13 @@ public class AccountRestControllerValidationTest extends Oauth2ServerApplication
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void badRequestOnCreateWithEmptyMiddleName() throws Exception {
-        mockMvc.perform(
+        mockMvc
+                .perform(
                         post("/api/v1/account/create")
                                 .content("""
                                         {
@@ -97,12 +101,13 @@ public class AccountRestControllerValidationTest extends Oauth2ServerApplication
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void badRequestOnCreateWithEmptyEmail() throws Exception {
-        mockMvc.perform(
+        mockMvc
+                .perform(
                         post("/api/v1/account/create")
                                 .content("""
                                         {
@@ -119,12 +124,13 @@ public class AccountRestControllerValidationTest extends Oauth2ServerApplication
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void badRequestOnCreateWithEmptyDateOfBirth() throws Exception {
-        mockMvc.perform(
+        mockMvc
+                .perform(
                         post("/api/v1/account/create")
                                 .content("""
                                         {
@@ -141,6 +147,6 @@ public class AccountRestControllerValidationTest extends Oauth2ServerApplication
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andDo(print())
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 }

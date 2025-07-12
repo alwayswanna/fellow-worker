@@ -12,28 +12,23 @@ import a.gleb.oauth2server.db.repository.OutboxMessageRepository;
 import a.gleb.oauth2server.exception.BadRequestException;
 import a.gleb.oauth2server.exception.NotFoundException;
 import a.gleb.oauth2server.mapper.AccountMapper;
-import a.gleb.oauth2server.model.Account;
 import a.gleb.oauth2server.model.Account.*;
 import a.gleb.oauth2server.model.OutboxMessageDeleteAccount;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import static a.gleb.oauth2server.constant.OAuth2ServerConstants.MAX_ENTITIES_PER_PAGE;
 import static a.gleb.oauth2server.db.scpecification.AccountEntitySpecification.buildAccountEntitySpecificationByFilter;
@@ -201,6 +196,7 @@ public class AccountService {
 
     /**
      * Update current user password user`s password
+     *
      * @param request data for change password
      */
     public void changePassword(AccountChangePasswordRequest request) {

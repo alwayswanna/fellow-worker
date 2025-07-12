@@ -1,5 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="oauth2-server" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="local" />
     <envs>
       <env name="DATASOURCE_URL" value="localhost" />
       <env name="OAUTH2_SERVER_URL" value="localhost" />

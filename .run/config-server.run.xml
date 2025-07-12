@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="config-server" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="local,native" />
+    <module name="config-server" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.configserver.ConfigServerApplication" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="a.gleb.configserver.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
