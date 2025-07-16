@@ -1,6 +1,8 @@
 package a.gleb.oauth2server.db.scpecification;
 
 import a.gleb.oauth2server.db.entity.AccountEntity;
+import a.gleb.oauth2server.db.entity.AccountEntity_;
+import a.gleb.oauth2server.db.entity.RoleEntity_;
 import a.gleb.oauth2server.model.Account.AccountFilterRequest;
 import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.lang3.StringUtils;

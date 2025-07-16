@@ -40,15 +40,16 @@
         <!-- Cloud version -->
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <!-- Library version -->
-        <kotlinx-coroutines.version>1.10.2</kotlinx-coroutines.version>
-        <kotlin-logging-jvm.version>2.1.23</kotlin-logging-jvm.version>
-        <services.version>1.0.0-RELEASE</services.version>
-        <springdoc-openapi-starter.version>2.8.9</springdoc-openapi-starter.version>
-        <testcontainers.version>1.17.6</testcontainers.version>
         <pdfbox.version>2.0.22</pdfbox.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
+        <services.version>1.0.0-RELEASE</services.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
+        <kotlinx-coroutines.version>1.10.2</kotlinx-coroutines.version>
+        <kotlin-logging-jvm.version>2.1.23</kotlin-logging-jvm.version>
+        <springdoc-openapi-starter.version>2.8.9</springdoc-openapi-starter.version>
 
         <!-- plugin version -->
+        <hibernate-model-gen-plugin.version>6.4.4.Final</hibernate-model-gen-plugin.version>
         <maven-processor-plugin.version>5.1</maven-processor-plugin.version>
     </properties>
 
