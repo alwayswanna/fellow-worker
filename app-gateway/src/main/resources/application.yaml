@@ -5,6 +5,18 @@ spring:
   application:
     name: gateway
 
+fellow-worker-app-gateway:
+  authorization-url: "/"
+  token-url: "/"
+  unprotected-patterns:
+    - "/assets/**"
+    - "/login"
+    - "/actuator/**"
+    - "/error"
+    - "/v3/api-docs/**"
+    - "/swagger-ui/**"
+    - "/swagger-ui.html"
+
 management:
   endpoint:
     health:

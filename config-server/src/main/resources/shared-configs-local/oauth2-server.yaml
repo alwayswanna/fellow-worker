@@ -32,10 +32,12 @@ fellow-worker-oauth2-server:
     - "/actuator/**"
     - "/error"
     - "/v3/api-docs/**"
+    - "/swagger-ui/**"
+    - "/swagger-ui.html"
     - "/api/v1/account/create" # create new account.
   defaultClients:
     - default-client-id: message
-      default-client-secret: c29tZXNlY3Rlcg==
+      default-client-secret: c29tZXNlY3Rlcg== # TODO: move to Vault
       default-access-token-time-to-live: 30 # minutes
       default-refreshToken-time-to-live: 3 # days
       client-secret-days-ttl: 90

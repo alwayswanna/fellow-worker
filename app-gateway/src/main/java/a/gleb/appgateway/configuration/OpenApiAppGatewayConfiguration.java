@@ -1,4 +1,5 @@
-package a.gleb.oauth2server.configuration;
+package a.gleb.appgateway.configuration;
+
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -8,12 +9,12 @@ import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
-import static a.gleb.oauth2server.constant.OAuth2ServerConstants.OAUTH2_SERVER_DEFINITION;
+import static a.gleb.appgateway.constants.AppGatewayConstants.OAUTH2_SERVER_DEFINITION;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "oauth2-server",
-                description = "Service for users authentication & authorization. API user management & authorities management. ",
+                title = "app-gateway",
+                description = "Gateway service for all servers. ",
                 version = "v1"
         )
 )
@@ -22,8 +23,8 @@ import static a.gleb.oauth2server.constant.OAuth2ServerConstants.OAUTH2_SERVER_D
         type = SecuritySchemeType.OAUTH2,
         flows = @OAuthFlows(
                 authorizationCode = @OAuthFlow(
-                        authorizationUrl = "${fellow-worker-oauth2-server.authorization-url}",
-                        tokenUrl = "${fellow-worker-oauth2-server.token-url}",
+                        authorizationUrl = "${fellow-worker-app-gateway.authorization-url}",
+                        tokenUrl = "${fellow-worker-app-gateway.token-url}",
                         scopes = {
                                 @OAuthScope(
                                         name = "openid", description = "Scope for get additional information about user."
@@ -31,8 +32,9 @@ import static a.gleb.oauth2server.constant.OAuth2ServerConstants.OAUTH2_SERVER_D
                         }
                 ),
                 clientCredentials = @OAuthFlow(
-                        tokenUrl = "${fellow-worker-oauth2-server.token-url}"
+                        tokenUrl = "${fellow-worker-app-gateway.token-url}"
                 )
         )
 )
-public record OpenApiOAuth2ServerConfiguration() {/* dummy class*/}
+public record OpenApiAppGatewayConfiguration() {
+}
