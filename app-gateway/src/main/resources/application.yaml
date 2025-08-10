@@ -4,18 +4,36 @@ server:
 spring:
   application:
     name: gateway
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:9001
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: oauth2-server
+              uri: http://localhost:9001
+              predicates:
+                - Header=X-Request-Id, \d+
+            - id: fellow-worker
+              uri: http://localhost:4334
+              predicates:
+                - Header=X-Request-Id, \d+
+            - id: cv-generator
+              uri: http://localhost:7044
+              predicates:
+                - Header=X-Request-Id, \d+
 
 fellow-worker-app-gateway:
   authorization-url: "/"
   token-url: "/"
   unprotected-patterns:
     - "/assets/**"
-    - "/login"
     - "/actuator/**"
-    - "/error"
-    - "/v3/api-docs/**"
-    - "/swagger-ui/**"
-    - "/swagger-ui.html"
+    - "/webjars/**"
 
 management:
   endpoint:

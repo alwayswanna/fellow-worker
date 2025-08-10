@@ -14,7 +14,7 @@ import static a.gleb.appgateway.constants.AppGatewayConstants.OAUTH2_SERVER_DEFI
 @OpenAPIDefinition(
         info = @Info(
                 title = "app-gateway",
-                description = "Gateway service for all servers. ",
+                description = "Gateway service for all applications. ",
                 version = "v1"
         )
 )

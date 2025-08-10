@@ -43,6 +43,7 @@ fellow-worker-oauth2-server:
       client-secret-days-ttl: 90
       default-redirect-uris:
         - "https://oauth.pstmn.io/v1/browser-callback"
+        - "http://localhost:9001/swagger-ui/oauth2-redirect.html"
   rmq:
     await-timeout: 40000
   default-roles:

@@ -6,12 +6,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity.AuthorizeExchangeSpec;
+import org.springframework.security.config.web.server.ServerHttpSecurity.CorsSpec;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -22,25 +22,25 @@ public class AppGatewayConfiguration {
     private final AppGatewayConfigurationProperties properties;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity httpSecurity) {
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(it -> {
-                    var configurationSource = new UrlBasedCorsConfigurationSource();
-                    configurationSource.registerCorsConfiguration("/**", properties.cors());
-                    it.configurationSource(configurationSource);
-                })
-                .authorizeHttpRequests(this::configureAuthorizationHttpRequests)
-                .oauth2ResourceServer(Customizer.withDefaults())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(this::configureCors)
+                .authorizeExchange(this::configureAuthorizationHttpRequests)
+                .oauth2ResourceServer(it -> it.jwt(Customizer.withDefaults()))
                 .build();
     }
 
-    private void configureAuthorizationHttpRequests(
-            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry) {
-        var unprotectedPatterns = properties.unprotectedPatterns().toArray(String[]::new);
-
-        registry.requestMatchers(unprotectedPatterns).permitAll();
-        registry.anyRequest().authenticated();
+    private void configureAuthorizationHttpRequests(AuthorizeExchangeSpec exchangeSpec) {
+        exchangeSpec
+                .pathMatchers(properties.unprotectedPatterns().toArray(String[]::new))
+                .permitAll();
+        exchangeSpec.anyExchange().authenticated();
     }
 
+    private void configureCors(CorsSpec corsSpec) {
+        var configurationSource = new UrlBasedCorsConfigurationSource();
+        configurationSource.registerCorsConfiguration("/**", properties.cors());
+        corsSpec.configurationSource(configurationSource);
+    }
 }
