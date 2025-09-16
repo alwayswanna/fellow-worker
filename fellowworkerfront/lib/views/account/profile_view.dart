@@ -441,12 +441,11 @@ class Profile extends StatefulWidget {
   late final FellowWorkerService resumeService;
   late final CvGeneratorService cvGeneratorService;
 
-  Profile({
+  Profile({Key? key,
     required ClientManagerService aS,
     required FellowWorkerService rS,
-    required CvGeneratorService cG,
-    super.key
-  }) {
+    required CvGeneratorService cG
+  }) : super(key: key) {
     accountService = aS;
     resumeService = rS;
     cvGeneratorService = cG;

@@ -8,7 +8,6 @@ import 'package:fellowworkerfront/utils/utility_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
-
 class _ChangePassword extends State<ChangePassword>
     with SingleTickerProviderStateMixin {
   late ClientManagerService accountService;
@@ -37,8 +36,7 @@ class _ChangePassword extends State<ChangePassword>
   Widget build(BuildContext context) {
     return UtilityWidgets.buildTopBar(
         UtilityWidgets.buildGradient(buildLayout(), _animationController),
-        context
-    );
+        context);
   }
 
   Widget buildLayout() {
@@ -183,10 +181,7 @@ class _ChangePassword extends State<ChangePassword>
 class ChangePassword extends StatefulWidget {
   late final ClientManagerService accountService;
 
-  ChangePassword(
-      {
-      required ClientManagerService aS,
-      super.key}) {
+  ChangePassword({required ClientManagerService aS}) {
     accountService = aS;
   }
 

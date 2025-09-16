@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="app-gateway" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="local" />
-    <module name="app-gateway" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.appgateway.AppGatewayApplication" />
+    <module name="gateway-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.gateway_service.AppGatewayApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

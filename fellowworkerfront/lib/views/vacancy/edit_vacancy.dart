@@ -376,11 +376,10 @@ class EditVacancy extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
   late final VacancyResponseApiModel vacancyResponseApiModel;
 
-  EditVacancy({
+  EditVacancy({Key? key,
     required FellowWorkerService fWS,
-    required VacancyResponseApiModel vRAM,
-    super.key
-  }) {
+    required VacancyResponseApiModel vRAM
+  }) : super(key: key) {
     fellowWorkerService = fWS;
     vacancyResponseApiModel = vRAM;
   }

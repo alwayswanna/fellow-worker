@@ -1,38 +1,115 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  # environment services
-  postgres:
-    container_name: postgresSQL
+  # 5432
+  postgres-user-service:
+    container_name: postgres-user-service
     image: postgres:15.2-alpine
     environment:
-      POSTGRES_DB: authorization
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: us-database
+      POSTGRES_USER: user-service
+      POSTGRES_PASSWORD: uSaB25**3
     ports:
       - "5432:5432"
-  mongo:
-    container_name: mongoDB
-    image: mongo:6.0.3
-    ports:
-      - "27017:27017"
+  # 5432
+  postgres-main-service:
+    container_name: postgres-main-service
+    image: postgres:15.2-alpine
     environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: mongo
-      MONGO_INITDB_DATABASE: fellow-worker
-  rabbit:
-    container_name: rabbitMQ
-    image: rabbitmq:3.11-management
+      POSTGRES_DB: m-database
+      POSTGRES_USER: main-service
+      POSTGRES_PASSWORD: uSaB25**3
     ports:
-      - "15672:15672"
-      - "5672:5672"
-  vault:
+      - "5433:5432"
+  # 8200
+  vault: # 8200
     image: vault:1.13.3
     container_name: vault
-    environment:
-      - VAULT_DEV_ROOT_TOKEN_ID=root-token
-      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+    restart: unless-stopped
     ports:
       - "8200:8200"
+    environment:
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+      - VAULT_API_ADDR=http://0.0.0.0:8200
+      - VAULT_UI=true
+    volumes:
+      - ./vault/config:/vault/config
+      - vault_data:/vault/data
+      - vault_logs:/vault/logs
+    cap_add:
+      - IPC_LOCK
+    command: server
+  # 9000, 9001
+  minio:
+    image: bitnami/minio:2025.7.23
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: user_default
+      MINIO_ROOT_PASSWORD: user_password
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+  # 2181
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+  # 9092, 29092
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+  # 8080
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
+      - KAFKA_CLUSTERS_0_JMXPORT=9997
+    restart: unless-stopped
 
 
+volumes:
+  minio_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./minio/data
+  vault_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./vault/data
+  vault_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./vault/logs

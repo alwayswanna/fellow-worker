@@ -451,10 +451,9 @@ class _CreateResume extends State<CreateResume>
 class CreateResume extends StatefulWidget {
   late final FellowWorkerService workerService;
 
-  CreateResume({
-    required FellowWorkerService fW,
-    super.key
-  }) {
+  CreateResume({Key? key,
+    required FellowWorkerService fW
+  }) : super(key: key) {
     workerService = fW;
   }
 

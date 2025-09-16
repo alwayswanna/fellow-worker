@@ -240,7 +240,6 @@ class EditCurrentAccount extends StatefulWidget {
 
   EditCurrentAccount({
     required ClientManagerService cM,
-    super.key
   }) {
     clientManagerService = cM;
   }

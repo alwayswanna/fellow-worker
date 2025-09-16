@@ -3,11 +3,11 @@
  * Created by https://github.com/alwayswanna
  */
 
-import 'package:flutter_web_auth/src/flutter_web_auth_web.dart';
+import 'package:flutter_web_auth/flutter_web_auth_web.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 // ignore: public_member_api_docs
 void registerPlugins(Registrar registrar) {
-  FlutterWebAuthPlugin.registerWith(registrar);
+  FlutterWebAuthWeb.registerWith(registrar);
   registrar.registerMessageHandler();
 }

@@ -252,10 +252,9 @@ class _Registration extends State<Registration>
 class Registration extends StatefulWidget {
   late final ClientManagerService accountService;
 
-  Registration({
+  Registration({Key? key,
     required ClientManagerService aS,
-    super.key
-  }) {
+  }) : super(key: key) {
     accountService = aS;
   }
 

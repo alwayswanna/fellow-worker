@@ -24,11 +24,11 @@
 
     <modules>
         <module>api-common</module>
-        <module>app-gateway</module>
-        <module>cv-generator</module>
+        <module>gateway-service</module>
+        <module>cv-service</module>
         <module>config-server</module>
-        <module>oauth2-server</module>
-        <module>fellow-worker-service</module>
+        <module>user-service</module>
+        <module>main-service</module>
     </modules>
 
     <properties>
@@ -51,6 +51,7 @@
         <!-- plugin version -->
         <hibernate-model-gen-plugin.version>6.4.4.Final</hibernate-model-gen-plugin.version>
         <maven-processor-plugin.version>5.1</maven-processor-plugin.version>
+        <shedlock.version>6.10.0</shedlock.version>
     </properties>
 
     <dependencyManagement>
@@ -88,6 +89,16 @@
             </dependency>
 
             <!-- Other -->
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-spring</artifactId>
+                <version>${shedlock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-provider-jdbc-template</artifactId>
+                <version>${shedlock.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

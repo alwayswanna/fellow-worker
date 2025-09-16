@@ -18,7 +18,7 @@ const recruiterText = "Здесь размещены самые свежие и 
 const searchFieldHint = '🔎 Найти работу мечты';
 
 class FullScreenWidget extends StatelessWidget {
-  const FullScreenWidget({super.key});
+  const FullScreenWidget({Key? key, }) : super(key: key);
 
   /// Build main page with two cards for employee & recruiter.
   @override

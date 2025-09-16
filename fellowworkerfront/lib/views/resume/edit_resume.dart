@@ -481,9 +481,8 @@ class EditResume extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
 
   EditResume(
-      {required ResumeResponseModel rM,
-      required FellowWorkerService fWS,
-      super.key}) {
+      {Key? key, required ResumeResponseModel rM,
+      required FellowWorkerService fWS}) : super(key: key) {
     resumeResponseModel = rM;
     fellowWorkerService = fWS;
   }

@@ -346,7 +346,7 @@ class _SearchVacancies extends State<SearchVacancies>
 class SearchVacancies extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
 
-  SearchVacancies({required FellowWorkerService fWS, super.key}) {
+  SearchVacancies({Key? key, required FellowWorkerService fWS}) : super(key: key) {
     fellowWorkerService = fWS;
   }
 

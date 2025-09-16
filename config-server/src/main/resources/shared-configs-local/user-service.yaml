@@ -1,0 +1,77 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/us-database
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-main.yaml
+    url: ${spring.datasource.url}
+    password: ${spring.datasource.password}
+    user: ${spring.datasource.username}
+  cloud:
+    function:
+      definition: accountEvent
+    stream:
+      binders:
+        kafka:
+          type: kafka
+      bindings:
+        account-event-out-0:
+          content-type: application/json
+          destination: user-service.account
+          group: user-service
+  threads:
+    virtual:
+      enabled: true
+
+user-service:
+  initialization-on-startup:
+    enabled: true
+  unprotected-patterns:
+    - "/assets/**"
+    - "/login"
+    - "/actuator/**"
+    - "/error"
+    - "/v3/api-docs/**"
+    - "/swagger-ui/**"
+    - "/swagger-ui.html"
+    - "/api/v1/account/create"
+  default-clients:
+    message-client:
+      client-id: message
+      access-token-ttl: 30 # minutes
+      refresh-token-ttl: 3 # days
+      client-secret-ttl: 365
+      redirect-uris:
+        - "https://oauth.pstmn.io/v1/browser-callback"
+        - "http://localhost:7001/swagger-ui/oauth2-redirect.html"
+        - "http://127.0.0.1:7001/swagger-ui/oauth2-redirect.html"
+  default-roles:
+    - role-name: UNRECOGNIZED
+      display-name: Unrecognized
+      system-role: false
+    - role-name: SYSTEM
+      display-name: System
+      system-role: true
+      is-map-on-default-client: true
+    - role-name: ADMIN
+      display-name: Administrator
+      system-role: true
+      is-map-on-default-client: false
+  issuer-url: http://127.0.0.1:7001
+  send-out-box-message:
+    cron: 0 */5 * * * ?
+  remove-expired-session-task:
+    cron: 0 0 0 * * ?
+    day-offset: 90
+  token-url: /oauth2/token
+  authorization-url: /oauth2/authorize
+  default-lock-at-most-for: 5m
+  cors:
+    allowed-origins: "*"
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
+    allowed-origin-patterns:
+      - "*"

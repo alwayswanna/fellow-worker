@@ -347,7 +347,7 @@ class _StateResume extends State<SearchResume>
 class SearchResume extends StatefulWidget {
   late final FellowWorkerService _fellowWorkerService;
 
-  SearchResume({required FellowWorkerService fWS, super.key}) {
+  SearchResume({Key? key, required FellowWorkerService fWS}) : super(key: key) {
     _fellowWorkerService = fWS;
   }
 

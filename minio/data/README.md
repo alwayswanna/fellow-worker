@@ -1,0 +1,1 @@
+# Directory for attaching to Minio and store userº data. 

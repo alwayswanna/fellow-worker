@@ -1,23 +1,26 @@
 /.idea/
 
+# gateway
+/gateway-service/.mvn/
+/gateway-service/target/
 # authorization
-/oauth2-server/.mvn/
-/oauth2-server/target/
+/user-service/.mvn/
+/user-service/target/
 # app-gateway
 /app-gateway/target/
 /app-gateway/.mvn/
 # main-service
-/fellow-worker-service/target/
-/fellow-worker-service/.mvn/
+/main-service/target/
+/main-service/.mvn/
 # models
 /api-common/.mvn/
 /api-common/target/
 # config-server
 /config-server/target/
 /config-server/.mvn/
-# cv-generator
-/cv-generator/.mvn/
-/cv-generator/target/
+# cv-service
+/cv-service/.mvn/
+/cv-service/target/
 # frontend application
 /fellowworkerfront/test/widget_test.dart
 /fellowworkerfront/.dart_tool
@@ -26,3 +29,7 @@
 /fellowworkerfront/build
 /fellowworkerfront/.flutter-plugins
 /fellowworkerfront/.flutter-plugins-dependencies
+/.secrets/
+/vault/data/
+/vault/logs/
+/minio/data

@@ -1,0 +1,110 @@
+server:
+  port: 7002
+  error:
+    include-message: always
+    include-binding-errors: always
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: message
+      client-secret: c29tZXNlY3Rlcg==
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorizationUrl: http://localhost:7001/oauth2/authorize
+    tokenUrl: http://localhost:7001/oauth2/token
+
+spring:
+  application:
+    name: main-service
+  profiles:
+    active: local
+  config:
+    import:
+      - configserver:http://localhost:7004
+      - vault://
+  cloud:
+    vault:
+      authentication: token
+      kv:
+        backend: secrets/fellow-worker
+        application-name: ${spring.application.name}
+        enabled: true
+        profiles:
+          - local
+      enabled: true
+      uri: http://localhost:8200
+      token: ${VAULT_TOKEN}
+    config:
+      enabled: true
+      uri: http://localhost:9099
+      fail-fast: true
+      retry:
+        initialInterval: 300
+        maxAttempts: 10
+        max-interval: 3000
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:7001
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5433/m-database
+    username: main-service
+    password: uSaB25**3
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-main.yaml
+    url: jdbc:postgresql://localhost:5433/m-database
+    password: ${spring.r2dbc.password}
+    user: ${spring.r2dbc.username}
+
+main-service:
+  cors:
+    enabled: true
+    allowed-origins:
+      - "*"
+    allowed-origins-all: true
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
+  security-constraints:
+    - roles:
+        - EMPLOYEE
+      security-collections:
+        - patterns:
+            - /api/v1/employee/create-resume
+            - /api/v1/employee/edit-resume
+            - /api/v1/employee/delete-resume
+            - /api/v1/employee/current-user-resume
+    - roles:
+        - COMPANY
+      security-collections:
+        - patterns:
+            - /api/v1/vacancy/create
+            - /api/v1/vacancy/edit
+            - /api/v1/vacancy/delete-id
+            - /api/v1/vacancy/current-user-vacancies
+  unprotected-paths:
+    - /api/v1/employee/get-all-resume
+    - /api/v1/employee/filter-resumes
+    - /api/v1/employee/get-resume-id
+    - /api/v1/vacancy/vacancy-all
+    - /api/v1/vacancy/id
+    - /api/v1/vacancy/filter-vacancies
+  scoped-paths:
+    - /api/v1/support/**
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    web: INFO

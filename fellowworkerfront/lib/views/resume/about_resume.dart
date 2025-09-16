@@ -215,10 +215,9 @@ class AboutResume extends StatefulWidget {
   late final ResumeResponseModel resumeResponseModel;
   late final FellowWorkerService fellowWorkerService;
 
-  AboutResume({
+  AboutResume({Key? key,
     required ResumeResponseModel resume,
-    required FellowWorkerService fS,
-    super.key})
+    required FellowWorkerService fS}) : super(key: key)
   {
     resumeResponseModel = resume;
     fellowWorkerService = fS;

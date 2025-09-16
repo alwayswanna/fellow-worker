@@ -61,7 +61,7 @@ class UtilityWidgets {
       child: FutureBuilder(
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           return widget;
-        },
+        }, future: null,
       ),
     );
   }

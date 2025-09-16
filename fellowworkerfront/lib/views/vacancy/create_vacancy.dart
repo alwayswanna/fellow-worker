@@ -340,7 +340,7 @@ class _CreateVacancy extends State<CreateVacancy>
 class CreateVacancy extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
 
-  CreateVacancy({required FellowWorkerService fWS, super.key}) {
+  CreateVacancy({Key? key, required FellowWorkerService fWS}) : super(key: key) {
     fellowWorkerService = fWS;
   }
 

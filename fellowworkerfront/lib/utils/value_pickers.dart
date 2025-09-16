@@ -11,10 +11,12 @@ class StateTextFieldWidget extends StatefulWidget {
   late final String uuidWidget;
   late final String message;
 
-  StateTextFieldWidget({super.key,
-    required Map<String, DateTime> tM,
-    required String id,
-    required String m}) {
+  StateTextFieldWidget(
+      {Key? key,
+      required Map<String, DateTime> tM,
+      required String id,
+      required String m})
+      : super(key: key) {
     timeMap = tM;
     uuidWidget = id;
     message = m;
@@ -45,8 +47,7 @@ class _StateTextFieldWidget extends State<StateTextFieldWidget> {
             fillColor: Colors.white,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
             hintText:
-            " $message ${timeMap[uuidWidget]!.year}/${timeMap[uuidWidget]!
-                .month}/${timeMap[uuidWidget]!.day}"),
+                " $message ${timeMap[uuidWidget]!.year}/${timeMap[uuidWidget]!.month}/${timeMap[uuidWidget]!.day}"),
         readOnly: true,
         // when true user cannot edit text
         onTap: () async {
@@ -77,11 +78,13 @@ class StateDropdownButtonWidget extends StatefulWidget {
   late final String uuidWidget;
   late final String message;
 
-  StateDropdownButtonWidget({super.key,
-    required Map<String, TextEditingController> tec,
-    required List<String> dV,
-    required String id,
-    required String m}) {
+  StateDropdownButtonWidget(
+      {Key? key,
+      required Map<String, TextEditingController> tec,
+      required List<String> dV,
+      required String id,
+      required String m})
+      : super(key: key) {
     textEditingContMap = tec;
     dropDownValues = dV;
     uuidWidget = id;
@@ -133,14 +136,12 @@ class _StateDropdownButtonWidget extends State<StateDropdownButtonWidget> {
   List<DropdownMenuItem<String>> buildDropDownButtonsForEducationFrame() {
     List<DropdownMenuItem<String>> buttons = [];
     for (var level in dropDownValues) {
-      buttons.add(
-          DropdownMenuItem(
-              value: level,
-              child: Text(
-                level,
-                style: const TextStyle(color: Colors.black),
-              ))
-      );
+      buttons.add(DropdownMenuItem(
+          value: level,
+          child: Text(
+            level,
+            style: const TextStyle(color: Colors.black),
+          )));
     }
 
     return buttons;

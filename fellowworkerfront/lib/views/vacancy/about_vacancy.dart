@@ -244,11 +244,10 @@ class AboutVacancy extends StatefulWidget {
   late final FellowWorkerService fellowWorkerService;
   late final VacancyResponseApiModel vacancyResponseApiModel;
 
-  AboutVacancy({
+  AboutVacancy({Key? key,
     required FellowWorkerService fWS,
     required VacancyResponseApiModel vacancy,
-    super.key
-  }) {
+  }) : super(key: key) {
     fellowWorkerService = fWS;
     vacancyResponseApiModel = vacancy;
   }

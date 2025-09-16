@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: changes/changelog-v1.0-create-schemes.sql
+      relativeToChangelogFile: true

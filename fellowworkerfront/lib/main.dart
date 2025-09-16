@@ -37,8 +37,7 @@ void main() {
       oauth2: oauth2Service,
       aS: clientManagerService,
       rS: fellowWorkerService,
-      cG: cvGeneratorService
-  ));
+      cG: cvGeneratorService));
 }
 
 class MyApp extends StatelessWidget {
@@ -47,12 +46,13 @@ class MyApp extends StatelessWidget {
   late final FellowWorkerService fellowWorkerService;
   late final CvGeneratorService cvGeneratorService;
 
-  MyApp(
-      {required Oauth2Service oauth2,
-      required ClientManagerService aS,
-      required FellowWorkerService rS,
-      required CvGeneratorService cG,
-      super.key}) {
+  MyApp({
+    Key? key,
+    required Oauth2Service oauth2,
+    required ClientManagerService aS,
+    required FellowWorkerService rS,
+    required CvGeneratorService cG,
+  }) : super(key: key) {
     oauth2service = oauth2;
     clientManagerService = aS;
     fellowWorkerService = rS;
@@ -96,10 +96,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage(
-      {super.key,
-      required this.title,
-      required this.oauth2service});
+  const MyHomePage({Key? key, required this.title, required this.oauth2service})
+      : super(key: key);
 
   final String title;
   final Oauth2Service oauth2service;
@@ -172,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage>
               future: buildButtonProfile(style),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return snapshot.data!;
+                  return TextButton(onPressed: () {}, child: const Text("Login"));
                 } else {
                   return TextButton(
                       onPressed: () {

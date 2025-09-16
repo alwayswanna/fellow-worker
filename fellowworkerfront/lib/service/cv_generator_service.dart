@@ -30,7 +30,7 @@ class CvGeneratorService {
 
     if (response.statusCode == 200) {
       await FileSaver.instance
-          .saveFile("result_cv.pdf", response.bodyBytes, "pdf");
+          .saveFile(name: "result_cv.pdf", bytes: response.bodyBytes, fileExtension: "pdf");
       return "Ваше резюме успешно сохранено ✔️";
     } else {
       return "Ошибка при попытке загрузить резюме";
