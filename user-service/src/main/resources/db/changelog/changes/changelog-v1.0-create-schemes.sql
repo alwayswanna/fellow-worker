@@ -71,6 +71,13 @@ CREATE TABLE role
 
 CREATE INDEX ON role (role_name);
 
+
+CREATE TYPE account_type AS ENUM(
+    'PERSON',
+    'LEGAL',
+    'SYSTEM'
+);
+
 CREATE TABLE account
 (
     id              uuid            NOT NULL,
@@ -84,6 +91,7 @@ CREATE TABLE account
     enabled         boolean         NOT NULL,
     role_id         uuid            NOT NULL,
     phone_number    text            NOT NULL,
+    type            account_type    NOT NULL,
     updated_at      timestamp       DEFAULT current_timestamp,
     created_at      timestamp       DEFAULT current_timestamp,
     version         bigint,

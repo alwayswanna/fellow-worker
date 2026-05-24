@@ -1,30 +1,21 @@
 version: '3.8'
 
 services:
-  # 5432
-  postgres-user-service:
-    container_name: postgres-user-service
+  postgres-server:
+    container_name: postgres-server-fw
     image: postgres:15.2-alpine
     environment:
-      POSTGRES_DB: us-database
-      POSTGRES_USER: user-service
+      POSTGRES_DB: fw
+      POSTGRES_USER: pgUser
       POSTGRES_PASSWORD: uSaB25**3
     ports:
       - "5432:5432"
-  # 5432
-  postgres-main-service:
-    container_name: postgres-main-service
-    image: postgres:15.2-alpine
-    environment:
-      POSTGRES_DB: m-database
-      POSTGRES_USER: main-service
-      POSTGRES_PASSWORD: uSaB25**3
-    ports:
-      - "5433:5432"
-  # 8200
-  vault: # 8200
+    volumes:
+      - ./postgres/create_schemas.sql:/docker-entrypoint-initdb.d/init.sql
+
+  vault:
     image: vault:1.13.3
-    container_name: vault
+    container_name: vault-fw
     restart: unless-stopped
     ports:
       - "8200:8200"
@@ -32,17 +23,17 @@ services:
       - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
       - VAULT_API_ADDR=http://0.0.0.0:8200
       - VAULT_UI=true
+      - VAULT_DEV_ROOT_TOKEN_ID=root
     volumes:
-      - ./vault/config:/vault/config
       - vault_data:/vault/data
       - vault_logs:/vault/logs
     cap_add:
       - IPC_LOCK
-    command: server
-  # 9000, 9001
+    command: server -devº
+
   minio:
     image: bitnami/minio:2025.7.23
-    container_name: minio
+    container_name: minio-fw
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -52,19 +43,19 @@ services:
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
-  # 2181
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
-    container_name: zookeeper
+    container_name: zookeeper-fw
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
-  # 9092, 29092
+
   kafka:
     image: confluentinc/cp-kafka:7.4.0
-    container_name: kafka
+    container_name: kafka-fw
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -78,10 +69,10 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-  # 8080
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
+    container_name: kafka-ui-fw
     depends_on:
       - kafka
     ports:

@@ -18,7 +18,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.0</version>
+        <version>4.0.6</version>
         <relativePath/>
     </parent>
 
@@ -32,17 +32,17 @@
     </modules>
 
     <properties>
+        <services.version>1.0.0-RELEASE</services.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
 
         <kotlin.version>2.1.21</kotlin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Cloud version -->
-        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <spring-cloud.version>2025.1.1</spring-cloud.version>
         <!-- Library version -->
         <pdfbox.version>2.0.22</pdfbox.version>
         <imgscalr-lib.version>4.2</imgscalr-lib.version>
-        <services.version>1.0.0-RELEASE</services.version>
         <testcontainers.version>1.17.6</testcontainers.version>
         <kotlinx-coroutines.version>1.10.2</kotlinx-coroutines.version>
         <kotlin-logging-jvm.version>2.1.23</kotlin-logging-jvm.version>

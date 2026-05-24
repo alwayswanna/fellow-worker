@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: config-server
+  profiles:
+    group:
+      local: native
 
 logging:
   level:
