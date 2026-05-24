@@ -1,0 +1,27 @@
+server:
+  port: 3000
+  forward-headers-strategy: framework
+  shutdown: graceful
+
+spring:
+  application:
+    name: gateway-app
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  cloud:
+    config:
+      enabled: true
+      fail-fast: true
+      # Явный таймаут HTTP-запроса к config-server, а не неограниченное ожидание:
+      # при сетевой деградации (не отказе, а именно зависании) узел не должен
+      # подвисать дольше одной попытки из retry-политики ниже.
+      request-connect-timeout: 3000
+      request-read-timeout: 3000
+      retry:
+        initial-interval: 300
+        max-attempts: 10
+        max-interval: 3000
+
+management:
+  server:
+    port: 2000

@@ -1,0 +1,37 @@
+app:
+  observability:
+    excluded-patterns:
+      - /actuator/**
+      - /v3/api-docs/**
+      - /swagger-ui/**
+  company-service:
+    base-url: ${COMPANY_SERVICE_BASE_URL:http://localhost:9070}
+  resume-service:
+    base-url: ${RESUME_SERVICE_BASE_URL:http://localhost:9091}
+
+springdoc:
+  app:
+    authorizationUri: http://localhost:9098/oauth2/authorize
+    tokenUri: http://localhost:9098/oauth2/token
+
+spring:
+  config:
+    import:
+      - configserver:http://localhost:9003
+      - vault://
+  cloud:
+    vault:
+      authentication: approle
+      kv:
+        backend: secret/fellow-worker
+        enabled: true
+        application-name: ${spring.application.name}
+        profiles:
+          - dev
+      enabled: true
+      uri: http://localhost:8200
+      app-role:
+        role-id: ${VAULT_RID}
+        secret-id: ${VAULT_SID}
+    config:
+      uri: http://localhost:9003

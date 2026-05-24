@@ -1,0 +1,21 @@
+spring:
+  config:
+    import:
+      - configserver:http://localhost:9003
+      - vault://
+  cloud:
+    vault:
+      authentication: approle
+      kv:
+        backend: secret/fellow-worker
+        enabled: true
+        application-name: ${spring.application.name}
+        profiles:
+          - dev
+      enabled: true
+      uri: http://localhost:8200
+      app-role:
+        role-id: ${VAULT_RID}
+        secret-id: ${VAULT_SID}
+    config:
+      uri: http://localhost:9003

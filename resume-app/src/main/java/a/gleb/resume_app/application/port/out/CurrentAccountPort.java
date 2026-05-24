@@ -1,0 +1,16 @@
+package a.gleb.resume_app.application.port.out;
+
+import java.util.UUID;
+
+public interface CurrentAccountPort {
+
+    /**
+     * @throws org.springframework.web.server.ResponseStatusException 401 if missing/unauthenticated.
+     */
+    UUID requiredAccountId();
+
+    /**
+     * @throws org.springframework.web.server.ResponseStatusException 401 if missing/unauthenticated.
+     */
+    String requiredRole();
+}

@@ -1,0 +1,229 @@
+app:
+  routes:
+    - id: resume-app
+      uri: ${app.resume-app.uri}
+    - id: user-app
+      uri: ${app.user-app.uri}
+    - id: vacancy-app
+      uri: ${app.vacancy-app.uri}
+    - id: company-app
+      uri: ${app.company-app.uri}
+  resume-app:
+    uri: http://localhost:9091
+  user-app:
+    uri: http://localhost:9098
+  vacancy-app:
+    uri: http://localhost:9099
+  company-app:
+    uri: http://localhost:9070
+  # Единая точка PUBLIC/AUTHENTICATED/роль для всех проксируемых путей — см. AuthorizationFilter.
+  # Правила проверяются по порядку, первое совпадение выигрывает; путь без method — любой метод.
+  authorization:
+    default-access: AUTHENTICATED
+    rules:
+      # Собственные служебные пути gateway.
+      - path: /fallback/**
+        access: [ PUBLIC ]
+      - path: /v3/api-docs/**
+        access: [ PUBLIC ]
+      - path: /swagger-ui/**
+        access: [ PUBLIC ]
+      - path: /actuator/**
+        access: [ PUBLIC ]
+      # user-app: интерактивный OAuth2 AS flow (сессионный, не Bearer) — всегда публичный на
+      # уровне gateway, аутентификацию ведёт сам user-app через форму логина/сессию.
+      - path: /user-app/login
+        access: [ PUBLIC ]
+      - path: /user-app/oauth2/**
+        access: [ PUBLIC ]
+      - path: /user-app/connect/logout
+        access: [ PUBLIC ]
+      - path: /user-app/.well-known/**
+        access: [ PUBLIC ]
+      - path: /user-app/api/v1/users/register
+        access: [ PUBLIC ]
+      - path: /user-app/api/v1/users/*/photo
+        access: [ PUBLIC ]
+      - path: /user-app/api/v1/roles
+        access: [ PUBLIC ]
+      - path: /user-app/api/v1/admin/**
+        access: [ ADMIN ]
+      # vacancy-app: "/vacancies/saved" матчится wildcard-ом ниже, поэтому пинится раньше.
+      - path: /vacancy-app/api/v1/vacancies/saved
+        method: GET
+        access: [ AUTHENTICATED ]
+      - path: /vacancy-app/api/v1/vacancies
+        method: GET
+        access: [ PUBLIC ]
+      - path: /vacancy-app/api/v1/vacancies/*
+        method: GET
+        access: [ PUBLIC ]
+      # company-app: "/companies/my" аналогично пинится раньше wildcard-а.
+      - path: /company-app/api/v1/companies/my
+        method: GET
+        access: [ AUTHENTICATED ]
+      - path: /company-app/api/v1/companies
+        method: GET
+        access: [ PUBLIC ]
+      - path: /company-app/api/v1/companies/*
+        method: GET
+        access: [ PUBLIC ]
+      - path: /company-app/api/v1/companies/*/recruiters/*
+        method: GET
+        access: [ PUBLIC ]
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: resume-app
+        url: /resume-app/v3/api-docs
+      - name: user-app
+        url: /user-app/v3/api-docs
+      - name: vacancy-app
+        url: /vacancy-app/v3/api-docs
+      - name: company-app
+        url: /company-app/v3/api-docs
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:9098}
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+    gateway:
+      httpclient:
+        connect-timeout: 3000
+        response-timeout: 10s
+        pool:
+          # FIXED вместо ELASTIC: ограничиваем общее число соединений на downstream,
+          # чтобы сетевая деградация одного сервиса не привела к неограниченному росту
+          # коннектов и исчерпанию файловых дескрипторов гейтвея.
+          type: fixed
+          max-connections: 500
+          acquire-timeout: 5000
+          max-idle-time: 30s
+          max-life-time: 5m
+          eviction-interval: 60s
+          # Публикует метрики пула соединений (connections.active/idle/pending) в Micrometer.
+          metrics: true
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origins: "*"
+                allowed-methods: "*"
+                allowed-headers: "*"
+          observability:
+            # Встроенный трейсинг Gateway (ObservedRequestHttpHeadersFilter) не видит span,
+            # который LoggingFilter создаёт через обычный Tracer API (не Observation API,
+            # не прокинут в Reactor Context) — из-за этого он не находит родителя и
+            # создаёт свой собственный новый root-спан на каждый проксируемый запрос,
+            # перезаписывая уже проставленные нами traceparent/b3-заголовки чужим traceId.
+            # Отключаем встроенный механизм и полагаемся только на LoggingFilter.
+            enabled: false
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 5
+    instances:
+      # resume-app отдаёт/принимает файлы через MinIO — медленнее остальных сервисов,
+      # поэтому даём ему больше терпимости к единичным медленным вызовам и дольше окно наблюдения.
+      resume-app:
+        base-config: default
+        sliding-window-size: 30
+        minimum-number-of-calls: 15
+        wait-duration-in-open-state: 20s
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 10s
+    instances:
+      resume-app:
+        base-config: default
+        timeout-duration: 30s
+  bulkhead:
+    configs:
+      default:
+        max-concurrent-calls: 50
+        max-wait-duration: 0ms
+    instances:
+      resume-app:
+        base-config: default
+        max-concurrent-calls: 20
+  ratelimiter:
+    configs:
+      default:
+        limit-for-period: 100
+        limit-refresh-period: 1s
+        timeout-duration: 0ms
+
+management:
+  tracing:
+    enabled: true
+    propagation:
+      type: w3c,b3 # Поддержка двух стандартов: W3C - современный стандарт; B3 - legacy, на всякий случай
+  health:
+    liveness-state:
+      enabled: true
+    readiness-state:
+      enabled: true
+  endpoints:
+    access:
+      default: none
+    web:
+      discovery:
+        enabled: false
+      exposure:
+        include: health, prometheus, refresh, busrefresh
+  endpoint:
+    metrics:
+      access: unrestricted
+    health:
+      access: unrestricted
+      show-details: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          # Готовность отражает только способность самого гейтвея принимать трафик,
+          # а НЕ здоровье downstream-сервисов: один упавший downstream обрабатывается
+          # circuit breaker/fallback, и не должен выводить из ротации весь гейтвей.
+          include: readinessState
+    prometheus:
+      access: unrestricted
+    busrefresh:
+      access: unrestricted
+  defaults:
+    metrics:
+      export:
+        enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        spring:
+          cloud:
+            gateway:
+              requests: true
+      percentiles:
+        spring:
+          cloud:
+            gateway:
+              requests: 0.5,0.95,0.99

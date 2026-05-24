@@ -1,0 +1,72 @@
+import 'package:flutter/material.dart';
+
+import '../theme/app_theme.dart';
+
+/// A centered empty-state view with an icon, title, optional subtitle and action.
+///
+/// Supply [actionLabel] + [onAction] for the default FilledButton,
+/// or pass [action] directly for full control over the button type.
+class EmptyState extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+  /// Custom action widget that overrides [actionLabel]/[onAction].
+  final Widget? action;
+
+  const EmptyState({
+    super.key,
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.actionLabel,
+    this.onAction,
+    this.action,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget? actionWidget = action;
+    if (actionWidget == null && actionLabel != null && onAction != null) {
+      actionWidget = FilledButton.icon(
+        onPressed: onAction,
+        icon: const Icon(Icons.add, size: 18),
+        label: Text(actionLabel!),
+      );
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 52, color: AppColors.border),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.text),
+              textAlign: TextAlign.center,
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                subtitle!,
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            if (actionWidget != null) ...[
+              const SizedBox(height: 20),
+              actionWidget,
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Fellow Worker — Sign in</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet"/>
+    <style>
+        /* Same token names/values as app/lib/theme/app_theme.dart so this
+           page and the Flutter app share one visual identity. This page is
+           a separate origin and can't read the app's in-app toggle, so it
+           follows the OS-level color-scheme preference instead. */
+        :root {
+            --bg: #0F172A;
+            --surface: #1E293B;
+            --border: #334155;
+            --text: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-tertiary: #64748B;
+            --primary: #818CF8;
+            --accent: #A78BFA;
+            --error: #EF4444;
+            --error-bg: rgba(239, 68, 68, 0.12);
+            --logout-bg: rgba(129, 140, 248, 0.12);
+            --logout-border: rgba(129, 140, 248, 0.3);
+            --logout-text: #A5B4FC;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #F5F6FA;
+                --surface: #FFFFFF;
+                --border: #E2E5EC;
+                --text: #0F172A;
+                --text-secondary: #64748B;
+                --text-tertiary: #94A3B8;
+                --primary: #6366F1;
+                --accent: #8B5CF6;
+                --error: #DC2626;
+                --error-bg: rgba(220, 38, 38, 0.08);
+                --logout-bg: rgba(99, 102, 241, 0.08);
+                --logout-border: rgba(99, 102, 241, 0.25);
+                --logout-text: #4338CA;
+                --shadow: rgba(15, 23, 42, 0.12);
+            }
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--text);
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 48px 40px;
+            box-shadow: 0 25px 50px var(--shadow);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .logo-text {
+            font-family: 'Sora', 'Inter', system-ui, sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
+
+        h1 {
+            font-family: 'Sora', 'Inter', system-ui, sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-bottom: 32px;
+        }
+
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .alert-error {
+            background: var(--error-bg);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        .alert-logout {
+            background: var(--logout-bg);
+            border: 1px solid var(--logout-border);
+            color: var(--logout-text);
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input::placeholder { color: var(--text-tertiary); }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            letter-spacing: 0.2px;
+        }
+
+        button[type="submit"]:hover { opacity: 0.9; }
+        button[type="submit"]:active { transform: scale(0.99); }
+
+        .footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">
+        <div class="logo-icon">🤝</div>
+        <span class="logo-text">Fellow Worker</span>
+    </div>
+
+    <h1>Welcome back</h1>
+    <p class="subtitle">Sign in to your account to continue</p>
+
+    <div th:if="${param.error}" class="alert alert-error">
+        <span>⚠</span>
+        <span>Invalid username or password</span>
+    </div>
+
+    <div th:if="${param.logout}" class="alert alert-logout">
+        <span>✓</span>
+        <span>You have been signed out</span>
+    </div>
+
+    <form method="post" action="/login">
+        <div class="field">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username"
+                   placeholder="Enter your username" autofocus autocomplete="username"/>
+        </div>
+
+        <div class="field">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password"
+                   placeholder="Enter your password" autocomplete="current-password"/>
+        </div>
+
+        <button type="submit">Sign in</button>
+    </form>
+
+    <p class="footer">Fellow Worker &copy; 2026</p>
+</div>
+</body>
+</html>

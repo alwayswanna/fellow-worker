@@ -1,0 +1,18 @@
+server:
+  port: 9099
+
+spring:
+  application:
+    name: vacancy-app
+  cloud:
+    config:
+      enabled: true
+      fail-fast: true
+      retry:
+        initial-interval: 300
+        max-attempts: 10
+        max-interval: 3000
+
+management:
+  server:
+    port: 8099

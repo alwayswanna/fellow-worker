@@ -1,0 +1,13 @@
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+spring:
+  config:
+    import:
+      - configserver:${CONFIG_SERVER_URL}
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URL}
