@@ -1,0 +1,20 @@
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+spring:
+  config:
+    import:
+      - configserver:${CONFIG_SERVER_URL}
+      - vault://
+  cloud:
+    vault:
+      kv:
+        profiles:
+          - prod
+      enabled: true
+      uri: ${VAULT_URI}
+    config:
+      uri: ${CONFIG_SERVER_URL}

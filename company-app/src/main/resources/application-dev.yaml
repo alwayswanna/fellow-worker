@@ -1,0 +1,24 @@
+springdoc:
+  app:
+    authorizationUri: http://localhost:9098/oauth2/authorize
+    tokenUri: http://localhost:9098/oauth2/token
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:9098}
+  config:
+    import:
+      - configserver:http://localhost:9003
+      - vault://
+  cloud:
+    vault:
+      kv:
+        profiles:
+          - dev
+      enabled: true
+      uri: http://localhost:8200
+    config:
+      uri: http://localhost:9003

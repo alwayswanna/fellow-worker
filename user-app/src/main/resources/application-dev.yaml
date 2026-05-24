@@ -1,0 +1,14 @@
+spring:
+  config:
+    import:
+      - configserver:http://localhost:9003
+      - vault://
+  cloud:
+    vault:
+      kv:
+        profiles:
+          - dev
+      enabled: true
+      uri: http://localhost:8200
+    config:
+      uri: http://localhost:9003

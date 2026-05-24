@@ -1,0 +1,57 @@
+package a.gleb.company_app.config;
+
+import a.gleb.company_app.config.properties.CompanyAppConfigurationProperties;
+import a.gleb.company_app.constant.CompanyAppConstant;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.OAuthFlow;
+import io.swagger.v3.oas.annotations.security.OAuthFlows;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "company-app",
+                description = "Microservice for company management.",
+                version = "1"
+        )
+)
+@SecurityScheme(
+        name = CompanyAppConstant.OAUTH_SECURITY_SCHEME,
+        type = SecuritySchemeType.OAUTH2,
+        flows = @OAuthFlows(
+                authorizationCode = @OAuthFlow(
+                        authorizationUrl = "${springdoc.app.authorizationUri}",
+                        tokenUrl = "${springdoc.app.tokenUri}"
+                )
+        )
+)
+@Configuration
+@EnableConfigurationProperties(CompanyAppConfigurationProperties.class)
+@RequiredArgsConstructor
+public class CompanyAppConfiguration {
+
+    private final CompanyAppConfigurationProperties properties;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(properties.unprotectedPatterns().toArray(String[]::new)).permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
+                .build();
+    }
+}

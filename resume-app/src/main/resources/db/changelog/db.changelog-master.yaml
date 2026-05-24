@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-init-resume-schema.sql
+  - include:
+      file: db/changelog/changes/002-add-birth-date-photo-url.sql

@@ -1,0 +1,29 @@
+app:
+  resume-app:
+    uri: http://localhost:9091
+  user-app:
+    uri: http://localhost:9098
+  vacancy-app:
+    uri: http://localhost:9099
+  company-app:
+    uri: http://localhost:9070
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: resume-app
+        url: /resume-app/v3/api-docs
+      - name: user-app
+        url: /user-app/v3/api-docs
+      - name: vacancy-app
+        url: /vacancy-app/v3/api-docs
+      - name: company-app
+        url: /company-app/v3/api-docs
+
+spring:
+  config:
+    import:
+      - configserver:http://localhost:9003
+  cloud:
+    config:
+      uri: http://localhost:9003

@@ -1,0 +1,73 @@
+server:
+  port: 3000
+  forward-headers-strategy: framework
+
+app:
+  routes:
+    - id: resume-app
+      uri: ${app.resume-app.uri}
+    - id: user-app
+      uri: ${app.user-app.uri}
+    - id: vacancy-app
+      uri: ${app.vacancy-app.uri}
+    - id: company-app
+      uri: ${app.company-app.uri}
+
+spring:
+  application:
+    name: gateway-app
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origins: "*"
+                allowed-methods: "*"
+                allowed-headers: "*"
+
+management:
+  server:
+    port: 2000
+  tracing:
+    enabled: true
+    propagation:
+      type: w3c,b3 # Поддержка двух стандартов: W3C - современный стандарт; B3 - legacy, на всякий случай
+  endpoints:
+    access:
+      default: none
+    web:
+      discovery:
+        enabled: false
+      exposure:
+        include: health, prometheus
+  endpoint:
+    metrics:
+      access: unrestricted
+    health:
+      access: unrestricted
+      probes:
+        enabled: true
+    prometheus:
+      access: unrestricted
+  defaults:
+    metrics:
+      export:
+        enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        spring:
+          cloud:
+            gateway:
+              requests: true
+      percentiles:
+        spring:
+          cloud:
+            gateway:
+              requests: 0.5,0.95,0.99

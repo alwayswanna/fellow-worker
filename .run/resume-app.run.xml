@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="resume-app" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <envs>
+      <env name="VAULT_RID" value="c29bfb5f-77a1-a28d-646b-37bfb2074e6e" />
+      <env name="VAULT_SID" value="55afb07d-8822-4b37-5950-9d7d14955523" />
+    </envs>
+    <module name="resume-app" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.resume_app.ResumeApp" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

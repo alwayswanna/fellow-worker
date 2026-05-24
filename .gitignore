@@ -1,3 +1,24 @@
-/oauth2-server/.mvn/
-/oauth2-server/target/
 /.idea/
+
+# Maven build output
+/config-server/target/
+/resume-app/target/
+/user-app/target/
+/vacancy-app/target/
+/gateway/target/
+/company-app/target/
+/common/target/
+
+# Flutter — generated & tool caches
+/app/build/
+/app/.dart_tool/
+/app/.flutter-plugins
+/app/.flutter-plugins-dependencies
+/app/.pub-cache/
+/app/.pub/
+/app/.metadata
+/app/**/.packages
+/app/**/*.iml
+
+# Flutter — IDE
+/app/.idea/

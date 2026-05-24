@@ -1,0 +1,221 @@
+server:
+  port: 9098
+
+app:
+  observability:
+    excluded-patterns:
+      - /actuator/**
+      - /v3/api-docs/**
+      - /swagger-ui/**
+  schedulers:
+    create-partition: 0 0 0 1 * ?
+    drop-partition: 0 0 0 1 * ?
+  outbox:
+    scheduler:
+      cron: "*/10 * * * * *"
+    lock:
+      at-most-for: PT15S
+      at-least-for: PT5S
+    batch-size: 100
+    max-retries: 5
+  minio:
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:minioadmin}
+    secret-key: ${MINIO_SECRET_KEY:minioadmin}
+    bucket: ${MINIO_BUCKET:user-app}
+  encoder-strength: 13
+  role:
+    role-code: ADMIN
+    role-name: Administrator
+  admin:
+    username: admin
+    password: admin
+    role-code: admin-role
+  unprotected-patterns:
+    - /v3/api-docs
+    - /swagger-ui.html
+    - /swagger-ui/**
+    - /actuator/health
+    - /actuator/health/*
+    - /actuator/prometheus
+    - /api/v1/users/register
+    - /api/v1/users/*/photo
+    - /api/v1/roles
+    - /oauth2/**
+    - /login
+  drop-partition:
+    lock:
+      at-most-for: PT30S
+      at-least-for: PT20S
+  create-partition:
+    lock:
+      at-most-for: PT30S
+      at-least-for: 20S
+  drop-partition-for: P1M
+  create-partition-for: P1M
+  registered-client:
+    client-id: default
+    client-secret: defaultSecret
+    client-name: defaultRegisteredClient
+    redirect-uris:
+      - http://localhost:8080
+    scopes:
+      - openid
+  init:
+    registered-client: true
+    default-user: false
+  registered-client-default-options:
+    client-secret-expires-at: P3M
+  security-constraints:
+    - roles:
+        - ADMIN
+      security-collections:
+        - patterns:
+            - "/api/v1/admin/**"
+
+spring:
+  application:
+    name: user-app
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: user
+  liquibase:
+    default-schema: user
+    change-log: classpath:/db/changelog/db.changelog-main.yaml
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  cloud:
+    vault:
+      authentication: approle
+      kv:
+        backend: secret/fellow-worker
+        enabled: true
+        application-name: ${spring.application.name}
+      enabled: true
+      app-role:
+        role-id: ${VAULT_RID}
+        secret-id: ${VAULT_SID}
+    stream:
+      bindings:
+        user-events-out-0:
+          destination: user.event
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+          producer-properties:
+            acks: all
+            enable.idempotence: true
+            retries: 3
+            delivery.timeout.ms: 30000
+    config:
+      enabled: true
+      fail-fast: true
+      retry:
+        initial-interval: 300
+        max-attempts: 10
+        max-interval: 3000
+  security:
+    oauth2:
+      authorization-server:
+        client:
+          default-client:
+            registration:
+              client-name: default
+              client-id: default
+              client-secret: default_secret
+              client-authentication-methods:
+                - client_secret_basic
+                - client_secret_post
+              authorization-grant-types:
+                - authorization_code
+                - refresh_token
+                - client_credentials
+              redirect-uris:
+                - http://127.0.0.1:9097/swagger-ui/oauth2-redirect.html
+                - https://oauth.pstmn.io/v1/browser-callback
+                - http://localhost:4000/
+              scopes:
+                - openid
+                - profile
+            require-authorization-consent: false
+            require-proof-key: false
+          flutter-client:
+            registration:
+              client-id: flutter-client
+              client-name: Fellow Worker Flutter Web
+              client-authentication-methods:
+                - none
+              authorization-grant-types:
+                - authorization_code
+                - refresh_token
+              redirect-uris:
+                - http://localhost:4000/
+                - https://oauth.pstmn.io/v1/browser-callback
+              post-logout-redirect-uris:
+                - http://localhost:4000/
+              scopes:
+                - openid
+                - profile
+            require-authorization-consent: false
+            require-proof-key: true
+
+
+management:
+  server:
+    port: 8098
+  health:
+    db:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoints:
+    web:
+      discovery:
+        enabled: false
+      exposure:
+        include: health, prometheus
+    access:
+      default: read_only
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      access: read_only
+      group:
+        liveness:
+          include:
+            - db
+    metrics:
+      access: read_only
+    prometheus:
+      access: read_only
+  defaults:
+    metrics:
+      export:
+        enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0 # 100% all request receive traceID/spandId inside MDC;
+    export:
+      enabled: false
+    propagation:
+      consume: [ B3, B3_MULTI, W3C ] # completable with monolith module crm-2.0
+      produce: [ W3C ] # since we have no reverse integrations into the monolith, we use only W3C
+  observations:
+    annotations:
+      enabled: true

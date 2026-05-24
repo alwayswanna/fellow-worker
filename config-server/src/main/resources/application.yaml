@@ -1,0 +1,14 @@
+server:
+  port: 9003
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    group:
+      dev: native
+
+
+management:
+  server:
+    port: 8003

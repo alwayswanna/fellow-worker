@@ -1,0 +1,94 @@
+server:
+  port: 9070
+
+app:
+  observability:
+    excluded-patterns:
+      - /actuator/**
+      - /v3/api-docs/**
+      - /swagger-ui/**
+  unprotected-patterns:
+    - /actuator/**
+    - /v3/api-docs/**
+    - /swagger-ui/**
+
+spring:
+  application:
+    name: company-app
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: company
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  cloud:
+    vault:
+      authentication: approle
+      kv:
+        backend: secret/fellow-worker
+        enabled: true
+        application-name: ${spring.application.name}
+      enabled: true
+      app-role:
+        role-id: ${VAULT_RID}
+        secret-id: ${VAULT_SID}
+    config:
+      enabled: true
+      fail-fast: true
+      retry:
+        initial-interval: 300
+        max-attempts: 10
+        max-interval: 3000
+
+management:
+  server:
+    port: 8070
+  health:
+    db:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoints:
+    web:
+      discovery:
+        enabled: false
+      exposure:
+        include: health, prometheus
+    access:
+      default: read_only
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      access: read_only
+      group:
+        liveness:
+          include:
+            - db
+    metrics:
+      access: read_only
+    prometheus:
+      access: read_only
+  defaults:
+    metrics:
+      export:
+        enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0 # 100% all request receive traceID/spandId inside MDC;
+    export:
+      enabled: false
+    propagation:
+      consume: [ B3, B3_MULTI, W3C ] # completable with monolith module crm-2.0
+      produce: [ W3C ] # since we have no reverse integrations into the monolith, we use only W3C
+  observations:
+    annotations:
+      enabled: true

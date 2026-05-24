@@ -6,37 +6,44 @@
 
     <groupId>a.gleb</groupId>
     <artifactId>fellow-worker</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-
-    <modules>
-        <module>client-manager</module>
-        <module>fellow-worker-service</module>
-        <module>oauth2-server</module>
-        <module>oauth2-persistence</module>
-    </modules>
+    <version>1.0.0</version>
 
     <packaging>pom</packaging>
+    <modules>
+        <module>common</module>
+        <module>config-server</module>
+        <module>resume-app</module>
+        <module>user-app</module>
+        <module>vacancy-app</module>
+        <module>gateway</module>
+        <module>company-app</module>
+    </modules>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0</version>
+        <version>4.0.7</version>
         <relativePath/>
     </parent>
 
+
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <kotlin.version>1.7.20</kotlin.version>
+        <java.version>25</java.version>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Library version -->
-        <spring-cloud.version>2021.0.5</spring-cloud.version>
-        <spring-security-oauth2-authorization-server.version>1.0.0</spring-security-oauth2-authorization-server.version>
-        <fellowworker.version>1.0.0-RELEASE</fellowworker.version>
+        <minio.version>8.5.17</minio.version>
+        <spring-cloud.version>2025.1.1</spring-cloud.version>
+        <schedlock.version>7.7.0</schedlock.version>
+        <springdoc-openapi.version>3.0.3</springdoc-openapi.version>
+        <springdoc-openapi.annotations.version>2.2.52</springdoc-openapi.annotations.version>
+        <opentelemetry-logback-mdc-1.0.version>2.18.1-alpha</opentelemetry-logback-mdc-1.0.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Boot & Spring Cloud -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -44,16 +51,54 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- Other -->
             <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-oauth2-authorization-server</artifactId>
-                <version>${spring-security-oauth2-authorization-server.version}</version>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${springdoc-openapi.annotations.version}</version>
             </dependency>
             <dependency>
-                <groupId>a.gleb</groupId>
-                <artifactId>oauth2-persistence</artifactId>
-                <version>${fellowworker.version}</version>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-logback-mdc-1.0</artifactId>
+                <version>${opentelemetry-logback-mdc-1.0.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-spring</artifactId>
+                <version>${schedlock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.javacrumbs.shedlock</groupId>
+                <artifactId>shedlock-provider-jdbc-template</artifactId>
+                <version>${schedlock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+                <version>${springdoc-openapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

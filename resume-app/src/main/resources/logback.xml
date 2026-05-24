@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <!-- Default appender for service -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%green(%date{dd/MM/yy HH:mm:ss.SSS}) [%X{traceId:-}:%X{spanId:-}] %highlight(%-5level) %magenta([%X{requestor:-anonymous}]) %green([%file:%line]) %cyan(: %msg%n)</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <logger name="a.gleb.resume_app" level="INFO"/>
+
+    <!-- Note: Добавлено для логирования запуска приложения -->
+    <logger name="org.springframework.boot.StartupInfoLogger" level="INFO"/>
+    <logger name="org.springframework.boot.SpringApplication" level="INFO"/>
+    <logger name="org.springframework.boot.web.embedded.tomcat.TomcatWebServer" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>
