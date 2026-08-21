@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// The small drag handle shown at the top of modal bottom sheets.
 class BottomSheetHandle extends StatelessWidget {
   const BottomSheetHandle({super.key});
@@ -12,7 +14,7 @@ class BottomSheetHandle extends StatelessWidget {
         height: 4,
         margin: const EdgeInsets.only(top: 12, bottom: 8),
         decoration: BoxDecoration(
-          color: Colors.grey.shade300,
+          color: AppColors.border,
           borderRadius: BorderRadius.circular(2),
         ),
       ),

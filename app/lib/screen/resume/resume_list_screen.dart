@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../model/resume.dart';
 import '../../service/resume_api_service.dart';
 import '../../service/user_api_service.dart';
+import '../../util/dialogs.dart';
 import 'resume_detail_screen.dart';
 import 'resume_form_screen.dart';
+import '../../theme/app_theme.dart';
 
 class ResumeListScreen extends StatefulWidget {
   final ResumeApiService resumeApiService;
@@ -72,28 +74,13 @@ class _ResumeListScreenState extends State<ResumeListScreen> {
   }
 
   Future<void> _confirmDelete(Resume resume) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('Delete resume?'),
-        content: Text(
+    final confirmed = await confirmDialog(
+      context,
+      title: 'Delete resume?',
+      message:
           'Resume "${resume.desiredPosition ?? resume.fullName}" will be permanently deleted.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
     );
-    if (confirmed != true || !mounted) return;
+    if (!confirmed || !mounted) return;
 
     final ok = await widget.resumeApiService.deleteResume(resume.id);
     if (!mounted) return;
@@ -112,20 +99,20 @@ class _ResumeListScreenState extends State<ResumeListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF232F3E),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.text,
         elevation: 0,
         shadowColor: Colors.black12,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: AppColors.surface,
         title: const Text(
           'My Resumes',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
-        bottom: const PreferredSize(
+        bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Color(0xFFE0E0E0)),
+          child: Divider(height: 1, thickness: 1, color: AppColors.border),
         ),
       ),
       body: _buildBody(),
@@ -137,7 +124,7 @@ class _ResumeListScreenState extends State<ResumeListScreen> {
           label: const Text('Create resume',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           style: FilledButton.styleFrom(
-            backgroundColor: Colors.indigo,
+            backgroundColor: AppColors.accent,
             minimumSize: const Size.fromHeight(52),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -196,7 +183,7 @@ class _ResumeCard extends StatelessWidget {
         : 'Resume';
 
     return Material(
-      color: Colors.white,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -218,17 +205,17 @@ class _ResumeCard extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF232F3E),
+                            color: AppColors.text,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           resume.fullName,
-                          style: const TextStyle(
-                              fontSize: 14, color: Color(0xFF666666)),
+                          style: TextStyle(
+                              fontSize: 14, color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -248,9 +235,9 @@ class _ResumeCard extends StatelessWidget {
                 _SkillsRow(skills: resume.skills),
               ],
 
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
-                child: Divider(height: 1, color: Color(0xFFF0F0F0)),
+                child: Divider(height: 1, color: AppColors.bg),
               ),
 
               // Action buttons
@@ -262,8 +249,8 @@ class _ResumeCard extends StatelessWidget {
                       icon: const Icon(Icons.edit_outlined, size: 16),
                       label: const Text('Edit'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.indigo,
-                        side: const BorderSide(color: Colors.indigo),
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8)),
                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -276,8 +263,8 @@ class _ResumeCard extends StatelessWidget {
                     icon: const Icon(Icons.delete_outline, size: 16),
                     label: const Text('Delete'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
+                      foregroundColor: AppColors.error,
+                      side: BorderSide(color: AppColors.error),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                       padding: const EdgeInsets.symmetric(
@@ -304,7 +291,7 @@ class _Avatar extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.indigo.shade50,
+        color: AppColors.tagBg,
         borderRadius: BorderRadius.circular(10),
       ),
       alignment: Alignment.center,
@@ -313,7 +300,7 @@ class _Avatar extends StatelessWidget {
         style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: Colors.indigo.shade700),
+            color: AppColors.tagText),
       ),
     );
   }
@@ -327,15 +314,15 @@ class _ActiveChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
+        color: AppColors.successBg,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const Text(
+      child: Text(
         'Active',
         style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF2E7D32)),
+            color: AppColors.success),
       ),
     );
   }
@@ -366,11 +353,11 @@ class _MetaRow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF999999)),
+        Icon(icon, size: 14, color: AppColors.textSecondary),
         const SizedBox(width: 4),
         Text(text,
             style:
-                const TextStyle(fontSize: 13, color: Color(0xFF666666))),
+                TextStyle(fontSize: 13, color: AppColors.textSecondary)),
       ],
     );
   }
@@ -406,14 +393,14 @@ class _SkillTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: muted ? const Color(0xFFF0F0F0) : const Color(0xFFEEF2FF),
+        color: muted ? AppColors.bg : AppColors.tagBg,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 12,
-          color: muted ? const Color(0xFF999999) : Colors.indigo.shade700,
+          color: muted ? AppColors.textSecondary : AppColors.tagText,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -439,25 +426,25 @@ class _EmptyState extends StatelessWidget {
               width: 96,
               height: 96,
               decoration: BoxDecoration(
-                color: Colors.indigo.shade50,
+                color: AppColors.tagBg,
                 shape: BoxShape.circle,
               ),
               child: Icon(Icons.description_outlined,
-                  size: 48, color: Colors.indigo.shade300),
+                  size: 48, color: AppColors.border),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'No resumes yet',
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF232F3E)),
+                  color: AppColors.text),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Create your first resume and start applying for jobs',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Color(0xFF666666)),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 32),
             FilledButton.icon(
@@ -465,7 +452,7 @@ class _EmptyState extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: const Text('Create resume'),
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.indigo,
+                backgroundColor: AppColors.accent,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -490,9 +477,9 @@ class _ErrorState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+          Icon(Icons.error_outline, size: 48, color: AppColors.error),
           const SizedBox(height: 16),
-          Text(message, style: const TextStyle(color: Colors.red)),
+          Text(message, style: TextStyle(color: AppColors.error)),
           const SizedBox(height: 16),
           OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
         ],

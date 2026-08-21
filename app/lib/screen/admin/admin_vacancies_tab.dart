@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../model/vacancy.dart';
+import '../../service/http_client.dart';
 import '../../service/vacancy_api_service.dart';
+import '../../util/dialogs.dart';
 import '../../util/formatters.dart';
+import '../../util/paginated_list_controller.dart';
+import '../../theme/app_theme.dart';
+import 'admin_vacancies/vacancy_form_dialog.dart';
 
 class AdminVacanciesTab extends StatefulWidget {
   final VacancyApiService vacancyApiService;
@@ -13,610 +18,120 @@ class AdminVacanciesTab extends StatefulWidget {
   State<AdminVacanciesTab> createState() => _AdminVacanciesTabState();
 }
 
-class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
-  final List<Vacancy> _vacancies = [];
-  final ScrollController _scrollController = ScrollController();
+class _AdminVacanciesTabState extends State<AdminVacanciesTab>
+    with PaginatedListMixin<Vacancy, AdminVacanciesTab> {
   final TextEditingController _searchController = TextEditingController();
   VacancyStatus _statusFilter = VacancyStatus.ACTIVE;
-  bool _isLoading = false;
-  bool _isLoadingMore = false;
-  bool _hasMore = true;
-  int _page = 0;
   static const int _pageSize = 20;
 
   @override
   void initState() {
     super.initState();
-    _loadPage(reset: true);
-    _scrollController.addListener(_onScroll);
+    initPagination();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    disposePagination();
     _searchController.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 200 &&
-        !_isLoadingMore &&
-        _hasMore) {
-      _loadPage();
-    }
-  }
-
-  Future<void> _loadPage({bool reset = false}) async {
-    if (reset) {
-      setState(() {
-        _isLoading = true;
-        _vacancies.clear();
-        _page = 0;
-        _hasMore = true;
-      });
-    } else {
-      setState(() => _isLoadingMore = true);
-    }
-
+  @override
+  Future<(List<Vacancy>, bool)> fetchPage(int page) async {
     final results = await widget.vacancyApiService.searchVacancies(
       title: _searchController.text.trim().isEmpty
           ? null
           : _searchController.text.trim(),
       status: _statusFilter,
-      page: _page,
+      page: page,
       size: _pageSize,
     );
-
-    if (mounted) {
-      setState(() {
-        _vacancies.addAll(results);
-        _hasMore = results.length >= _pageSize;
-        _page++;
-        _isLoading = false;
-        _isLoadingMore = false;
-      });
-    }
+    return (results, results.length >= _pageSize);
   }
 
   Future<void> _showAddDialog() async {
-    final titleCtrl = TextEditingController();
-    final companyIdCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-    final requirementsCtrl = TextEditingController();
-    final salaryFromCtrl = TextEditingController();
-    final salaryToCtrl = TextEditingController();
-    final currencyCtrl = TextEditingController(text: 'RUB');
-    final cityCtrl = TextEditingController();
-    final countryCtrl = TextEditingController();
-    final contactNameCtrl = TextEditingController();
-    final contactEmailCtrl = TextEditingController();
-    final contactPhoneCtrl = TextEditingController();
-    final skillsCtrl = TextEditingController();
-    EmploymentType? employmentType;
-    WorkFormat? workFormat;
-    ExperienceLevel? experienceLevel;
-    VacancyStatus status = VacancyStatus.DRAFT;
-    final formKey = GlobalKey<FormState>();
-
-    final confirmed = await showDialog<bool>(
+    final result = await showDialog<VacancyFormResult>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Add vacancy'),
-          content: SizedBox(
-            width: 480,
-            child: SingleChildScrollView(
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextFormField(
-                      controller: titleCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Title *', border: OutlineInputBorder()),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Required' : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: companyIdCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Company ID *',
-                          border: OutlineInputBorder()),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Required' : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: descCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Description',
-                          border: OutlineInputBorder()),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: requirementsCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Requirements',
-                          border: OutlineInputBorder()),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: salaryFromCtrl,
-                            decoration: const InputDecoration(
-                                labelText: 'Salary from',
-                                border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextFormField(
-                            controller: salaryToCtrl,
-                            decoration: const InputDecoration(
-                                labelText: 'Salary to',
-                                border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextFormField(
-                            controller: currencyCtrl,
-                            decoration: const InputDecoration(
-                                labelText: 'Currency',
-                                border: OutlineInputBorder()),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<EmploymentType>(
-                      value: employmentType,
-                      decoration: const InputDecoration(
-                          labelText: 'Employment type',
-                          border: OutlineInputBorder()),
-                      items: EmploymentType.values
-                          .map((e) => DropdownMenuItem(
-                              value: e, child: Text(e.displayName)))
-                          .toList(),
-                      onChanged: (v) =>
-                          setDialogState(() => employmentType = v),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<WorkFormat>(
-                      value: workFormat,
-                      decoration: const InputDecoration(
-                          labelText: 'Work format',
-                          border: OutlineInputBorder()),
-                      items: WorkFormat.values
-                          .map((e) => DropdownMenuItem(
-                              value: e, child: Text(e.displayName)))
-                          .toList(),
-                      onChanged: (v) =>
-                          setDialogState(() => workFormat = v),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<ExperienceLevel>(
-                      value: experienceLevel,
-                      decoration: const InputDecoration(
-                          labelText: 'Experience level',
-                          border: OutlineInputBorder()),
-                      items: ExperienceLevel.values
-                          .map((e) => DropdownMenuItem(
-                              value: e, child: Text(e.displayName)))
-                          .toList(),
-                      onChanged: (v) =>
-                          setDialogState(() => experienceLevel = v),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<VacancyStatus>(
-                      value: status,
-                      decoration: const InputDecoration(
-                          labelText: 'Status *',
-                          border: OutlineInputBorder()),
-                      items: VacancyStatus.values
-                          .map((e) => DropdownMenuItem(
-                              value: e, child: Text(e.displayName)))
-                          .toList(),
-                      onChanged: (v) =>
-                          setDialogState(() => status = v ?? status),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: cityCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'City', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: countryCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Country', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: skillsCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Skills (comma-separated)',
-                          border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text('Contact info',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: contactNameCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Name', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: contactEmailCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Email', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: contactPhoneCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Phone', border: OutlineInputBorder()),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  Navigator.pop(ctx, true);
-                }
-              },
-              child: const Text('Create'),
-            ),
-          ],
-        ),
-      ),
+      builder: (_) => const VacancyFormDialog(),
     );
-
-    if (confirmed != true || !mounted) return;
-
-    final skills = skillsCtrl.text
-        .split(',')
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
+    if (result == null || !mounted) return;
 
     final body = <String, dynamic>{
-      'title': titleCtrl.text.trim(),
-      'companyId': companyIdCtrl.text.trim(),
-      'status': status.name,
-      if (descCtrl.text.trim().isNotEmpty) 'description': descCtrl.text.trim(),
-      if (requirementsCtrl.text.trim().isNotEmpty)
-        'requirements': requirementsCtrl.text.trim(),
-      if (salaryFromCtrl.text.trim().isNotEmpty)
-        'salaryFrom': int.tryParse(salaryFromCtrl.text.trim()),
-      if (salaryToCtrl.text.trim().isNotEmpty)
-        'salaryTo': int.tryParse(salaryToCtrl.text.trim()),
-      if (currencyCtrl.text.trim().isNotEmpty) 'currency': currencyCtrl.text.trim(),
-      if (employmentType != null) 'employmentType': employmentType!.name,
-      if (workFormat != null) 'workFormat': workFormat!.name,
-      if (experienceLevel != null) 'experienceLevel': experienceLevel!.name,
-      if (cityCtrl.text.trim().isNotEmpty) 'city': cityCtrl.text.trim(),
-      if (countryCtrl.text.trim().isNotEmpty) 'country': countryCtrl.text.trim(),
-      if (skills.isNotEmpty) 'skills': skills,
-      if (contactNameCtrl.text.trim().isNotEmpty)
-        'contactName': contactNameCtrl.text.trim(),
-      if (contactEmailCtrl.text.trim().isNotEmpty)
-        'contactEmail': contactEmailCtrl.text.trim(),
-      if (contactPhoneCtrl.text.trim().isNotEmpty)
-        'contactPhone': contactPhoneCtrl.text.trim(),
+      'title': result.title,
+      'companyId': result.companyId,
+      'status': result.status.name,
+      if (result.description.isNotEmpty) 'description': result.description,
+      if (result.requirements.isNotEmpty) 'requirements': result.requirements,
+      if (result.salaryFrom.isNotEmpty)
+        'salaryFrom': int.tryParse(result.salaryFrom),
+      if (result.salaryTo.isNotEmpty) 'salaryTo': int.tryParse(result.salaryTo),
+      if (result.currency.isNotEmpty) 'currency': result.currency,
+      if (result.employmentType != null)
+        'employmentType': result.employmentType!.name,
+      if (result.workFormat != null) 'workFormat': result.workFormat!.name,
+      if (result.experienceLevel != null)
+        'experienceLevel': result.experienceLevel!.name,
+      if (result.city.isNotEmpty) 'city': result.city,
+      if (result.country.isNotEmpty) 'country': result.country,
+      if (result.skills.isNotEmpty) 'skills': result.skills,
+      if (result.contactName.isNotEmpty) 'contactName': result.contactName,
+      if (result.contactEmail.isNotEmpty) 'contactEmail': result.contactEmail,
+      if (result.contactPhone.isNotEmpty) 'contactPhone': result.contactPhone,
     };
 
-    final created = await widget.vacancyApiService.createVacancy(body);
-    if (mounted) {
-      if (created == null) {
-        _showSnack('Failed to create vacancy');
-      } else {
-        await _loadPage(reset: true);
+    try {
+      await widget.vacancyApiService.createVacancy(body);
+      if (mounted) await loadPage(reset: true);
+    } catch (e) {
+      if (mounted) {
+        _showSnack(e is ApiException ? e.message : 'Failed to create vacancy');
       }
     }
   }
 
   Future<void> _showEditDialog(Vacancy vacancy) async {
-    final titleCtrl = TextEditingController(text: vacancy.title);
-    final descCtrl = TextEditingController(text: vacancy.description ?? '');
-    final requirementsCtrl =
-        TextEditingController(text: vacancy.requirements ?? '');
-    final salaryFromCtrl =
-        TextEditingController(text: vacancy.salaryFrom?.toString() ?? '');
-    final salaryToCtrl =
-        TextEditingController(text: vacancy.salaryTo?.toString() ?? '');
-    final currencyCtrl =
-        TextEditingController(text: vacancy.currency ?? 'RUB');
-    final cityCtrl = TextEditingController(text: vacancy.city ?? '');
-    final countryCtrl = TextEditingController(text: vacancy.country ?? '');
-    final contactNameCtrl =
-        TextEditingController(text: vacancy.contactName ?? '');
-    final contactEmailCtrl =
-        TextEditingController(text: vacancy.contactEmail ?? '');
-    final contactPhoneCtrl =
-        TextEditingController(text: vacancy.contactPhone ?? '');
-    final skillsCtrl =
-        TextEditingController(text: vacancy.skills.join(', '));
-    EmploymentType? employmentType = vacancy.employmentType;
-    WorkFormat? workFormat = vacancy.workFormat;
-    ExperienceLevel? experienceLevel = vacancy.experienceLevel;
-    VacancyStatus status = vacancy.status;
-    final formKey = GlobalKey<FormState>();
-
-    final confirmed = await showDialog<bool>(
+    final result = await showDialog<VacancyFormResult>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: Text('Edit "${vacancy.title}"'),
-          content: SizedBox(
-            width: 480,
-            child: SingleChildScrollView(
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextFormField(
-                      controller: titleCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Title *', border: OutlineInputBorder()),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Required' : null,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: descCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Description',
-                          border: OutlineInputBorder()),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: requirementsCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Requirements',
-                          border: OutlineInputBorder()),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: salaryFromCtrl,
-                            decoration: const InputDecoration(
-                                labelText: 'Salary from',
-                                border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextFormField(
-                            controller: salaryToCtrl,
-                            decoration: const InputDecoration(
-                                labelText: 'Salary to',
-                                border: OutlineInputBorder()),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextFormField(
-                            controller: currencyCtrl,
-                            decoration: const InputDecoration(
-                                labelText: 'Currency',
-                                border: OutlineInputBorder()),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<EmploymentType>(
-                      value: employmentType,
-                      decoration: const InputDecoration(
-                          labelText: 'Employment type',
-                          border: OutlineInputBorder()),
-                      items: EmploymentType.values
-                          .map((e) => DropdownMenuItem(
-                              value: e, child: Text(e.displayName)))
-                          .toList(),
-                      onChanged: (v) =>
-                          setDialogState(() => employmentType = v),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<WorkFormat>(
-                      value: workFormat,
-                      decoration: const InputDecoration(
-                          labelText: 'Work format',
-                          border: OutlineInputBorder()),
-                      items: WorkFormat.values
-                          .map((e) => DropdownMenuItem(
-                              value: e, child: Text(e.displayName)))
-                          .toList(),
-                      onChanged: (v) =>
-                          setDialogState(() => workFormat = v),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<ExperienceLevel>(
-                      value: experienceLevel,
-                      decoration: const InputDecoration(
-                          labelText: 'Experience level',
-                          border: OutlineInputBorder()),
-                      items: ExperienceLevel.values
-                          .map((e) => DropdownMenuItem(
-                              value: e, child: Text(e.displayName)))
-                          .toList(),
-                      onChanged: (v) =>
-                          setDialogState(() => experienceLevel = v),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<VacancyStatus>(
-                      value: status,
-                      decoration: const InputDecoration(
-                          labelText: 'Status *',
-                          border: OutlineInputBorder()),
-                      items: VacancyStatus.values
-                          .map((e) => DropdownMenuItem(
-                              value: e, child: Text(e.displayName)))
-                          .toList(),
-                      onChanged: (v) =>
-                          setDialogState(() => status = v ?? status),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: cityCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'City', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: countryCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Country', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: skillsCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Skills (comma-separated)',
-                          border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text('Contact info',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: contactNameCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Name', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: contactEmailCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Email', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: contactPhoneCtrl,
-                      decoration: const InputDecoration(
-                          labelText: 'Phone', border: OutlineInputBorder()),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  Navigator.pop(ctx, true);
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        ),
-      ),
+      builder: (_) => VacancyFormDialog(existing: vacancy),
     );
-
-    if (confirmed != true || !mounted) return;
-
-    final skills = skillsCtrl.text
-        .split(',')
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
+    if (result == null || !mounted) return;
 
     final body = <String, dynamic>{
-      'title': titleCtrl.text.trim(),
-      'status': status.name,
-      'description': descCtrl.text.trim().isEmpty ? null : descCtrl.text.trim(),
-      'requirements': requirementsCtrl.text.trim().isEmpty
-          ? null
-          : requirementsCtrl.text.trim(),
-      'salaryFrom': int.tryParse(salaryFromCtrl.text.trim()),
-      'salaryTo': int.tryParse(salaryToCtrl.text.trim()),
-      'currency': currencyCtrl.text.trim().isEmpty
-          ? null
-          : currencyCtrl.text.trim(),
-      'employmentType': employmentType?.name,
-      'workFormat': workFormat?.name,
-      'experienceLevel': experienceLevel?.name,
-      'city': cityCtrl.text.trim().isEmpty ? null : cityCtrl.text.trim(),
-      'country': countryCtrl.text.trim().isEmpty ? null : countryCtrl.text.trim(),
-      'skills': skills,
-      'contactName': contactNameCtrl.text.trim().isEmpty
-          ? null
-          : contactNameCtrl.text.trim(),
-      'contactEmail': contactEmailCtrl.text.trim().isEmpty
-          ? null
-          : contactEmailCtrl.text.trim(),
-      'contactPhone': contactPhoneCtrl.text.trim().isEmpty
-          ? null
-          : contactPhoneCtrl.text.trim(),
+      'title': result.title,
+      'status': result.status.name,
+      'description': result.description.isEmpty ? null : result.description,
+      'requirements': result.requirements.isEmpty ? null : result.requirements,
+      'salaryFrom': int.tryParse(result.salaryFrom),
+      'salaryTo': int.tryParse(result.salaryTo),
+      'currency': result.currency.isEmpty ? null : result.currency,
+      'employmentType': result.employmentType?.name,
+      'workFormat': result.workFormat?.name,
+      'experienceLevel': result.experienceLevel?.name,
+      'city': result.city.isEmpty ? null : result.city,
+      'country': result.country.isEmpty ? null : result.country,
+      'skills': result.skills,
+      'contactName': result.contactName.isEmpty ? null : result.contactName,
+      'contactEmail': result.contactEmail.isEmpty ? null : result.contactEmail,
+      'contactPhone': result.contactPhone.isEmpty ? null : result.contactPhone,
     };
 
-    final updated =
-        await widget.vacancyApiService.updateVacancy(vacancy.id, body);
-    if (mounted) {
-      if (updated == null) {
-        _showSnack('Failed to update vacancy');
-      } else {
-        await _loadPage(reset: true);
+    try {
+      await widget.vacancyApiService.updateVacancy(vacancy.id, body);
+      if (mounted) await loadPage(reset: true);
+    } catch (e) {
+      if (mounted) {
+        _showSnack(e is ApiException ? e.message : 'Failed to update vacancy');
       }
     }
   }
 
   Future<void> _delete(Vacancy vacancy) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete vacancy'),
-        content: Text('Delete "${vacancy.title}"?'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, foregroundColor: Colors.white),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
+    final confirmed = await confirmDialog(context,
+        title: 'Delete vacancy', message: 'Delete "${vacancy.title}"?');
+    if (!confirmed) return;
     await widget.vacancyApiService.deleteVacancy(vacancy.id);
-    if (mounted) await _loadPage(reset: true);
+    if (mounted) await loadPage(reset: true);
   }
 
   void _showSnack(String message) {
@@ -625,9 +140,9 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
   }
 
   Color _statusColor(VacancyStatus s) => switch (s) {
-        VacancyStatus.ACTIVE => Colors.green,
-        VacancyStatus.DRAFT => Colors.orange,
-        VacancyStatus.CLOSED => Colors.grey,
+        VacancyStatus.ACTIVE => AppColors.success,
+        VacancyStatus.DRAFT => AppColors.warning,
+        VacancyStatus.CLOSED => AppColors.textSecondary,
       };
 
   @override
@@ -652,12 +167,12 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
                             icon: const Icon(Icons.clear),
                             onPressed: () {
                               _searchController.clear();
-                              _loadPage(reset: true);
+                              loadPage(reset: true);
                             },
                           )
                         : null,
                   ),
-                  onSubmitted: (_) => _loadPage(reset: true),
+                  onSubmitted: (_) => loadPage(reset: true),
                 ),
               ),
               const SizedBox(width: 8),
@@ -671,13 +186,13 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
                 onChanged: (v) {
                   if (v != null) {
                     setState(() => _statusFilter = v);
-                    _loadPage(reset: true);
+                    loadPage(reset: true);
                   }
                 },
               ),
               const SizedBox(width: 8),
               FilledButton.icon(
-                style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
                 icon: const Icon(Icons.add),
                 label: const Text('Add'),
                 onPressed: _showAddDialog,
@@ -686,32 +201,32 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
           ),
         ),
         Expanded(
-          child: _isLoading
+          child: isLoading
               ? const Center(child: CircularProgressIndicator())
-              : _vacancies.isEmpty
+              : items.isEmpty
                   ? const Center(child: Text('No vacancies found'))
                   : RefreshIndicator(
-                      onRefresh: () => _loadPage(reset: true),
+                      onRefresh: () => loadPage(reset: true),
                       child: ListView.separated(
-                        controller: _scrollController,
+                        controller: scrollController,
                         itemCount:
-                            _vacancies.length + (_isLoadingMore ? 1 : 0),
+                            items.length + (isLoadingMore ? 1 : 0),
                         separatorBuilder: (_, __) =>
                             const Divider(height: 1),
                         itemBuilder: (_, i) {
-                          if (i == _vacancies.length) {
+                          if (i == items.length) {
                             return const Padding(
                               padding: EdgeInsets.symmetric(vertical: 16),
                               child:
                                   Center(child: CircularProgressIndicator()),
                             );
                           }
-                          final v = _vacancies[i];
+                          final v = items[i];
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Colors.indigo.shade50,
+                              backgroundColor: AppColors.tagBg,
                               child: Icon(Icons.work_outline,
-                                  color: Colors.indigo.shade400),
+                                  color: AppColors.primary),
                             ),
                             title: Text(v.title),
                             subtitle: Text([
@@ -750,8 +265,8 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
                                   onPressed: () => _showEditDialog(v),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline,
-                                      color: Colors.red),
+                                  icon: Icon(Icons.delete_outline,
+                                      color: AppColors.error),
                                   tooltip: 'Delete',
                                   onPressed: () => _delete(v),
                                 ),

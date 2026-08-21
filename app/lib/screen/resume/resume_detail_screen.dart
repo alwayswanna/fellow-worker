@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../model/resume.dart';
 import '../../service/resume_api_service.dart';
+import '../../util/dialogs.dart';
+import '../../theme/app_theme.dart';
 
 class ResumeDetailScreen extends StatelessWidget {
   final Resume resume;
@@ -16,25 +18,12 @@ class ResumeDetailScreen extends StatelessWidget {
   });
 
   Future<void> _confirmDelete(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('Delete resume?'),
-        content: const Text('This action cannot be undone.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+    final confirmed = await confirmDialog(
+      context,
+      title: 'Delete resume?',
+      message: 'This action cannot be undone.',
     );
-    if (confirmed != true || !context.mounted) return;
+    if (!confirmed || !context.mounted) return;
     final ok = await resumeApiService.deleteResume(resume.id);
     if (context.mounted) {
       Navigator.of(context).pop(ok);
@@ -44,20 +33,20 @@ class ResumeDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF232F3E),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.text,
         elevation: 0,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: AppColors.surface,
         title: Text(
           resume.desiredPosition ?? resume.fullName,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           overflow: TextOverflow.ellipsis,
         ),
-        bottom: const PreferredSize(
+        bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Color(0xFFE0E0E0)),
+          child: Divider(height: 1, thickness: 1, color: AppColors.border),
         ),
         actions: [
           IconButton(
@@ -66,7 +55,7 @@ class ResumeDetailScreen extends StatelessWidget {
             onPressed: onEdit,
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            icon: Icon(Icons.delete_outline, color: AppColors.error),
             tooltip: 'Delete',
             onPressed: () => _confirmDelete(context),
           ),
@@ -110,7 +99,7 @@ class ResumeDetailScreen extends StatelessWidget {
           label: const Text('Edit resume',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           style: FilledButton.styleFrom(
-            backgroundColor: Colors.indigo,
+            backgroundColor: AppColors.accent,
             minimumSize: const Size.fromHeight(52),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -139,7 +128,7 @@ class _SectionCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -149,20 +138,20 @@ class _SectionCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: Row(
               children: [
-                Icon(icon, size: 18, color: Colors.indigo),
+                Icon(icon, size: 18, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF232F3E),
+                    color: AppColors.text,
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          Divider(height: 1, color: AppColors.bg),
           Padding(
             padding: const EdgeInsets.all(16),
             child: child,
@@ -185,7 +174,7 @@ class _HeaderCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -198,7 +187,7 @@ class _HeaderCard extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
+                  color: AppColors.tagBg,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
@@ -209,7 +198,7 @@ class _HeaderCard extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.indigo.shade700),
+                      color: AppColors.tagText),
                 ),
               ),
               const SizedBox(width: 16),
@@ -219,18 +208,18 @@ class _HeaderCard extends StatelessWidget {
                   children: [
                     Text(
                       resume.fullName,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF232F3E)),
+                          color: AppColors.text),
                     ),
                     if (resume.desiredPosition?.isNotEmpty == true) ...[
                       const SizedBox(height: 4),
                       Text(
                         resume.desiredPosition!,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 15,
-                            color: Colors.indigo,
+                            color: AppColors.primary,
                             fontWeight: FontWeight.w500),
                       ),
                     ],
@@ -239,15 +228,15 @@ class _HeaderCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE8F5E9),
+                        color: AppColors.successBg,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Active',
                         style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF2E7D32)),
+                            color: AppColors.success),
                       ),
                     ),
                   ],
@@ -256,7 +245,7 @@ class _HeaderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          Divider(height: 1, color: AppColors.bg),
           const SizedBox(height: 16),
           _contactRow(Icons.email_outlined, resume.email),
           if (resume.phone?.isNotEmpty == true) ...[
@@ -271,10 +260,10 @@ class _HeaderCard extends StatelessWidget {
   Widget _contactRow(IconData icon, String value) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: const Color(0xFF999999)),
+        Icon(icon, size: 16, color: AppColors.textSecondary),
         const SizedBox(width: 10),
         Text(value,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF444444))),
+            style: TextStyle(fontSize: 14, color: AppColors.text)),
       ],
     );
   }
@@ -293,8 +282,8 @@ class _SummaryCard extends StatelessWidget {
       title: 'About me',
       child: Text(
         summary,
-        style: const TextStyle(
-            fontSize: 14, color: Color(0xFF444444), height: 1.6),
+        style: TextStyle(
+            fontSize: 14, color: AppColors.text, height: 1.6),
       ),
     );
   }
@@ -319,14 +308,14 @@ class _SkillsCard extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEEF2FF),
+                    color: AppColors.tagBg,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     s,
                     style: TextStyle(
                         fontSize: 13,
-                        color: Colors.indigo.shade700,
+                        color: AppColors.tagText,
                         fontWeight: FontWeight.w500),
                   ),
                 ))
@@ -355,7 +344,7 @@ class _ExperienceCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (i > 0) ...[
-                const Divider(height: 24, color: Color(0xFFF0F0F0)),
+                Divider(height: 24, color: AppColors.bg),
               ],
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,12 +353,12 @@ class _ExperienceCard extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
+                      color: AppColors.bg,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
-                    child: const Icon(Icons.business_outlined,
-                        size: 18, color: Color(0xFF999999)),
+                    child: Icon(Icons.business_outlined,
+                        size: 18, color: AppColors.textSecondary),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -377,29 +366,29 @@ class _ExperienceCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(e.company,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
-                                color: Color(0xFF232F3E))),
+                                color: AppColors.text)),
                         const SizedBox(height: 2),
                         Text(e.position,
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.indigo,
+                            style: TextStyle(
+                                fontSize: 14, color: AppColors.primary,
                                 fontWeight: FontWeight.w500)),
                         if (e.startDate != null || e.endDate != null) ...[
                           const SizedBox(height: 4),
                           Text(
                             _dateRange(e.startDate, e.endDate),
-                            style: const TextStyle(
-                                fontSize: 13, color: Color(0xFF999999)),
+                            style: TextStyle(
+                                fontSize: 13, color: AppColors.textSecondary),
                           ),
                         ],
                         if (e.description?.isNotEmpty == true) ...[
                           const SizedBox(height: 8),
                           Text(e.description!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 14,
-                                  color: Color(0xFF444444),
+                                  color: AppColors.text,
                                   height: 1.5)),
                         ],
                       ],
@@ -440,7 +429,7 @@ class _EducationCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (i > 0) ...[
-                const Divider(height: 24, color: Color(0xFFF0F0F0)),
+                Divider(height: 24, color: AppColors.bg),
               ],
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,12 +438,12 @@ class _EducationCard extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
+                      color: AppColors.bg,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
-                    child: const Icon(Icons.account_balance_outlined,
-                        size: 18, color: Color(0xFF999999)),
+                    child: Icon(Icons.account_balance_outlined,
+                        size: 18, color: AppColors.textSecondary),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -462,20 +451,20 @@ class _EducationCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(e.institution,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
-                                color: Color(0xFF232F3E))),
+                                color: AppColors.text)),
                         const SizedBox(height: 2),
                         Text('${e.degree} · ${e.fieldOfStudy}',
-                            style: const TextStyle(
-                                fontSize: 14, color: Color(0xFF444444))),
+                            style: TextStyle(
+                                fontSize: 14, color: AppColors.text)),
                         if (e.startDate != null || e.endDate != null) ...[
                           const SizedBox(height: 4),
                           Text(
                             _dateRange(e.startDate, e.endDate),
-                            style: const TextStyle(
-                                fontSize: 13, color: Color(0xFF999999)),
+                            style: TextStyle(
+                                fontSize: 13, color: AppColors.textSecondary),
                           ),
                         ],
                       ],
@@ -514,17 +503,17 @@ class _LinksCard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
                     children: [
-                      const Icon(Icons.open_in_new,
-                          size: 14, color: Colors.indigo),
+                      Icon(Icons.open_in_new,
+                          size: 14, color: AppColors.primary),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           link,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 14,
-                              color: Colors.indigo,
+                              color: AppColors.primary,
                               decoration: TextDecoration.underline,
-                              decorationColor: Colors.indigo),
+                              decorationColor: AppColors.primary),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

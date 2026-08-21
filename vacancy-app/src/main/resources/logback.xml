@@ -15,6 +15,11 @@
     <logger name="org.springframework.boot.SpringApplication" level="INFO"/>
     <logger name="org.springframework.boot.web.embedded.tomcat.TomcatWebServer" level="INFO"/>
 
+    <!-- Note: Подавление шумных логов Kafka-клиента (дампы конфигов, ребалансы и т.п.) -->
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="org.springframework.kafka" level="WARN"/>
+    <logger name="org.springframework.cloud.stream.binder.kafka" level="WARN"/>
+
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>

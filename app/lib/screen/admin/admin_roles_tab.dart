@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../model/user_profile.dart';
 import '../../service/admin_api_service.dart';
+import '../../util/dialogs.dart';
+import '../../util/paginated_list_controller.dart';
+import '../../theme/app_theme.dart';
 
 class AdminRolesTab extends StatefulWidget {
   final AdminApiService adminApiService;
@@ -12,60 +15,24 @@ class AdminRolesTab extends StatefulWidget {
   State<AdminRolesTab> createState() => _AdminRolesTabState();
 }
 
-class _AdminRolesTabState extends State<AdminRolesTab> {
-  final List<UserRole> _roles = [];
-  final ScrollController _scrollController = ScrollController();
-  bool _isLoading = false;
-  bool _isLoadingMore = false;
-  bool _hasMore = true;
-  int _page = 0;
-
+class _AdminRolesTabState extends State<AdminRolesTab>
+    with PaginatedListMixin<UserRole, AdminRolesTab> {
   @override
   void initState() {
     super.initState();
-    _loadPage(reset: true);
-    _scrollController.addListener(_onScroll);
+    initPagination();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    disposePagination();
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 200 &&
-        !_isLoadingMore &&
-        _hasMore) {
-      _loadPage();
-    }
-  }
-
-  Future<void> _loadPage({bool reset = false}) async {
-    if (reset) {
-      setState(() {
-        _isLoading = true;
-        _roles.clear();
-        _page = 0;
-        _hasMore = true;
-      });
-    } else {
-      setState(() => _isLoadingMore = true);
-    }
-
-    final result =
-        await widget.adminApiService.getRoles(page: _page, size: 20);
-
-    if (mounted) {
-      setState(() {
-        _roles.addAll(result.content);
-        _hasMore = !result.last;
-        _page++;
-        _isLoading = false;
-        _isLoadingMore = false;
-      });
-    }
+  @override
+  Future<(List<UserRole>, bool)> fetchPage(int page) async {
+    final result = await widget.adminApiService.getRoles(page: page, size: 20);
+    return (result.content, !result.last);
   }
 
   Future<void> _showRoleDialog({UserRole? role}) async {
@@ -144,36 +111,20 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
         selectable: selectable,
       );
     }
-    await _loadPage(reset: true);
+    await loadPage(reset: true);
   }
 
   Future<void> _delete(UserRole role) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete role'),
-        content: Text('Delete "${role.displayName}"?'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, foregroundColor: Colors.white),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
+    final confirmed = await confirmDialog(context,
+        title: 'Delete role', message: 'Delete "${role.displayName}"?');
+    if (!confirmed) return;
     await widget.adminApiService.deleteRole(role.id);
-    await _loadPage(reset: true);
+    await loadPage(reset: true);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (isLoading) return const Center(child: CircularProgressIndicator());
 
     return Column(
       children: [
@@ -186,32 +137,32 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
               icon: const Icon(Icons.add),
               label: const Text('New role'),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo, foregroundColor: Colors.white),
+                  backgroundColor: AppColors.accent, foregroundColor: AppColors.surface),
             ),
           ),
         ),
         Expanded(
-          child: _roles.isEmpty
+          child: items.isEmpty
               ? const Center(child: Text('No roles found'))
               : RefreshIndicator(
-                  onRefresh: () => _loadPage(reset: true),
+                  onRefresh: () => loadPage(reset: true),
                   child: ListView.separated(
-                    controller: _scrollController,
-                    itemCount: _roles.length + (_isLoadingMore ? 1 : 0),
+                    controller: scrollController,
+                    itemCount: items.length + (isLoadingMore ? 1 : 0),
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (_, i) {
-                      if (i == _roles.length) {
+                      if (i == items.length) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
                           child: Center(child: CircularProgressIndicator()),
                         );
                       }
-                      final role = _roles[i];
+                      final role = items[i];
                       return ListTile(
-                        leading: const CircleAvatar(
-                          backgroundColor: Colors.indigo,
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.accent,
                           child: Icon(Icons.shield_outlined,
-                              color: Colors.white, size: 20),
+                              color: AppColors.surface, size: 20),
                         ),
                         title: Row(
                           children: [
@@ -225,12 +176,12 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                               padding: EdgeInsets.zero,
                               visualDensity: VisualDensity.compact,
                               backgroundColor: role.selectable
-                                  ? Colors.green.shade100
-                                  : Colors.grey.shade200,
+                                  ? AppColors.successBg
+                                  : AppColors.border,
                               labelStyle: TextStyle(
                                 color: role.selectable
-                                    ? Colors.green.shade800
-                                    : Colors.grey.shade600,
+                                    ? AppColors.success
+                                    : AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -247,8 +198,8 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                               onPressed: () => _showRoleDialog(role: role),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline,
-                                  color: Colors.red),
+                              icon: Icon(Icons.delete_outline,
+                                  color: AppColors.error),
                               tooltip: 'Delete',
                               onPressed: () => _delete(role),
                             ),

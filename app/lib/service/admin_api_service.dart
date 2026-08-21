@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import '../config/app_config.dart';
 import '../model/user_profile.dart';
-import 'auth_service.dart';
 import 'http_client.dart';
 
 class PagedResponse<T> {
@@ -24,7 +23,7 @@ class AdminApiService extends AuthenticatedHttpClient {
   Future<PagedResponse<UserProfile>> getUsers({int page = 0, int size = 20}) async {
     final url = '${AppConfig.adminUsersEndpoint}?page=$page&size=$size';
     final response = await get(url);
-    if (response == null || response.statusCode != 200) return PagedResponse.empty();
+    if (response.statusCode != 200) return PagedResponse.empty();
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final content = (json['content'] as List<dynamic>)
         .map((e) => UserProfile.fromJson(e as Map<String, dynamic>))
@@ -50,13 +49,13 @@ class AdminApiService extends AuthenticatedHttpClient {
     if (password != null && password.isNotEmpty) body['password'] = password;
 
     final response = await put('${AppConfig.adminUsersEndpoint}/$id', body);
-    if (response == null || response.statusCode != 200) return null;
+    if (response.statusCode != 200) return null;
     return UserProfile.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   Future<bool> deleteUser(String id) async {
     final response = await delete('${AppConfig.adminUsersEndpoint}/$id');
-    return response != null && response.statusCode == 204;
+    return response.statusCode == 204;
   }
 
   // ── Roles ──────────────────────────────────────────────────────────────────
@@ -64,7 +63,7 @@ class AdminApiService extends AuthenticatedHttpClient {
   Future<PagedResponse<UserRole>> getRoles({int page = 0, int size = 20}) async {
     final url = '${AppConfig.adminRolesEndpoint}?page=$page&size=$size';
     final response = await get(url);
-    if (response == null || response.statusCode != 200) return PagedResponse.empty();
+    if (response.statusCode != 200) return PagedResponse.empty();
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final content = (json['content'] as List<dynamic>)
         .map((e) => UserRole.fromJson(e as Map<String, dynamic>))
@@ -83,7 +82,7 @@ class AdminApiService extends AuthenticatedHttpClient {
   }) async {
     final response = await post(AppConfig.adminRolesEndpoint,
         {'code': code, 'displayName': displayName, 'selectable': selectable});
-    if (response == null || response.statusCode != 201) return null;
+    if (response.statusCode != 201) return null;
     return UserRole.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -99,12 +98,12 @@ class AdminApiService extends AuthenticatedHttpClient {
     if (selectable != null) body['selectable'] = selectable;
 
     final response = await put('${AppConfig.adminRolesEndpoint}/$id', body);
-    if (response == null || response.statusCode != 200) return null;
+    if (response.statusCode != 200) return null;
     return UserRole.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   Future<bool> deleteRole(String id) async {
     final response = await delete('${AppConfig.adminRolesEndpoint}/$id');
-    return response != null && response.statusCode == 204;
+    return response.statusCode == 204;
   }
 }

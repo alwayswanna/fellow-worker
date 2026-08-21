@@ -5,11 +5,14 @@ import 'screen/admin/admin_screen.dart';
 import 'screen/login_screen.dart';
 import 'screen/profile_screen.dart';
 import 'screen/register_screen.dart';
+import 'screen/vacancy/vacancy_browse_screen.dart';
 import 'service/admin_api_service.dart';
 import 'service/auth_service.dart';
 import 'service/resume_api_service.dart';
 import 'service/user_api_service.dart';
 import 'service/vacancy_api_service.dart';
+import 'theme/app_theme.dart';
+import 'theme/theme_controller.dart';
 
 // Services are singletons created once in main() and shared across the app.
 late final AuthService _authService;
@@ -18,7 +21,7 @@ late final AdminApiService _adminApiService;
 late final ResumeApiService _resumeApiService;
 late final VacancyApiService _vacancyApiService;
 
-void main() {
+void main() async {
   _authService = AuthService();
   _userApiService = UserApiService(_authService);
   _adminApiService = AdminApiService(_authService);
@@ -26,6 +29,7 @@ void main() {
   _vacancyApiService = VacancyApiService(_authService);
 
   usePathUrlStrategy();
+  await ThemeController.instance.load();
   runApp(const FellowWorkerApp());
 }
 
@@ -34,13 +38,17 @@ class FellowWorkerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeController.instance.mode,
+      builder: (context, _, __) => _buildApp(),
+    );
+  }
+
+  Widget _buildApp() {
     return MaterialApp(
       title: 'Fellow Worker',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.theme,
       onGenerateInitialRoutes: (_) => [
         MaterialPageRoute(
           builder: (context) => AppRouter(
@@ -71,6 +79,10 @@ class FellowWorkerApp extends StatelessWidget {
               userApiService: _userApiService,
               resumeApiService: _resumeApiService,
               vacancyApiService: _vacancyApiService,
+            ),
+        '/vacancies': (context) => VacancyBrowseScreen(
+              vacancyApiService: _vacancyApiService,
+              authService: _authService,
             ),
       },
     );
@@ -110,8 +122,10 @@ class _AppRouterState extends State<AppRouter> {
       return;
     }
 
+    // Guests land on the public vacancy browser instead of being forced
+    // through OAuth before seeing anything.
     final authenticated = await widget.authService.isAuthenticated();
-    _navigate(authenticated ? '/profile' : '/login');
+    _navigate(authenticated ? '/profile' : '/vacancies');
   }
 
   void _navigate(String route) {

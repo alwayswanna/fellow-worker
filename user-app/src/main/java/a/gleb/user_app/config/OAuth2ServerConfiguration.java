@@ -1,8 +1,8 @@
 package a.gleb.user_app.config;
 
+import a.gleb.user_app.adapter.in.security.OAuth2UserDetailsService;
+import a.gleb.user_app.application.port.out.UserRepositoryPort;
 import a.gleb.user_app.config.properties.UserAppConfigurationProperties;
-import a.gleb.user_app.db.repository.UserEntityRepository;
-import a.gleb.user_app.service.oauth.OAuth2UserDetailsService;
 import a.gleb.user_app.utils.Jwks;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -30,7 +30,6 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @RequiredArgsConstructor
 @Configuration(proxyBeanMethods = false)
@@ -94,10 +93,10 @@ public class OAuth2ServerConfiguration {
     }
 
     @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer(UserEntityRepository userEntityRepository) {
+    public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer(UserRepositoryPort userRepositoryPort) {
         return context -> {
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
-                userEntityRepository.findUserEntityByLogin(context.getPrincipal().getName())
+                userRepositoryPort.findByLogin(context.getPrincipal().getName())
                         .ifPresent(user -> context.getClaims()
                                 .claim("account_id", user.getId().toString())
                                 .claim("login", user.getLogin()));

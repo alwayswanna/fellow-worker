@@ -207,6 +207,33 @@ class Vacancy {
       );
 }
 
+class CompanyReview {
+  final String id;
+  final String companyId;
+  final String accountId;
+  final int rating;
+  final String? comment;
+  final String? createdAt;
+
+  CompanyReview({
+    required this.id,
+    required this.companyId,
+    required this.accountId,
+    required this.rating,
+    this.comment,
+    this.createdAt,
+  });
+
+  factory CompanyReview.fromJson(Map<String, dynamic> json) => CompanyReview(
+        id: json['id'] as String,
+        companyId: json['companyId'] as String,
+        accountId: json['accountId'] as String,
+        rating: json['rating'] as int,
+        comment: json['comment'] as String?,
+        createdAt: json['createdAt'] as String?,
+      );
+}
+
 class Company {
   final String id;
   final String name;

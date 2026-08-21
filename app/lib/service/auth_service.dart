@@ -4,10 +4,10 @@ import 'dart:math';
 import 'dart:html' as html;
 
 import 'package:crypto/crypto.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/app_config.dart';
+import 'http_client.dart' show sharedHttpClient;
 
 class AuthService {
   static const _keyAccessToken = 'access_token';
@@ -65,7 +65,7 @@ class AuthService {
       return false;
     }
 
-    final response = await http.post(
+    final response = await sharedHttpClient.post(
       Uri.parse(AppConfig.tokenEndpoint),
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: {
@@ -111,10 +111,18 @@ class AuthService {
   Future<bool> _doRefresh() async {
     final prefs = await SharedPreferences.getInstance();
     final refreshToken = prefs.getString(_keyRefreshToken);
-    if (refreshToken == null) return false;
+    // No refresh token stored means this session can never be renewed (the
+    // auth server doesn't issue one for this public/PKCE client) — treat it
+    // the same as a definitively-dead refresh token below: log out instead
+    // of silently leaving an expired access token in place for every future
+    // call to 401 against.
+    if (refreshToken == null) {
+      await logout();
+      return false;
+    }
 
     try {
-      final response = await http.post(
+      final response = await sharedHttpClient.post(
         Uri.parse(AppConfig.tokenEndpoint),
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: {
@@ -130,6 +138,13 @@ class AuthService {
         if (data['refresh_token'] != null) {
           await prefs.setString(
               _keyRefreshToken, data['refresh_token'] as String);
+        }
+        // The id_token is used later as id_token_hint on RP-initiated
+        // logout — without refreshing it here it goes stale after the
+        // first access-token TTL window, causing the auth server to
+        // reject it (and fall back to a generic error page) on logout.
+        if (data['id_token'] != null) {
+          await prefs.setString(_keyIdToken, data['id_token'] as String);
         }
         return true;
       }

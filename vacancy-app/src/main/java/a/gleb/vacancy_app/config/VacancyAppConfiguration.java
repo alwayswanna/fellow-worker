@@ -12,11 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestClient;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -42,11 +44,28 @@ public class VacancyAppConfiguration {
 
     private final VacancyAppConfigurationProperties properties;
 
+    /**
+     * Used by {@link a.gleb.vacancy_app.adapter.out.client.CompanyRestClientAdapter}
+     * to enrich vacancy responses with company name/logo/city/rating.
+     */
+    @Bean
+    public RestClient companyServiceRestClient() {
+        return RestClient.builder()
+                .baseUrl(properties.companyService().baseUrl())
+                .build();
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(properties.unprotectedPatterns().toArray(String[]::new)).permitAll()
+                        // "/vacancies/saved" matches the single-segment wildcard below, so it must be
+                        // pinned to authenticated explicitly, ahead of that rule.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/vacancies/saved").authenticated()
+                        // Guest browsing: vacancy search/detail is public; create/update/delete
+                        // and everything under /applications stay behind auth.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/vacancies", "/api/v1/vacancies/*").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

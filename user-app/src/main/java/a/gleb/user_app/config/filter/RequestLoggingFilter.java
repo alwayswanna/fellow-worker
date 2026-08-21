@@ -1,7 +1,7 @@
 package a.gleb.user_app.config.filter;
 
+import a.gleb.user_app.application.port.out.CurrentUserPort;
 import a.gleb.user_app.config.properties.UserAppConfigurationProperties;
-import a.gleb.user_app.service.oauth.AccountContext;
 import io.micrometer.tracing.Tracer;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,6 +21,7 @@ import java.util.List;
 
 import static a.gleb.user_app.constant.UserAppConstant.REQUESTOR;
 import static a.gleb.user_app.constant.UserAppConstant.TRACE_ID_RESPONSE_HEADER;
+import static a.gleb.user_app.constant.UserAppConstant.X_FORWARDED_FOR_HEADER;
 
 @Slf4j
 @Component
@@ -30,16 +31,16 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final Tracer tracer;
-    private final AccountContext accountContext;
+    private final CurrentUserPort currentUserPort;
     private final List<String> excludedEndpoints;
 
     public RequestLoggingFilter(
             Tracer tracer,
-            AccountContext accountContext,
+            CurrentUserPort currentUserPort,
             UserAppConfigurationProperties properties
     ) {
         this.tracer = tracer;
-        this.accountContext = accountContext;
+        this.currentUserPort = currentUserPort;
         this.excludedEndpoints = properties.observability().excludedPatterns();
     }
 
@@ -50,7 +51,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         var startTime = System.currentTimeMillis();
-        var requestor = accountContext.getAccountLogin();
+        var requestor = currentUserPort.getCurrentLogin();
 
         try {
             MDC.put(REQUESTOR, requestor);
@@ -78,12 +79,24 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
                     response.getStatus(),
                     duration,
                     requestor,
-                    request.getRemoteAddr()
+                    resolveClientAddress(request)
             );
 
             // Clear MDC context
             MDC.remove(REQUESTOR);
         }
+    }
+
+    /**
+     * The app sits behind an internal gateway, so `X-Forwarded-For` (set/overwritten there)
+     * reflects the real client IP; `getRemoteAddr()` alone would only ever show the gateway.
+     */
+    private String resolveClientAddress(HttpServletRequest request) {
+        var forwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     @Override

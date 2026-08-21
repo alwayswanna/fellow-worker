@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../model/vacancy.dart';
 import '../../service/vacancy_api_service.dart';
+import '../../util/dialogs.dart';
+import '../../util/paginated_list_controller.dart';
+import '../../theme/app_theme.dart';
 
 class AdminCompaniesTab extends StatefulWidget {
   final VacancyApiService vacancyApiService;
@@ -12,67 +15,33 @@ class AdminCompaniesTab extends StatefulWidget {
   State<AdminCompaniesTab> createState() => _AdminCompaniesTabState();
 }
 
-class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
-  final List<Company> _companies = [];
-  final ScrollController _scrollController = ScrollController();
+class _AdminCompaniesTabState extends State<AdminCompaniesTab>
+    with PaginatedListMixin<Company, AdminCompaniesTab> {
   final TextEditingController _searchController = TextEditingController();
-  bool _isLoading = false;
-  bool _isLoadingMore = false;
-  bool _hasMore = true;
-  int _page = 0;
   static const int _pageSize = 20;
 
   @override
   void initState() {
     super.initState();
-    _loadPage(reset: true);
-    _scrollController.addListener(_onScroll);
+    initPagination();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    disposePagination();
     _searchController.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 200 &&
-        !_isLoadingMore &&
-        _hasMore) {
-      _loadPage();
-    }
-  }
-
-  Future<void> _loadPage({bool reset = false}) async {
-    if (reset) {
-      setState(() {
-        _isLoading = true;
-        _companies.clear();
-        _page = 0;
-        _hasMore = true;
-      });
-    } else {
-      setState(() => _isLoadingMore = true);
-    }
-
+  @override
+  Future<(List<Company>, bool)> fetchPage(int page) async {
     final results = await widget.vacancyApiService.searchCompanies(
       name: _searchController.text.trim().isEmpty
           ? null
           : _searchController.text.trim(),
-      page: _page,
+      page: page,
     );
-
-    if (mounted) {
-      setState(() {
-        _companies.addAll(results);
-        _hasMore = results.length >= _pageSize;
-        _page++;
-        _isLoading = false;
-        _isLoadingMore = false;
-      });
-    }
+    return (results, results.length >= _pageSize);
   }
 
   Future<void> _showAddDialog() async {
@@ -188,7 +157,7 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
       if (created == null) {
         _showSnack('Failed to create company');
       } else {
-        await _loadPage(reset: true);
+        await loadPage(reset: true);
       }
     }
   }
@@ -305,33 +274,17 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
       if (updated == null) {
         _showSnack('Failed to update company');
       } else {
-        await _loadPage(reset: true);
+        await loadPage(reset: true);
       }
     }
   }
 
   Future<void> _delete(Company company) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete company'),
-        content: Text('Delete "${company.name}"?'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, foregroundColor: Colors.white),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
+    final confirmed = await confirmDialog(context,
+        title: 'Delete company', message: 'Delete "${company.name}"?');
+    if (!confirmed) return;
     await widget.vacancyApiService.deleteCompany(company.id);
-    if (mounted) await _loadPage(reset: true);
+    if (mounted) await loadPage(reset: true);
   }
 
   void _showSnack(String message) {
@@ -361,17 +314,17 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
                             icon: const Icon(Icons.clear),
                             onPressed: () {
                               _searchController.clear();
-                              _loadPage(reset: true);
+                              loadPage(reset: true);
                             },
                           )
                         : null,
                   ),
-                  onSubmitted: (_) => _loadPage(reset: true),
+                  onSubmitted: (_) => loadPage(reset: true),
                 ),
               ),
               const SizedBox(width: 8),
               FilledButton.icon(
-                style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
                 icon: const Icon(Icons.add),
                 label: const Text('Add'),
                 onPressed: _showAddDialog,
@@ -380,36 +333,36 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
           ),
         ),
         Expanded(
-          child: _isLoading
+          child: isLoading
               ? const Center(child: CircularProgressIndicator())
-              : _companies.isEmpty
+              : items.isEmpty
                   ? const Center(child: Text('No companies found'))
                   : RefreshIndicator(
-                      onRefresh: () => _loadPage(reset: true),
+                      onRefresh: () => loadPage(reset: true),
                       child: ListView.separated(
-                        controller: _scrollController,
+                        controller: scrollController,
                         itemCount:
-                            _companies.length + (_isLoadingMore ? 1 : 0),
+                            items.length + (isLoadingMore ? 1 : 0),
                         separatorBuilder: (_, __) =>
                             const Divider(height: 1),
                         itemBuilder: (_, i) {
-                          if (i == _companies.length) {
+                          if (i == items.length) {
                             return const Padding(
                               padding: EdgeInsets.symmetric(vertical: 16),
                               child:
                                   Center(child: CircularProgressIndicator()),
                             );
                           }
-                          final company = _companies[i];
+                          final company = items[i];
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Colors.indigo.shade50,
+                              backgroundColor: AppColors.tagBg,
                               child: Text(
                                 company.name.isNotEmpty
                                     ? company.name[0].toUpperCase()
                                     : '?',
                                 style:
-                                    const TextStyle(color: Colors.indigo),
+                                    TextStyle(color: AppColors.primary),
                               ),
                             ),
                             title: Text(company.name),
@@ -428,8 +381,8 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
                                   onPressed: () => _showEditDialog(company),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline,
-                                      color: Colors.red),
+                                  icon: Icon(Icons.delete_outline,
+                                      color: AppColors.error),
                                   tooltip: 'Delete',
                                   onPressed: () => _delete(company),
                                 ),
