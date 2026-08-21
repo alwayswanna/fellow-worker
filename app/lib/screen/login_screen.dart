@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../service/auth_service.dart';
 import '../service/user_api_service.dart';
 import 'register_screen.dart';
+import '../theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthService authService;
@@ -29,13 +30,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: Navigator.of(context).canPop()
+          ? AppBar(backgroundColor: Colors.transparent, elevation: 0)
+          : null,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.work_outline, size: 80, color: Colors.indigo),
+              const Icon(Icons.work_outline, size: 80, color: AppColors.primary),
               const SizedBox(height: 24),
               Text(
                 'Fellow Worker',
@@ -50,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: Theme.of(context)
                     .textTheme
                     .bodyLarge
-                    ?.copyWith(color: Colors.grey),
+                    ?.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: 48),
               SizedBox(
@@ -67,8 +71,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       : const Icon(Icons.login),
                   label: Text(_isLoading ? 'Redirecting...' : 'Sign in'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.indigo,
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: AppColors.surface,
                   ),
                 ),
               ),

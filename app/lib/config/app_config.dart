@@ -59,4 +59,14 @@ class AppConfig {
       '$_gatewayBase/vacancy-app/api/v1/applications/my';
   static String vacancyApplicationsEndpoint(String vacancyId) =>
       '$_gatewayBase/vacancy-app/api/v1/vacancies/$vacancyId/applications';
+
+  // saved vacancies
+  static const String savedVacanciesEndpoint =
+      '$_gatewayBase/vacancy-app/api/v1/vacancies/saved';
+  static String vacancySaveEndpoint(String vacancyId) =>
+      '$_gatewayBase/vacancy-app/api/v1/vacancies/$vacancyId/save';
+
+  // company reviews
+  static String companyReviewsEndpoint(String companyId) =>
+      '$_gatewayBase/company-app/api/v1/companies/$companyId/reviews';
 }

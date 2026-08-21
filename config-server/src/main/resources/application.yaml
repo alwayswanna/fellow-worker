@@ -7,8 +7,19 @@ spring:
   profiles:
     group:
       dev: native
-
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
 
 management:
   server:
     port: 8003
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, busrefresh
+  endpoint:
+    busrefresh:
+      access: unrestricted

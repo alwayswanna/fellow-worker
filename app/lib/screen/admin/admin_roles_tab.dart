@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../model/user_profile.dart';
 import '../../service/admin_api_service.dart';
+import '../../theme/app_theme.dart';
 
 class AdminRolesTab extends StatefulWidget {
   final AdminApiService adminApiService;
@@ -159,7 +160,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
               child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, foregroundColor: Colors.white),
+                backgroundColor: AppColors.error, foregroundColor: AppColors.surface),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Delete'),
           ),
@@ -186,7 +187,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
               icon: const Icon(Icons.add),
               label: const Text('New role'),
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo, foregroundColor: Colors.white),
+                  backgroundColor: AppColors.accent, foregroundColor: AppColors.surface),
             ),
           ),
         ),
@@ -209,9 +210,9 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                       final role = _roles[i];
                       return ListTile(
                         leading: const CircleAvatar(
-                          backgroundColor: Colors.indigo,
+                          backgroundColor: AppColors.accent,
                           child: Icon(Icons.shield_outlined,
-                              color: Colors.white, size: 20),
+                              color: AppColors.surface, size: 20),
                         ),
                         title: Row(
                           children: [
@@ -225,12 +226,12 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                               padding: EdgeInsets.zero,
                               visualDensity: VisualDensity.compact,
                               backgroundColor: role.selectable
-                                  ? Colors.green.shade100
-                                  : Colors.grey.shade200,
+                                  ? AppColors.successBg
+                                  : AppColors.border,
                               labelStyle: TextStyle(
                                 color: role.selectable
-                                    ? Colors.green.shade800
-                                    : Colors.grey.shade600,
+                                    ? AppColors.success
+                                    : AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -248,7 +249,7 @@ class _AdminRolesTabState extends State<AdminRolesTab> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete_outline,
-                                  color: Colors.red),
+                                  color: AppColors.error),
                               tooltip: 'Delete',
                               onPressed: () => _delete(role),
                             ),

@@ -11,10 +11,17 @@ spring:
       - vault://
   cloud:
     vault:
+      authentication: approle
       kv:
+        backend: secret/fellow-worker
+        enabled: true
+        application-name: ${spring.application.name}
         profiles:
           - prod
       enabled: true
       uri: ${VAULT_URI}
+      app-role:
+        role-id: ${VAULT_RID}
+        secret-id: ${VAULT_SID}
     config:
       uri: ${CONFIG_SERVER_URL}

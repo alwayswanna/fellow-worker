@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../model/user_profile.dart';
 import '../../service/admin_api_service.dart';
 import '../../util/formatters.dart';
+import '../../theme/app_theme.dart';
 
 class AdminUsersTab extends StatefulWidget {
   final AdminApiService adminApiService;
@@ -176,7 +177,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
               child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, foregroundColor: Colors.white),
+                backgroundColor: AppColors.error, foregroundColor: AppColors.surface),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Delete'),
           ),
@@ -212,9 +213,9 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
               user.firstName.isNotEmpty ? user.firstName[0].toUpperCase() : '?';
           return ListTile(
             leading: CircleAvatar(
-              backgroundColor: Colors.indigo,
+              backgroundColor: AppColors.accent,
               child:
-                  Text(initials, style: const TextStyle(color: Colors.white)),
+                  Text(initials, style: const TextStyle(color: AppColors.surface)),
             ),
             title: Text(user.fullName),
             subtitle: Column(
@@ -224,7 +225,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                 if (user.role != null)
                   Text(user.role!.displayName,
                       style: const TextStyle(
-                          fontSize: 11, color: Colors.indigo)),
+                          fontSize: 11, color: AppColors.primary)),
               ],
             ),
             isThreeLine: user.role != null,
@@ -238,7 +239,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                 ),
                 IconButton(
                   icon:
-                      const Icon(Icons.delete_outline, color: Colors.red),
+                      const Icon(Icons.delete_outline, color: AppColors.error),
                   tooltip: 'Delete',
                   onPressed: () => _delete(user),
                 ),

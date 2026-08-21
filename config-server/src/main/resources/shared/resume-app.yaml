@@ -1,3 +1,129 @@
+app:
+  cors:
+    max-age: 3600
+    allowed-origins:
+      - "*"
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
+  unprotected-patterns:
+    - /actuator/**
+    - /v3/api-docs/**
+    - /swagger-ui/**
+  observability:
+    excluded-patterns:
+      - /actuator/**
+      - /v3/api-docs/**
+      - /swagger-ui/**
+  minio:
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:minioadmin}
+    secret-key: ${MINIO_SECRET_KEY:minioadmin}
+    bucket: ${MINIO_BUCKET:resume-app}
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/fellow-worker
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/fellow-worker}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: resume
+      maximum-pool-size: 15
+      minimum-idle: 5
+      connection-timeout: 10000
+      leak-detection-threshold: 30000
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    default-schema: resume
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:9098}
+  cloud:
+    function:
+      definition: userEventConsumer
+    stream:
+      bindings:
+        userEventConsumer-in-0:
+          destination: user.event
+          group: resume-app
+          content-type: application/json
+          consumer:
+            max-attempts: 3
+            back-off-initial-interval: 1000
+            back-off-max-interval: 10000
+            back-off-multiplier: 2.0
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+        bindings:
+          userEventConsumer-in-0:
+            consumer:
+              enableDlq: true
+              dlqName: user.event.resume-app.dlq
+
+server:
+  shutdown: graceful
+
+management:
+  health:
+    db:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoints:
+    web:
+      discovery:
+        enabled: false
+      exposure:
+        include: health, prometheus, refresh, busrefresh
+    access:
+      default: read_only
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      access: read_only
+      group:
+        liveness:
+          include:
+            - livenessState
+        readiness:
+          include:
+            - readinessState
+            - db
+    metrics:
+      access: read_only
+    prometheus:
+      access: read_only
+    busrefresh:
+      access: unrestricted
+  defaults:
+    metrics:
+      export:
+        enabled: false
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0 # 100% all request receive traceID/spandId inside MDC;
+    export:
+      enabled: false
+    propagation:
+      consume: [ B3, B3_MULTI, W3C ] # completable with monolith module crm-2.0
+      produce: [ W3C ] # since we have no reverse integrations into the monolith, we use only W3C
+  observations:
+    annotations:
+      enabled: true

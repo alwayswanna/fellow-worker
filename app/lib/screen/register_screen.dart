@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../model/user_profile.dart';
 import '../service/user_api_service.dart';
+import '../theme/app_theme.dart';
 import '../util/formatters.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -224,7 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 16),
                     Text(
                       _errorMessage!,
-                      style: const TextStyle(color: Colors.red),
+                      style: const TextStyle(color: AppColors.error),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -236,15 +237,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? null
                           : _onRegisterPressed,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: AppColors.surface,
                       ),
                       child: _isLoading
                           ? const SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white),
+                                  strokeWidth: 2, color: AppColors.surface),
                             )
                           : const Text('Create account'),
                     ),
@@ -266,18 +267,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         children: [
           CircleAvatar(
             radius: 48,
-            backgroundColor: Colors.indigo.shade100,
+            backgroundColor: AppColors.tagBg,
             backgroundImage:
                 _photoBytes != null ? MemoryImage(_photoBytes!) : null,
             child: _photoBytes == null
                 ? const Icon(Icons.person_add_outlined,
-                    size: 40, color: Colors.indigo)
+                    size: 40, color: AppColors.primary)
                 : null,
           ),
           CircleAvatar(
             radius: 14,
-            backgroundColor: Colors.indigo,
-            child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+            backgroundColor: AppColors.accent,
+            child: const Icon(Icons.camera_alt, size: 16, color: AppColors.surface),
           ),
         ],
       ),

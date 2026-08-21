@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A circular avatar showing the first letter of [name] on a colored background.
 /// Optionally displays a [backgroundImage] instead.
 class InitialsAvatar extends StatelessWidget {
@@ -19,7 +21,7 @@ class InitialsAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    final bg = color ?? Colors.indigo;
+    final bg = color ?? AppColors.primary;
     return CircleAvatar(
       radius: radius,
       backgroundColor: bg,

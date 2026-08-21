@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../model/vacancy.dart';
 import '../../service/vacancy_api_service.dart';
 import '../../util/formatters.dart';
+import '../../theme/app_theme.dart';
 
 class AdminVacanciesTab extends StatefulWidget {
   final VacancyApiService vacancyApiService;
@@ -607,7 +608,7 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
               child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, foregroundColor: Colors.white),
+                backgroundColor: AppColors.error, foregroundColor: AppColors.surface),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Delete'),
           ),
@@ -625,9 +626,9 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
   }
 
   Color _statusColor(VacancyStatus s) => switch (s) {
-        VacancyStatus.ACTIVE => Colors.green,
-        VacancyStatus.DRAFT => Colors.orange,
-        VacancyStatus.CLOSED => Colors.grey,
+        VacancyStatus.ACTIVE => AppColors.success,
+        VacancyStatus.DRAFT => AppColors.warning,
+        VacancyStatus.CLOSED => AppColors.textSecondary,
       };
 
   @override
@@ -677,7 +678,7 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
               ),
               const SizedBox(width: 8),
               FilledButton.icon(
-                style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
                 icon: const Icon(Icons.add),
                 label: const Text('Add'),
                 onPressed: _showAddDialog,
@@ -709,9 +710,9 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
                           final v = _vacancies[i];
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Colors.indigo.shade50,
+                              backgroundColor: AppColors.tagBg,
                               child: Icon(Icons.work_outline,
-                                  color: Colors.indigo.shade400),
+                                  color: AppColors.primary),
                             ),
                             title: Text(v.title),
                             subtitle: Text([
@@ -751,7 +752,7 @@ class _AdminVacanciesTabState extends State<AdminVacanciesTab> {
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete_outline,
-                                      color: Colors.red),
+                                      color: AppColors.error),
                                   tooltip: 'Delete',
                                   onPressed: () => _delete(v),
                                 ),

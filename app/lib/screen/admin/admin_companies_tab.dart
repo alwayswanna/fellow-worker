@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../model/vacancy.dart';
 import '../../service/vacancy_api_service.dart';
+import '../../theme/app_theme.dart';
 
 class AdminCompaniesTab extends StatefulWidget {
   final VacancyApiService vacancyApiService;
@@ -322,7 +323,7 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
               child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, foregroundColor: Colors.white),
+                backgroundColor: AppColors.error, foregroundColor: AppColors.surface),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Delete'),
           ),
@@ -371,7 +372,7 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
               ),
               const SizedBox(width: 8),
               FilledButton.icon(
-                style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
                 icon: const Icon(Icons.add),
                 label: const Text('Add'),
                 onPressed: _showAddDialog,
@@ -403,13 +404,13 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
                           final company = _companies[i];
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Colors.indigo.shade50,
+                              backgroundColor: AppColors.tagBg,
                               child: Text(
                                 company.name.isNotEmpty
                                     ? company.name[0].toUpperCase()
                                     : '?',
                                 style:
-                                    const TextStyle(color: Colors.indigo),
+                                    const TextStyle(color: AppColors.primary),
                               ),
                             ),
                             title: Text(company.name),
@@ -429,7 +430,7 @@ class _AdminCompaniesTabState extends State<AdminCompaniesTab> {
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete_outline,
-                                      color: Colors.red),
+                                      color: AppColors.error),
                                   tooltip: 'Delete',
                                   onPressed: () => _delete(company),
                                 ),

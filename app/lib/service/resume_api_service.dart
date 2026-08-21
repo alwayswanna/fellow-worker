@@ -13,7 +13,7 @@ class ResumeApiService extends AuthenticatedHttpClient {
 
   Future<List<Resume>> findAll() async {
     final response = await get('${AppConfig.resumesEndpoint}/my');
-    if (response == null || response.statusCode != 200) return [];
+    if (response.statusCode != 200) return [];
     final list = jsonDecode(response.body) as List<dynamic>;
     return list.map((e) => Resume.fromJson(e as Map<String, dynamic>)).toList();
   }
@@ -37,7 +37,7 @@ class ResumeApiService extends AuthenticatedHttpClient {
     final url = Uri.parse(AppConfig.resumesEndpoint)
         .replace(queryParameters: params);
     final response = await get(url.toString());
-    if (response == null || response.statusCode != 200) return [];
+    if (response.statusCode != 200) return [];
     final body = jsonDecode(response.body);
     // Support both paginated { content: [...] } and plain list responses.
     if (body is Map<String, dynamic>) {
@@ -56,19 +56,19 @@ class ResumeApiService extends AuthenticatedHttpClient {
 
   Future<Resume?> findById(String id) async {
     final response = await get('${AppConfig.resumesEndpoint}/$id');
-    if (response == null || response.statusCode != 200) return null;
+    if (response.statusCode != 200) return null;
     return Resume.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   Future<Resume?> create(Map<String, dynamic> body) async {
     final response = await post(AppConfig.resumesEndpoint, body);
-    if (response == null || response.statusCode != 201) return null;
+    if (response.statusCode != 201) return null;
     return Resume.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   Future<Resume?> update(String id, Map<String, dynamic> body) async {
     final response = await put('${AppConfig.resumesEndpoint}/$id', body);
-    if (response == null || response.statusCode != 200) return null;
+    if (response.statusCode != 200) return null;
     return Resume.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -91,6 +91,6 @@ class ResumeApiService extends AuthenticatedHttpClient {
 
   Future<bool> deleteResume(String id) async {
     final response = await delete('${AppConfig.resumesEndpoint}/$id');
-    return response != null && response.statusCode == 204;
+    return response.statusCode == 204;
   }
 }

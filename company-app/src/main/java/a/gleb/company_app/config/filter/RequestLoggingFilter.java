@@ -1,7 +1,7 @@
 package a.gleb.company_app.config.filter;
 
+import a.gleb.company_app.adapter.out.security.AccountAdapter;
 import a.gleb.company_app.config.properties.CompanyAppConfigurationProperties;
-import a.gleb.company_app.security.AccountContext;
 import io.micrometer.tracing.Tracer;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,12 +30,12 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final Tracer tracer;
-    private final AccountContext accountContext;
+    private final AccountAdapter accountContext;
     private final List<String> excludedEndpoints;
 
     public RequestLoggingFilter(
             Tracer tracer,
-            AccountContext accountContext,
+            AccountAdapter accountContext,
             CompanyAppConfigurationProperties properties
     ) {
         this.tracer = tracer;

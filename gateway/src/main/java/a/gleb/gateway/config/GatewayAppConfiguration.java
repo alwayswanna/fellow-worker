@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus.Series;
 
 import java.util.List;
 import java.util.function.Function;
@@ -28,6 +30,8 @@ public class GatewayAppConfiguration {
 
     private static final String MATCH_ALL_PATTERN = "/**";
     private static final String API_DOCS_PATH = "/v3/api-docs";
+    private static final String FALLBACK_PATH = "/fallback/";
+    private static final int RETRY_ATTEMPTS = 2;
 
     private static final Profiles NOT_PROD_PROFILES_EXPR = Profiles.of("!prod");
 
@@ -58,7 +62,15 @@ public class GatewayAppConfiguration {
     private Function<PredicateSpec, Buildable<Route>> getRoute(RouteDefinition crmRouteDefinition) {
         return r -> r
                 .path("/" + crmRouteDefinition.id() + MATCH_ALL_PATTERN)
-                .filters(f -> f.stripPrefix(1))
+                .filters(f -> f
+                        .stripPrefix(1)
+                        .circuitBreaker(c -> c
+                                .setName(crmRouteDefinition.id())
+                                .setFallbackUri(FALLBACK_PATH + crmRouteDefinition.id()))
+                        .retry(retryConfig -> retryConfig
+                                .setRetries(RETRY_ATTEMPTS)
+                                .setMethods(HttpMethod.GET)
+                                .setSeries(Series.SERVER_ERROR)))
                 .uri(crmRouteDefinition.uri());
     }
 

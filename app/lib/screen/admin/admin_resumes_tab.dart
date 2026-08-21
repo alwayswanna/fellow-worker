@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../config/app_config.dart';
 import '../../model/resume.dart';
 import '../../service/resume_api_service.dart';
+import '../../theme/app_theme.dart';
 
 class AdminResumesTab extends StatefulWidget {
   final ResumeApiService resumeApiService;
@@ -143,14 +144,14 @@ class _AdminResumesTabState extends State<AdminResumesTab> {
                                   ? NetworkImage(
                                       '${AppConfig.photoBaseUrl}${r.photoUrl}')
                                   : null,
-                              backgroundColor: Colors.indigo.shade50,
+                              backgroundColor: AppColors.tagBg,
                               child: r.photoUrl == null
                                   ? Text(
                                       r.firstName.isNotEmpty
                                           ? r.firstName[0].toUpperCase()
                                           : '?',
                                       style: const TextStyle(
-                                          color: Colors.indigo),
+                                          color: AppColors.primary),
                                     )
                                   : null,
                             ),
@@ -191,7 +192,7 @@ class _ResumeDetailSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: AppColors.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -210,14 +211,14 @@ class _ResumeDetailSheet extends StatelessWidget {
                           ? NetworkImage(
                               '${AppConfig.photoBaseUrl}${resume.photoUrl}')
                           : null,
-                      backgroundColor: Colors.indigo.shade50,
+                      backgroundColor: AppColors.tagBg,
                       child: resume.photoUrl == null
                           ? Text(
                               resume.firstName.isNotEmpty
                                   ? resume.firstName[0].toUpperCase()
                                   : '?',
                               style: const TextStyle(
-                                  fontSize: 24, color: Colors.indigo),
+                                  fontSize: 24, color: AppColors.primary),
                             )
                           : null,
                     ),
@@ -230,12 +231,12 @@ class _ResumeDetailSheet extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleLarge),
                           if (resume.desiredPosition != null)
                             Text(resume.desiredPosition!,
-                                style: const TextStyle(color: Colors.indigo)),
+                                style: const TextStyle(color: AppColors.primary)),
                           Text(resume.email,
-                              style: const TextStyle(color: Colors.grey)),
+                              style: const TextStyle(color: AppColors.textSecondary)),
                           if (resume.phone != null)
                             Text(resume.phone!,
-                                style: const TextStyle(color: Colors.grey)),
+                                style: const TextStyle(color: AppColors.textSecondary)),
                         ],
                       ),
                     ),
@@ -282,7 +283,7 @@ class _ResumeDetailSheet extends StatelessWidget {
                     (l) => Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Text(l,
-                          style: const TextStyle(color: Colors.indigo)),
+                          style: const TextStyle(color: AppColors.primary)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -314,7 +315,7 @@ class _ResumeDetailSheet extends StatelessWidget {
                 [e.startDate, e.endDate ?? 'present']
                     .where((d) => d != null)
                     .join(' – '),
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
             if (e.description != null)
               Text(e.description!,
@@ -337,7 +338,7 @@ class _ResumeDetailSheet extends StatelessWidget {
                 [e.startDate, e.endDate ?? 'present']
                     .where((d) => d != null)
                     .join(' – '),
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
           ],
         ),

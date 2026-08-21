@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A styled search text field with a search icon, optional clear button,
 /// and submit-on-enter support.
 class SearchTextField extends StatefulWidget {
@@ -53,20 +55,20 @@ class _SearchTextFieldState extends State<SearchTextField> {
               )
             : null,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.surface,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.indigo),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
       onChanged: (v) {

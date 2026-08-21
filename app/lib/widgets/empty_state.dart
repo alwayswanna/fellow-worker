@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A centered empty-state view with an icon, title, optional subtitle and action.
 ///
 /// Supply [actionLabel] + [onAction] for the default FilledButton,
@@ -31,10 +33,6 @@ class EmptyState extends StatelessWidget {
         onPressed: onAction,
         icon: const Icon(Icons.add, size: 18),
         label: Text(actionLabel!),
-        style: FilledButton.styleFrom(
-          backgroundColor: Colors.indigo,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
       );
     }
 
@@ -44,21 +42,21 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 52, color: Colors.indigo.shade200),
+            Icon(icon, size: 52, color: AppColors.border),
             const SizedBox(height: 16),
             Text(
               title,
               style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF333333)),
+                  color: AppColors.text),
               textAlign: TextAlign.center,
             ),
             if (subtitle != null) ...[
               const SizedBox(height: 6),
               Text(
                 subtitle!,
-                style: const TextStyle(fontSize: 13, color: Color(0xFF888888)),
+                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
               ),
             ],

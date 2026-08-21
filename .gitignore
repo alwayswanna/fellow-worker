@@ -22,3 +22,6 @@
 
 # Flutter — IDE
 /app/.idea/
+
+# Secrets
+.env.local

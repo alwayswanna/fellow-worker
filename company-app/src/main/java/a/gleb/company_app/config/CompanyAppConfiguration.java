@@ -9,14 +9,24 @@ import io.swagger.v3.oas.annotations.security.OAuthFlow;
 import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
+
+import static a.gleb.company_app.constant.CompanyAppConstant.LOCK_TABLE;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -36,6 +46,8 @@ import org.springframework.security.web.SecurityFilterChain;
         )
 )
 @Configuration
+@EnableScheduling
+@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 @EnableConfigurationProperties(CompanyAppConfigurationProperties.class)
 @RequiredArgsConstructor
 public class CompanyAppConfiguration {
@@ -47,11 +59,27 @@ public class CompanyAppConfiguration {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(properties.unprotectedPatterns().toArray(String[]::new)).permitAll()
+                        // "/my" must stay authenticated even though it matches the
+                        // public pattern below, so it's declared first (first match wins).
+                        .requestMatchers(HttpMethod.GET, "/api/v1/companies/my").authenticated()
+                        // Guest browsing: company search/detail is public; create/update/delete stay behind auth.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/companies", "/api/v1/companies/*").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .build();
+    }
+
+    @Bean
+    public LockProvider lockProvider(DataSource dataSource) {
+        return new JdbcTemplateLockProvider(
+                JdbcTemplateLockProvider.Configuration.builder()
+                        .withJdbcTemplate(new JdbcTemplate(dataSource))
+                        .withTableName(LOCK_TABLE)
+                        .usingDbTime()
+                        .build()
+        );
     }
 }

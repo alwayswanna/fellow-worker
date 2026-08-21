@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -47,6 +48,12 @@ public class VacancyAppConfiguration {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(properties.unprotectedPatterns().toArray(String[]::new)).permitAll()
+                        // "/vacancies/saved" matches the single-segment wildcard below, so it must be
+                        // pinned to authenticated explicitly, ahead of that rule.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/vacancies/saved").authenticated()
+                        // Guest browsing: vacancy search/detail is public; create/update/delete
+                        // and everything under /applications stay behind auth.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/vacancies", "/api/v1/vacancies/*").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

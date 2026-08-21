@@ -14,6 +14,7 @@ import '../service/auth_service.dart';
 import '../service/resume_api_service.dart';
 import '../service/user_api_service.dart';
 import '../service/vacancy_api_service.dart';
+import '../theme/app_theme.dart';
 import '../util/formatters.dart';
 import '../widgets/widgets.dart';
 import 'resume/resume_detail_screen.dart';
@@ -159,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
             onPressed: () {
               if (formKey.currentState!.validate()) Navigator.pop(ctx, true);
             },
@@ -210,19 +211,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.red.shade50,
+                        color: AppColors.errorBg,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red.shade200),
+                        border: Border.all(color: AppColors.error.withAlpha(80)),
                       ),
                       child: Row(
                         children: [
                           Icon(Icons.error_outline,
-                              size: 16, color: Colors.red.shade700),
+                              size: 16, color: AppColors.error),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(serverError!,
                                 style: TextStyle(
-                                    color: Colors.red.shade700, fontSize: 13)),
+                                    color: AppColors.error, fontSize: 13)),
                           ),
                         ],
                       ),
@@ -270,7 +271,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: const Text('Cancel'),
             ),
             FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
               onPressed: () async {
                 setDialogState(() => serverError = null);
                 if (!formKey.currentState!.validate()) return;
@@ -356,19 +357,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF232F3E),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.text,
         elevation: 0,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: AppColors.surface,
         title: const Text(
           'Fellow Worker',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Color(0xFFE0E0E0)),
+          child: Divider(height: 1, thickness: 1, color: AppColors.border),
         ),
         actions: [
           if (_profile?.role?.code == 'ADMIN')
@@ -397,7 +398,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(_error!, style: const TextStyle(color: Colors.red)),
+            Text(_error!, style: const TextStyle(color: AppColors.error)),
             const SizedBox(height: 16),
             ElevatedButton(onPressed: _loadProfile, child: const Text('Retry')),
           ],
@@ -410,7 +411,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildContent(UserProfile profile) {
     final isEmployer = profile.role?.code == 'EMPLOYER';
     final isApplicant = profile.role?.code == 'APPLICANT';
-    final isCompany = profile.role?.code == 'COMPANY';
+    final isCompany = profile.role?.code == 'COMPANY_FOUNDER';
     final isRecruiter = profile.role?.code == 'RECRUITER';
     final resume = _resumes.firstOrNull;
 
@@ -433,7 +434,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     Widget buildRightPanel() {
       if (isEmployer) {
-        return _JobSearchPanel(
+        return JobSearchPanel(
           vacancyApiService: widget.vacancyApiService,
           userRole: profile.role?.code,
         );
@@ -479,7 +480,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(width: 320, child: leftPanel),
-              const VerticalDivider(width: 1, color: Color(0xFFE0E0E0)),
+              const VerticalDivider(width: 1, color: AppColors.border),
               Expanded(child: buildRightPanel()),
             ],
           );
@@ -494,7 +495,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     maxHeight: MediaQuery.of(context).size.height * 0.45),
                 child: leftPanel,
               ),
-              const Divider(height: 1, color: Color(0xFFE0E0E0)),
+              const Divider(height: 1, color: AppColors.border),
               Expanded(child: buildRightPanel()),
             ],
           );
@@ -504,7 +505,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             children: [
               leftPanel,
-              const Divider(height: 1, color: Color(0xFFE0E0E0)),
+              const Divider(height: 1, color: AppColors.border),
               buildRightPanel(),
             ],
           ),
@@ -566,20 +567,20 @@ class _ProfilePanel extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 48,
-                    backgroundColor: Colors.indigo,
+                    backgroundColor: AppColors.accent,
                     backgroundImage: profile.photoUrl != null
                         ? NetworkImage(
                             '${AppConfig.photoBaseUrl}${profile.photoUrl}')
                         : null,
                     child: isUploadingPhoto
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const CircularProgressIndicator(color: AppColors.surface)
                         : profile.photoUrl == null
                             ? Text(
                                 profile.firstName.isNotEmpty
                                     ? profile.firstName[0].toUpperCase()
                                     : '?',
                                 style: const TextStyle(
-                                    fontSize: 36, color: Colors.white),
+                                    fontSize: 36, color: AppColors.surface),
                               )
                             : null,
                   ),
@@ -588,12 +589,12 @@ class _ProfilePanel extends StatelessWidget {
                     right: 0,
                     child: Container(
                       decoration: const BoxDecoration(
-                        color: Colors.indigo,
+                        color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
                       padding: const EdgeInsets.all(6),
                       child: const Icon(Icons.camera_alt,
-                          size: 16, color: Colors.white),
+                          size: 16, color: AppColors.surface),
                     ),
                   ),
                 ],
@@ -615,13 +616,13 @@ class _ProfilePanel extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '@${profile.login}',
-                  style: const TextStyle(color: Color(0xFF888888)),
+                  style: const TextStyle(color: AppColors.textSecondary),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          const Divider(color: Color(0xFFE0E0E0)),
+          const Divider(color: AppColors.border),
           const SizedBox(height: 16),
 
           // Info rows
@@ -645,8 +646,8 @@ class _ProfilePanel extends StatelessWidget {
               icon: const Icon(Icons.edit_outlined, size: 18),
               label: const Text('Edit profile'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.indigo,
-                side: const BorderSide(color: Colors.indigo),
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -663,8 +664,8 @@ class _ProfilePanel extends StatelessWidget {
               icon: const Icon(Icons.lock_outline, size: 18),
               label: const Text('Change password'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF555555),
-                side: const BorderSide(color: Color(0xFFCCCCCC)),
+                foregroundColor: AppColors.textSecondary,
+                side: const BorderSide(color: AppColors.border),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -673,7 +674,7 @@ class _ProfilePanel extends StatelessWidget {
           ),
           if (extra != null) ...[
             const SizedBox(height: 24),
-            const Divider(color: Color(0xFFE0E0E0)),
+            const Divider(color: AppColors.border),
             const SizedBox(height: 4),
             extra!,
           ],
@@ -704,10 +705,10 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: const Color(0xFF888888)),
+          Icon(icon, size: 18, color: AppColors.textSecondary),
           const SizedBox(width: 10),
           Text('$label: ',
-              style: const TextStyle(color: Color(0xFF888888), fontSize: 14)),
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
           Expanded(
             child: Text(value,
                 style: const TextStyle(fontSize: 14),
@@ -718,773 +719,6 @@ class _InfoRow extends StatelessWidget {
     );
   }
 }
-
-// ── Job search panel (read-only vacancy browser for job seekers) ───────────────
-
-class _JobSearchPanel extends StatefulWidget {
-  final VacancyApiService vacancyApiService;
-  final String? userRole;
-
-  const _JobSearchPanel({required this.vacancyApiService, this.userRole});
-
-  @override
-  State<_JobSearchPanel> createState() => _JobSearchPanelState();
-}
-
-class _JobSearchPanelState extends State<_JobSearchPanel> {
-  final _searchCtrl = TextEditingController();
-  bool _isLoading = false;
-  bool _firstLoad = false;
-  List<Vacancy> _vacancies = [];
-
-  EmploymentType? _typeFilter;
-  WorkFormat? _formatFilter;
-  ExperienceLevel? _levelFilter;
-
-  @override
-  void initState() {
-    super.initState();
-    _search();
-  }
-
-  @override
-  void dispose() {
-    _searchCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _search() async {
-    setState(() {
-      _isLoading = true;
-      if (!_firstLoad) _firstLoad = true;
-    });
-    final results = await widget.vacancyApiService.searchVacancies(
-      title: _searchCtrl.text.trim().isEmpty ? null : _searchCtrl.text.trim(),
-      employmentType: _typeFilter,
-      workFormat: _formatFilter,
-      experienceLevel: _levelFilter,
-    );
-    if (mounted) {
-      setState(() {
-        _vacancies = results;
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _showVacancyDetail(Vacancy v) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _VacancyDetailSheet(
-        vacancy: v,
-        vacancyApiService: widget.vacancyApiService,
-        userRole: widget.userRole,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Search bar
-        Container(
-          color: Colors.white,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          child: Column(
-            children: [
-              TextField(
-                controller: _searchCtrl,
-                decoration: InputDecoration(
-                  hintText: 'Job title, skill, company...',
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF888888)),
-                  suffixIcon: _searchCtrl.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 18),
-                          onPressed: () {
-                            _searchCtrl.clear();
-                            _search();
-                          },
-                        )
-                      : null,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                ),
-                onSubmitted: (_) => _search(),
-              ),
-              const SizedBox(height: 10),
-              // Filter chips
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _FilterPopup<EmploymentType?>(
-                      label: _typeFilter?.displayName ?? 'Employment',
-                      isActive: _typeFilter != null,
-                      options: [
-                        (null, 'Any'),
-                        ...EmploymentType.values.map((e) => (e, e.displayName)),
-                      ],
-                      value: _typeFilter,
-                      onChanged: (v) {
-                        setState(() => _typeFilter = v);
-                        _search();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    _FilterPopup<WorkFormat?>(
-                      label: _formatFilter?.displayName ?? 'Format',
-                      isActive: _formatFilter != null,
-                      options: [
-                        (null, 'Any'),
-                        ...WorkFormat.values.map((e) => (e, e.displayName)),
-                      ],
-                      value: _formatFilter,
-                      onChanged: (v) {
-                        setState(() => _formatFilter = v);
-                        _search();
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    _FilterPopup<ExperienceLevel?>(
-                      label: _levelFilter?.displayName ?? 'Experience',
-                      isActive: _levelFilter != null,
-                      options: [
-                        (null, 'Any'),
-                        ...ExperienceLevel.values.map((e) => (e, e.displayName)),
-                      ],
-                      value: _levelFilter,
-                      onChanged: (v) {
-                        setState(() => _levelFilter = v);
-                        _search();
-                      },
-                    ),
-                    if (_typeFilter != null || _formatFilter != null || _levelFilter != null) ...[
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _typeFilter = null;
-                            _formatFilter = null;
-                            _levelFilter = null;
-                          });
-                          _search();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 7),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFDDDDDD)),
-                          ),
-                          child: const Text('Clear all',
-                              style: TextStyle(
-                                  fontSize: 13, color: Color(0xFF888888))),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-        const Divider(height: 1, color: Color(0xFFE0E0E0)),
-        // Results
-        Expanded(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _vacancies.isEmpty
-                  ? EmptyState(
-                      icon: Icons.search_off_outlined,
-                      title: 'No vacancies found',
-                      subtitle: 'Try different keywords or filters',
-                      action: OutlinedButton(
-                        onPressed: () {
-                          _searchCtrl.clear();
-                          setState(() {
-                            _typeFilter = null;
-                            _formatFilter = null;
-                            _levelFilter = null;
-                          });
-                          _search();
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.indigo,
-                          side: const BorderSide(color: Colors.indigo),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                        child: const Text('Reset filters'),
-                      ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _vacancies.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _VacancyBrowseCard(
-                        vacancy: _vacancies[i],
-                        onTap: () => _showVacancyDetail(_vacancies[i]),
-                      ),
-                    ),
-        ),
-      ],
-    );
-  }
-}
-
-class _FilterPopup<T> extends StatelessWidget {
-  final String label;
-  final bool isActive;
-  final List<(T, String)> options;
-  final T value;
-  final void Function(T) onChanged;
-
-  const _FilterPopup({
-    required this.label,
-    required this.isActive,
-    required this.options,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<T>(
-      initialValue: value,
-      onSelected: onChanged,
-      itemBuilder: (_) => options
-          .map((opt) => PopupMenuItem<T>(value: opt.$1, child: Text(opt.$2)))
-          .toList(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(
-          color: isActive ? Colors.indigo.shade50 : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isActive ? Colors.indigo.shade300 : const Color(0xFFDDDDDD),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(label,
-                style: TextStyle(
-                    fontSize: 13,
-                    color:
-                        isActive ? Colors.indigo : const Color(0xFF555555))),
-            const SizedBox(width: 4),
-            Icon(Icons.arrow_drop_down,
-                size: 18,
-                color: isActive ? Colors.indigo : const Color(0xFF888888)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _VacancyBrowseCard extends StatelessWidget {
-  final Vacancy vacancy;
-  final VoidCallback onTap;
-
-  const _VacancyBrowseCard({required this.vacancy, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      (vacancy.company?.name ?? '').isNotEmpty
-                          ? vacancy.company!.name[0].toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.indigo.shade600),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(vacancy.title,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 15)),
-                        Text(vacancy.company?.name ?? '',
-                            style: const TextStyle(
-                                fontSize: 13, color: Color(0xFF666666))),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.chevron_right,
-                      size: 20, color: Color(0xFFCCCCCC)),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 6,
-                children: [
-                  if (_salary != null)
-                    _MetaTag(Icons.payments_outlined, _salary!),
-                  if (vacancy.city != null)
-                    _MetaTag(Icons.location_on_outlined, vacancy.city!),
-                  if (vacancy.employmentType != null)
-                    _MetaTag(Icons.access_time_outlined,
-                        vacancy.employmentType!.displayName),
-                  if (vacancy.workFormat != null)
-                    _MetaTag(
-                        Icons.laptop_outlined, vacancy.workFormat!.displayName),
-                  if (vacancy.experienceLevel != null)
-                    _MetaTag(Icons.bar_chart_outlined,
-                        vacancy.experienceLevel!.displayName),
-                ],
-              ),
-              if (vacancy.skills.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: vacancy.skills.take(5).map((s) => Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEEF2FF),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(s,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.indigo.shade700)),
-                      )).toList(),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String? get _salary =>
-      formatSalary(vacancy.salaryFrom, vacancy.salaryTo, vacancy.currency);
-}
-
-class _MetaTag extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _MetaTag(this.icon, this.label);
-
-  @override
-  Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: const Color(0xFF888888)),
-          const SizedBox(width: 4),
-          Text(label,
-              style:
-                  const TextStyle(fontSize: 13, color: Color(0xFF555555))),
-        ],
-      );
-}
-
-// ── Vacancy detail sheet ───────────────────────────────────────────────────────
-
-class _VacancyDetailSheet extends StatefulWidget {
-  final Vacancy vacancy;
-  final String? userRole;
-  final VacancyApiService? vacancyApiService;
-
-  const _VacancyDetailSheet({
-    required this.vacancy,
-    this.userRole,
-    this.vacancyApiService,
-  });
-
-  @override
-  State<_VacancyDetailSheet> createState() => _VacancyDetailSheetState();
-}
-
-class _VacancyDetailSheetState extends State<_VacancyDetailSheet> {
-  Application? _myApplication;
-  Company? _company;
-  bool _isApplying = false;
-
-  bool get _isApplicant =>
-      widget.userRole == 'APPLICANT' || widget.userRole == 'EMPLOYER';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final api = widget.vacancyApiService;
-    if (api == null) return;
-    final futures = <Future>[
-      if (_isApplicant) api.getMyApplicationForVacancy(widget.vacancy.id),
-      api.getCompanyById(widget.vacancy.companyId),
-    ];
-    final results = await Future.wait(futures);
-    if (!mounted) return;
-    setState(() {
-      int idx = 0;
-      if (_isApplicant) { _myApplication = results[idx++] as Application?; }
-      _company = results[idx] as Company?;
-    });
-  }
-
-  Future<void> _apply() async {
-    setState(() => _isApplying = true);
-    final result = await widget.vacancyApiService!.applyToVacancy(widget.vacancy.id);
-    if (mounted) setState(() { _myApplication = result; _isApplying = false; });
-  }
-
-  Future<void> _withdraw() async {
-    setState(() => _isApplying = true);
-    final ok = await widget.vacancyApiService!.withdrawApplication(widget.vacancy.id);
-    if (mounted && ok) {
-      final updated = await widget.vacancyApiService!.getMyApplicationForVacancy(widget.vacancy.id);
-      setState(() { _myApplication = updated; _isApplying = false; });
-    } else if (mounted) {
-      setState(() => _isApplying = false);
-    }
-  }
-
-  void _viewCompany() {
-    final company = _company;
-    if (company == null) return;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _CompanyDetailSheet(company: company),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final vacancy = widget.vacancy;
-    return DraggableScrollableSheet(
-      initialChildSize: 0.75,
-      minChildSize: 0.4,
-      maxChildSize: 0.95,
-      builder: (_, scrollCtrl) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            const BottomSheetHandle(),
-            Expanded(
-              child: ListView(
-                controller: scrollCtrl,
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-                children: [
-                  // Header
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: Colors.indigo.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          (vacancy.company?.name ?? _company?.name ?? '').isNotEmpty
-                              ? (vacancy.company?.name ?? _company?.name ?? '?')[0].toUpperCase()
-                              : '?',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.indigo.shade600),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(vacancy.title,
-                                style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 2),
-                            if ((vacancy.company?.name ?? _company?.name) != null)
-                              Text(vacancy.company?.name ?? _company!.name,
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0xFF555555))),
-                            if ((vacancy.company?.city ?? _company?.city) != null)
-                              Text(vacancy.company?.city ?? _company!.city!,
-                                  style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF888888))),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Meta chips
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 8,
-                    children: [
-                      if (_salary != null)
-                        _DetailChip(Icons.payments_outlined, _salary!,
-                            color: const Color(0xFF16A34A)),
-                      if (vacancy.city != null)
-                        _DetailChip(Icons.location_on_outlined, vacancy.city!),
-                      if (vacancy.employmentType != null)
-                        _DetailChip(Icons.access_time_outlined,
-                            vacancy.employmentType!.displayName),
-                      if (vacancy.workFormat != null)
-                        _DetailChip(Icons.laptop_outlined,
-                            vacancy.workFormat!.displayName),
-                      if (vacancy.experienceLevel != null)
-                        _DetailChip(Icons.bar_chart_outlined,
-                            vacancy.experienceLevel!.displayName),
-                    ],
-                  ),
-                  if (vacancy.skills.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    const Text('Skills',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: vacancy.skills
-                          .map((s) => Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFEEF2FF),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(s,
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.indigo.shade700)),
-                              ))
-                          .toList(),
-                    ),
-                  ],
-                  if (vacancy.description != null &&
-                      vacancy.description!.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    const Text('Description',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
-                    const SizedBox(height: 8),
-                    Text(vacancy.description!,
-                        style: const TextStyle(
-                            fontSize: 14, height: 1.5, color: Color(0xFF333333))),
-                  ],
-                  if (vacancy.requirements != null &&
-                      vacancy.requirements!.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    const Text('Requirements',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
-                    const SizedBox(height: 8),
-                    Text(vacancy.requirements!,
-                        style: const TextStyle(
-                            fontSize: 14, height: 1.5, color: Color(0xFF333333))),
-                  ],
-                  // Contact info
-                  if (vacancy.contactName != null ||
-                      vacancy.contactEmail != null ||
-                      vacancy.contactPhone != null) ...[
-                    const SizedBox(height: 20),
-                    const Text('Contact',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F7FF),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFE0E4FF)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (vacancy.contactName != null)
-                            _ContactRow(Icons.person_outline, vacancy.contactName!),
-                          if (vacancy.contactEmail != null)
-                            _ContactRow(Icons.email_outlined, vacancy.contactEmail!),
-                          if (vacancy.contactPhone != null)
-                            _ContactRow(Icons.phone_outlined, vacancy.contactPhone!),
-                        ],
-                      ),
-                    ),
-                  ],
-                  // Action buttons
-                  const SizedBox(height: 24),
-                  if (_company != null)
-                    OutlinedButton.icon(
-                      onPressed: _viewCompany,
-                      icon: const Icon(Icons.business_outlined, size: 18),
-                      label: const Text('View company'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.indigo,
-                        side: const BorderSide(color: Colors.indigo),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        minimumSize: const Size(double.infinity, 44),
-                      ),
-                    ),
-                  if (_isApplicant) ...[
-                    const SizedBox(height: 10),
-                    _buildApplyButton(),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildApplyButton() {
-    final app = _myApplication;
-    if (app == null) {
-      return FilledButton.icon(
-        onPressed: _isApplying ? null : _apply,
-        icon: _isApplying
-            ? const SizedBox(width: 16, height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-            : const Icon(Icons.send_outlined, size: 18),
-        label: const Text('Apply'),
-        style: FilledButton.styleFrom(
-          backgroundColor: Colors.indigo,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          minimumSize: const Size(double.infinity, 44),
-        ),
-      );
-    }
-    final statusColor = switch (app.status) {
-      ApplicationStatus.ACCEPTED => Colors.green,
-      ApplicationStatus.REJECTED => Colors.red,
-      ApplicationStatus.WITHDRAWN => Colors.grey,
-      _ => Colors.indigo,
-    };
-    final canWithdraw = app.status.isActive;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: statusColor.withAlpha(20),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: statusColor.withAlpha(80)),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.info_outline, size: 16, color: statusColor),
-              const SizedBox(width: 8),
-              Text('Application status: ${app.status.displayName}',
-                  style: TextStyle(color: statusColor, fontWeight: FontWeight.w500)),
-            ],
-          ),
-        ),
-        if (canWithdraw) ...[
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: _isApplying ? null : _withdraw,
-            icon: _isApplying
-                ? const SizedBox(width: 16, height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.close, size: 18),
-            label: const Text('Withdraw application'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.red,
-              side: const BorderSide(color: Colors.red),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              minimumSize: const Size(double.infinity, 44),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  String? get _salary {
-    final v = widget.vacancy;
-    return formatSalary(v.salaryFrom, v.salaryTo, v.currency);
-  }
-}
-
-class _DetailChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color? color;
-
-  const _DetailChip(this.icon, this.label, {this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    final c = color ?? const Color(0xFF555555);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: c.withAlpha(20),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 15, color: c),
-          const SizedBox(width: 5),
-          Text(label, style: TextStyle(fontSize: 13, color: c)),
-        ],
-      ),
-    );
-  }
-}
-
 
 // ── Resume section (compact, single resume in left panel for EMPLOYER) ────────
 
@@ -1519,7 +753,7 @@ class _ResumeSection extends StatelessWidget {
                 icon: const Icon(Icons.add, size: 16),
                 label: const Text('Create'),
                 style: TextButton.styleFrom(
-                    foregroundColor: Colors.indigo,
+                    foregroundColor: AppColors.primary,
                     padding: EdgeInsets.zero,
                     minimumSize: const Size(0, 0),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -1553,25 +787,25 @@ class _EmptyResumeHint extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: AppColors.bg,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-            color: const Color(0xFFE0E0E0), style: BorderStyle.solid),
+            color: AppColors.border, style: BorderStyle.solid),
       ),
       child: Column(
         children: [
           Icon(Icons.description_outlined,
-              size: 36, color: Colors.indigo.shade200),
+              size: 36, color: AppColors.border),
           const SizedBox(height: 8),
           const Text('No resume yet',
-              style: TextStyle(fontSize: 13, color: Color(0xFF666666))),
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
           const SizedBox(height: 10),
           FilledButton.icon(
             onPressed: onCreate,
             icon: const Icon(Icons.add, size: 16),
             label: const Text('Create resume'),
             style: FilledButton.styleFrom(
-              backgroundColor: Colors.indigo,
+              backgroundColor: AppColors.accent,
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               textStyle: const TextStyle(fontSize: 13),
@@ -1603,7 +837,7 @@ class _CompactResumeCard extends StatelessWidget {
         : 'Resume';
 
     return Material(
-      color: const Color(0xFFF8F8FF),
+      color: AppColors.tagBg,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
@@ -1619,7 +853,7 @@ class _CompactResumeCard extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: Colors.indigo.shade100,
+                      color: AppColors.tagBg,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
@@ -1630,7 +864,7 @@ class _CompactResumeCard extends StatelessWidget {
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.indigo.shade700),
+                          color: AppColors.tagText),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1644,13 +878,13 @@ class _CompactResumeCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis),
                         Text(resume.fullName,
                             style: const TextStyle(
-                                fontSize: 12, color: Color(0xFF666666))),
+                                fontSize: 12, color: AppColors.textSecondary)),
                       ],
                     ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit_outlined,
-                        size: 16, color: Color(0xFF888888)),
+                        size: 16, color: AppColors.textSecondary),
                     tooltip: 'Edit',
                     onPressed: onEdit,
                     padding: EdgeInsets.zero,
@@ -1667,13 +901,13 @@ class _CompactResumeCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 7, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.indigo.shade50,
+                          color: AppColors.tagBg,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(s,
                             style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.indigo.shade700)),
+                                color: AppColors.tagText)),
                       )).toList(),
                 ),
               ],
@@ -1764,7 +998,7 @@ class _ResumeCard extends StatelessWidget {
         : 'Resume';
 
     return Material(
-      color: Colors.white,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
@@ -1777,7 +1011,7 @@ class _ResumeCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
+                  color: AppColors.tagBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
@@ -1788,7 +1022,7 @@ class _ResumeCard extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.indigo.shade700),
+                      color: AppColors.tagText),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1805,7 +1039,7 @@ class _ResumeCard extends StatelessWidget {
                     Text(
                       resume.fullName,
                       style: const TextStyle(
-                          fontSize: 13, color: Color(0xFF666666)),
+                          fontSize: 13, color: AppColors.textSecondary),
                     ),
                     if (resume.skills.isNotEmpty) ...[
                       const SizedBox(height: 6),
@@ -1816,13 +1050,13 @@ class _ResumeCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEEF2FF),
+                            color: AppColors.tagBg,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(s,
                               style: TextStyle(
                                   fontSize: 11,
-                                  color: Colors.indigo.shade700)),
+                                  color: AppColors.tagText)),
                         )).toList(),
                       ),
                     ],
@@ -1831,12 +1065,12 @@ class _ResumeCard extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined,
-                    size: 18, color: Color(0xFF888888)),
+                    size: 18, color: AppColors.textSecondary),
                 tooltip: 'Edit',
                 onPressed: onEdit,
               ),
               const Icon(Icons.chevron_right,
-                  size: 20, color: Color(0xFFCCCCCC)),
+                  size: 20, color: AppColors.border),
             ],
           ),
         ),
@@ -1877,7 +1111,7 @@ class _ApplicantTabPanelState extends State<_ApplicantTabPanel>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -1891,20 +1125,20 @@ class _ApplicantTabPanelState extends State<_ApplicantTabPanel>
     return Column(
       children: [
         Container(
-          color: Colors.white,
+          color: AppColors.surface,
           child: TabBar(
             controller: _tabController,
-            labelColor: Colors.indigo,
-            unselectedLabelColor: const Color(0xFF888888),
-            indicatorColor: Colors.indigo,
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
             tabs: const [
               Tab(icon: Icon(Icons.description_outlined, size: 18), text: 'My Resumes'),
               Tab(icon: Icon(Icons.business_outlined, size: 18), text: 'Companies'),
               Tab(icon: Icon(Icons.send_outlined, size: 18), text: 'My Applications'),
+              Tab(icon: Icon(Icons.bookmark_border, size: 18), text: 'Saved'),
             ],
           ),
         ),
-        const Divider(height: 1, color: Color(0xFFE0E0E0)),
+        const Divider(height: 1),
         Expanded(
           child: TabBarView(
             controller: _tabController,
@@ -1918,8 +1152,15 @@ class _ApplicantTabPanelState extends State<_ApplicantTabPanel>
                   onEdit: widget.onEditResume,
                 ),
               ),
-              _CompanySearchPanel(vacancyApiService: widget.vacancyApiService),
+              _CompanySearchPanel(
+                vacancyApiService: widget.vacancyApiService,
+                userRole: widget.userRole,
+              ),
               _MyApplicationsTab(vacancyApiService: widget.vacancyApiService),
+              _SavedVacanciesTab(
+                vacancyApiService: widget.vacancyApiService,
+                userRole: widget.userRole,
+              ),
             ],
           ),
         ),
@@ -1932,8 +1173,9 @@ class _ApplicantTabPanelState extends State<_ApplicantTabPanel>
 
 class _CompanySearchPanel extends StatefulWidget {
   final VacancyApiService vacancyApiService;
+  final String? userRole;
 
-  const _CompanySearchPanel({required this.vacancyApiService});
+  const _CompanySearchPanel({required this.vacancyApiService, this.userRole});
 
   @override
   State<_CompanySearchPanel> createState() => _CompanySearchPanelState();
@@ -1977,7 +1219,11 @@ class _CompanySearchPanelState extends State<_CompanySearchPanel> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _CompanyDetailSheet(company: c),
+      builder: (_) => CompanyDetailSheet(
+        company: c,
+        vacancyApiService: widget.vacancyApiService,
+        userRole: widget.userRole,
+      ),
     );
   }
 
@@ -1986,7 +1232,7 @@ class _CompanySearchPanelState extends State<_CompanySearchPanel> {
     return Column(
       children: [
         Container(
-          color: Colors.white,
+          color: AppColors.surface,
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: Column(
             children: [
@@ -1995,7 +1241,7 @@ class _CompanySearchPanelState extends State<_CompanySearchPanel> {
                 decoration: InputDecoration(
                   hintText: 'Company name...',
                   prefixIcon:
-                      const Icon(Icons.search, color: Color(0xFF888888)),
+                      const Icon(Icons.search, color: AppColors.textSecondary),
                   suffixIcon: _nameCtrl.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear, size: 18),
@@ -2007,13 +1253,13 @@ class _CompanySearchPanelState extends State<_CompanySearchPanel> {
                       : null,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
+                      borderSide: const BorderSide(color: AppColors.border)),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
+                      borderSide: const BorderSide(color: AppColors.border)),
                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
+                  fillColor: AppColors.bg,
                 ),
                 onSubmitted: (_) => _search(),
               ),
@@ -2023,7 +1269,7 @@ class _CompanySearchPanelState extends State<_CompanySearchPanel> {
                 decoration: InputDecoration(
                   hintText: 'City...',
                   prefixIcon: const Icon(Icons.location_on_outlined,
-                      color: Color(0xFF888888)),
+                      color: AppColors.textSecondary),
                   suffixIcon: _cityCtrl.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear, size: 18),
@@ -2035,20 +1281,20 @@ class _CompanySearchPanelState extends State<_CompanySearchPanel> {
                       : null,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
+                      borderSide: const BorderSide(color: AppColors.border)),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
+                      borderSide: const BorderSide(color: AppColors.border)),
                   contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
+                  fillColor: AppColors.bg,
                 ),
                 onSubmitted: (_) => _search(),
               ),
             ],
           ),
         ),
-        const Divider(height: 1, color: Color(0xFFE0E0E0)),
+        const Divider(height: 1, color: AppColors.border),
         Expanded(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -2064,8 +1310,8 @@ class _CompanySearchPanelState extends State<_CompanySearchPanel> {
                           _search();
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.indigo,
-                          side: const BorderSide(color: Colors.indigo),
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                         ),
@@ -2096,7 +1342,7 @@ class _CompanyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
@@ -2109,7 +1355,7 @@ class _CompanyCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
+                  color: AppColors.tagBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
@@ -2120,7 +1366,7 @@ class _CompanyCard extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.indigo.shade600),
+                      color: AppColors.primary),
                 ),
               ),
               const SizedBox(width: 12),
@@ -2134,17 +1380,17 @@ class _CompanyCard extends StatelessWidget {
                     if (company.industry != null)
                       Text(company.industry!,
                           style: const TextStyle(
-                              fontSize: 13, color: Color(0xFF666666))),
+                              fontSize: 13, color: AppColors.textSecondary)),
                     const SizedBox(height: 4),
                     Wrap(
                       spacing: 12,
                       children: [
                         if (company.city != null)
-                          _MetaTag(Icons.location_on_outlined, company.city!),
+                          MetaTag(Icons.location_on_outlined, company.city!),
                         if (company.size != null)
-                          _MetaTag(
+                          MetaTag(
                               Icons.people_outline, company.size!.displayName),
-                        _MetaTag(Icons.star_outline,
+                        MetaTag(Icons.star_outline,
                             company.rating.toStringAsFixed(1)),
                       ],
                     ),
@@ -2152,131 +1398,9 @@ class _CompanyCard extends StatelessWidget {
                 ),
               ),
               const Icon(Icons.chevron_right,
-                  size: 20, color: Color(0xFFCCCCCC)),
+                  size: 20, color: AppColors.border),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Company detail sheet ───────────────────────────────────────────────────────
-
-class _CompanyDetailSheet extends StatelessWidget {
-  final Company company;
-
-  const _CompanyDetailSheet({required this.company});
-
-  @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.65,
-      minChildSize: 0.4,
-      maxChildSize: 0.95,
-      builder: (_, scrollCtrl) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            const BottomSheetHandle(),
-            Expanded(
-              child: ListView(
-                controller: scrollCtrl,
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: Colors.indigo.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          company.name.isNotEmpty
-                              ? company.name[0].toUpperCase()
-                              : '?',
-                          style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.indigo.shade600),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(company.name,
-                                style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold)),
-                            if (company.industry != null)
-                              Text(company.industry!,
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Color(0xFF555555))),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 8,
-                    children: [
-                      if (company.city != null)
-                        _DetailChip(Icons.location_on_outlined, company.city!),
-                      if (company.country != null)
-                        _DetailChip(Icons.flag_outlined, company.country!),
-                      if (company.size != null)
-                        _DetailChip(
-                            Icons.people_outline, company.size!.displayName),
-                      _DetailChip(
-                        Icons.star_outline,
-                        '${company.rating.toStringAsFixed(1)} (${company.reviewCount} reviews)',
-                        color: const Color(0xFFCA8A04),
-                      ),
-                    ],
-                  ),
-                  if (company.website != null &&
-                      company.website!.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        const Icon(Icons.link,
-                            size: 16, color: Color(0xFF888888)),
-                        const SizedBox(width: 6),
-                        Text(company.website!,
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.indigo)),
-                      ],
-                    ),
-                  ],
-                  if (company.description != null &&
-                      company.description!.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    const Text('About',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
-                    const SizedBox(height: 8),
-                    Text(company.description!,
-                        style: const TextStyle(
-                            fontSize: 14,
-                            height: 1.5,
-                            color: Color(0xFF333333))),
-                  ],
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -2334,12 +1458,12 @@ class _CompanyOwnerPanelState extends State<_CompanyOwnerPanel>
     return Column(
       children: [
         Container(
-          color: Colors.white,
+          color: AppColors.surface,
           child: TabBar(
             controller: _tabController,
-            labelColor: Colors.indigo,
-            unselectedLabelColor: const Color(0xFF888888),
-            indicatorColor: Colors.indigo,
+            labelColor: AppColors.primary,
+            unselectedLabelColor: AppColors.textSecondary,
+            indicatorColor: AppColors.primary,
             tabs: const [
               Tab(icon: Icon(Icons.business_outlined, size: 18), text: 'Company'),
               Tab(icon: Icon(Icons.work_outline, size: 18), text: 'Vacancies'),
@@ -2348,7 +1472,7 @@ class _CompanyOwnerPanelState extends State<_CompanyOwnerPanel>
             ],
           ),
         ),
-        const Divider(height: 1, color: Color(0xFFE0E0E0)),
+        const Divider(height: 1, color: AppColors.border),
         Expanded(
           child: TabBarView(
             controller: _tabController,
@@ -2437,14 +1561,14 @@ class _CompanyInfo extends StatelessWidget {
               Container(
                 width: 56, height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
+                  color: AppColors.tagBg,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   company.name.isNotEmpty ? company.name[0].toUpperCase() : '?',
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold,
-                      color: Colors.indigo.shade600),
+                      color: AppColors.primary),
                 ),
               ),
               const SizedBox(width: 16),
@@ -2454,7 +1578,7 @@ class _CompanyInfo extends StatelessWidget {
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   if (company.industry != null)
                     Text(company.industry!,
-                        style: const TextStyle(fontSize: 14, color: Color(0xFF666666))),
+                        style: const TextStyle(fontSize: 14, color: AppColors.textSecondary)),
                 ]),
               ),
               OutlinedButton.icon(
@@ -2462,8 +1586,8 @@ class _CompanyInfo extends StatelessWidget {
                 icon: const Icon(Icons.edit_outlined, size: 16),
                 label: const Text('Edit'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.indigo,
-                  side: const BorderSide(color: Colors.indigo),
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),
@@ -2474,23 +1598,23 @@ class _CompanyInfo extends StatelessWidget {
             spacing: 10, runSpacing: 8,
             children: [
               if (company.city != null)
-                _DetailChip(Icons.location_on_outlined, company.city!),
+                DetailChip(Icons.location_on_outlined, company.city!),
               if (company.country != null)
-                _DetailChip(Icons.flag_outlined, company.country!),
+                DetailChip(Icons.flag_outlined, company.country!),
               if (company.size != null)
-                _DetailChip(Icons.people_outline, company.size!.displayName),
-              _DetailChip(Icons.star_outline,
+                DetailChip(Icons.people_outline, company.size!.displayName),
+              DetailChip(Icons.star_outline,
                   '${company.rating.toStringAsFixed(1)} (${company.reviewCount} reviews)',
-                  color: const Color(0xFFCA8A04)),
+                  color: AppColors.warning),
             ],
           ),
           if (company.website != null && company.website!.isNotEmpty) ...[
             const SizedBox(height: 16),
             Row(children: [
-              const Icon(Icons.link, size: 16, color: Color(0xFF888888)),
+              const Icon(Icons.link, size: 16, color: AppColors.textSecondary),
               const SizedBox(width: 6),
               Text(company.website!,
-                  style: const TextStyle(fontSize: 14, color: Colors.indigo)),
+                  style: const TextStyle(fontSize: 14, color: AppColors.primary)),
             ]),
           ],
           if (company.description != null && company.description!.isNotEmpty) ...[
@@ -2498,7 +1622,7 @@ class _CompanyInfo extends StatelessWidget {
             const Text('About', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
             const SizedBox(height: 8),
             Text(company.description!,
-                style: const TextStyle(fontSize: 14, height: 1.5, color: Color(0xFF333333))),
+                style: const TextStyle(fontSize: 14, height: 1.5, color: AppColors.text)),
           ],
         ],
       ),
@@ -2606,10 +1730,10 @@ class _CompanyFormState extends State<_CompanyForm> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red.shade50, borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
+                color: AppColors.errorBg, borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.error.withAlpha(80)),
               ),
-              child: Text(_error!, style: TextStyle(color: Colors.red.shade700, fontSize: 13)),
+              child: Text(_error!, style: TextStyle(color: AppColors.error, fontSize: 13)),
             ),
             const SizedBox(height: 16),
           ],
@@ -2641,8 +1765,8 @@ class _CompanyFormState extends State<_CompanyForm> {
                 child: OutlinedButton(
                   onPressed: widget.onCancel,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF555555),
-                    side: const BorderSide(color: Color(0xFFCCCCCC)),
+                    foregroundColor: AppColors.textSecondary,
+                    side: const BorderSide(color: AppColors.border),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
@@ -2655,13 +1779,13 @@ class _CompanyFormState extends State<_CompanyForm> {
               child: FilledButton(
                 onPressed: _isSaving ? null : _save,
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.indigo,
+                  backgroundColor: AppColors.accent,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 child: _isSaving
                     ? const SizedBox(width: 18, height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.surface))
                     : Text(widget.company == null ? 'Create' : 'Save'),
               ),
             ),
@@ -2718,11 +1842,11 @@ class _VacanciesTabState extends State<_VacanciesTab> {
       return const Center(child: Padding(padding: EdgeInsets.all(32),
           child: Text('Create your company first to manage vacancies.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF888888)))));
+              style: TextStyle(color: AppColors.textSecondary))));
     }
     return Column(children: [
       Container(
-        color: Colors.white,
+        color: AppColors.surface,
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           const Text('Vacancies', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
@@ -2730,33 +1854,33 @@ class _VacanciesTabState extends State<_VacanciesTab> {
             onPressed: _showCreate,
             icon: const Icon(Icons.add, size: 16),
             label: const Text('New vacancy'),
-            style: FilledButton.styleFrom(backgroundColor: Colors.indigo,
+            style: FilledButton.styleFrom(backgroundColor: AppColors.accent,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
           ),
         ]),
       ),
-      const Divider(height: 1, color: Color(0xFFE0E0E0)),
+      const Divider(height: 1, color: AppColors.border),
       Expanded(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _vacancies.isEmpty
                 ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Icon(Icons.work_off_outlined, size: 48, color: Colors.indigo.shade200),
+                    Icon(Icons.work_off_outlined, size: 48, color: AppColors.border),
                     const SizedBox(height: 12),
                     const Text('No vacancies yet',
                         style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
-                            color: Color(0xFF444444))),
+                            color: AppColors.text)),
                   ]))
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: _vacancies.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (_, i) => _VacancyBrowseCard(
+                    itemBuilder: (_, i) => VacancyBrowseCard(
                       vacancy: _vacancies[i],
                       onTap: () => showModalBottomSheet(
                         context: context, isScrollControlled: true,
                         backgroundColor: Colors.transparent,
-                        builder: (_) => _VacancyDetailSheet(
+                        builder: (_) => VacancyDetailSheet(
                           vacancy: _vacancies[i],
                           vacancyApiService: widget.vacancyApiService,
                         ),
@@ -2926,10 +2050,10 @@ class _VacancyFormDialogState extends State<_VacancyFormDialog> {
         TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
         FilledButton(
           onPressed: _isSaving ? null : _save,
-          style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
           child: _isSaving
               ? const SizedBox(width: 16, height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.surface))
               : const Text('Create'),
         ),
       ],
@@ -2998,7 +2122,7 @@ class _RecruitersTabState extends State<_RecruitersTab> {
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             child: const Text('Remove'),
           ),
         ],
@@ -3015,11 +2139,11 @@ class _RecruitersTabState extends State<_RecruitersTab> {
     if (widget.company == null) {
       return const Center(child: Padding(padding: EdgeInsets.all(32),
           child: Text('Create your company first to manage recruiters.',
-              textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF888888)))));
+              textAlign: TextAlign.center, style: TextStyle(color: AppColors.textSecondary))));
     }
     return Column(children: [
       Container(
-        color: Colors.white,
+        color: AppColors.surface,
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           const Text('Recruiters', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
@@ -3027,22 +2151,22 @@ class _RecruitersTabState extends State<_RecruitersTab> {
             onPressed: _showAdd,
             icon: const Icon(Icons.person_add_outlined, size: 16),
             label: const Text('Add recruiter'),
-            style: FilledButton.styleFrom(backgroundColor: Colors.indigo,
+            style: FilledButton.styleFrom(backgroundColor: AppColors.accent,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
           ),
         ]),
       ),
-      const Divider(height: 1, color: Color(0xFFE0E0E0)),
+      const Divider(height: 1, color: AppColors.border),
       Expanded(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _recruiters.isEmpty
                 ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Icon(Icons.people_outline, size: 48, color: Colors.indigo.shade200),
+                    Icon(Icons.people_outline, size: 48, color: AppColors.border),
                     const SizedBox(height: 12),
                     const Text('No recruiters yet',
                         style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
-                            color: Color(0xFF444444))),
+                            color: AppColors.text)),
                   ]))
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
@@ -3052,18 +2176,18 @@ class _RecruitersTabState extends State<_RecruitersTab> {
                       final e = _recruiters[i];
                       final u = e.user;
                       return Material(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(10),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           child: Row(children: [
                             CircleAvatar(
-                              radius: 20, backgroundColor: Colors.indigo.shade50,
+                              radius: 20, backgroundColor: AppColors.tagBg,
                               child: Text(
                                 u != null && u.firstName.isNotEmpty
                                     ? u.firstName[0].toUpperCase() : '?',
                                 style: TextStyle(fontWeight: FontWeight.bold,
-                                    color: Colors.indigo.shade600),
+                                    color: AppColors.primary),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -3072,11 +2196,11 @@ class _RecruitersTabState extends State<_RecruitersTab> {
                                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                               if (u != null)
                                 Text('@${u.login}',
-                                    style: const TextStyle(fontSize: 12, color: Color(0xFF888888))),
+                                    style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                             ])),
                             IconButton(
                               icon: const Icon(Icons.person_remove_outlined,
-                                  size: 20, color: Color(0xFFCC4444)),
+                                  size: 20, color: AppColors.error),
                               tooltip: 'Remove',
                               onPressed: () => _remove(e.recruiter),
                             ),
@@ -3161,10 +2285,10 @@ class _AddRecruiterDialogState extends State<_AddRecruiterDialog> {
           if (_error != null) ...[
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.red.shade50,
+              decoration: BoxDecoration(color: AppColors.errorBg,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.shade200)),
-              child: Text(_error!, style: TextStyle(color: Colors.red.shade700, fontSize: 13)),
+                  border: Border.all(color: AppColors.error.withAlpha(80))),
+              child: Text(_error!, style: TextStyle(color: AppColors.error, fontSize: 13)),
             ),
             const SizedBox(height: 12),
           ],
@@ -3172,7 +2296,7 @@ class _AddRecruiterDialogState extends State<_AddRecruiterDialog> {
             controller: _searchCtrl,
             decoration: InputDecoration(
               hintText: 'Search by name or login...',
-              prefixIcon: const Icon(Icons.search, color: Color(0xFF888888)),
+              prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
               suffixIcon: IconButton(icon: const Icon(Icons.search), onPressed: _search),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -3184,7 +2308,7 @@ class _AddRecruiterDialogState extends State<_AddRecruiterDialog> {
             const Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator())
           else if (_results.isEmpty && _searchCtrl.text.isNotEmpty)
             const Padding(padding: EdgeInsets.all(16),
-                child: Text('No users found', style: TextStyle(color: Color(0xFF888888))))
+                child: Text('No users found', style: TextStyle(color: AppColors.textSecondary)))
           else
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 240),
@@ -3197,20 +2321,20 @@ class _AddRecruiterDialogState extends State<_AddRecruiterDialog> {
                   return ListTile(
                     dense: true,
                     leading: CircleAvatar(
-                      radius: 16, backgroundColor: Colors.indigo.shade50,
+                      radius: 16, backgroundColor: AppColors.tagBg,
                       child: Text(
                         u.firstName.isNotEmpty ? u.firstName[0].toUpperCase() : '?',
                         style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold,
-                            color: Colors.indigo.shade600),
+                            color: AppColors.primary),
                       ),
                     ),
                     title: Text(u.fullName, style: const TextStyle(fontSize: 14)),
                     subtitle: Text('@${u.login}', style: const TextStyle(fontSize: 12)),
                     selected: sel,
-                    selectedTileColor: Colors.indigo.shade50,
+                    selectedTileColor: AppColors.tagBg,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     onTap: () => setState(() => _selected = u),
-                    trailing: sel ? Icon(Icons.check_circle, color: Colors.indigo.shade400) : null,
+                    trailing: sel ? Icon(Icons.check_circle, color: AppColors.primary) : null,
                   );
                 },
               ),
@@ -3221,34 +2345,13 @@ class _AddRecruiterDialogState extends State<_AddRecruiterDialog> {
         TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
         FilledButton(
           onPressed: (_selected == null || _isAdding) ? null : _add,
-          style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
           child: _isAdding
               ? const SizedBox(width: 16, height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.surface))
               : const Text('Add'),
         ),
       ],
-    );
-  }
-}
-
-// ── Contact row ────────────────────────────────────────────────────────────────
-
-class _ContactRow extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  const _ContactRow(this.icon, this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(children: [
-        Icon(icon, size: 16, color: Colors.indigo.shade400),
-        const SizedBox(width: 8),
-        Expanded(child: Text(text,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF333333)))),
-      ]),
     );
   }
 }
@@ -3304,9 +2407,13 @@ class _MyApplicationsTabState extends State<_MyApplicationsTab> {
           final app = _applications[i];
           final color = StatusBadge.colorFor(app.status);
           return Material(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(10),
-            child: Padding(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.border),
+              ),
               padding: const EdgeInsets.all(14),
               child: Row(children: [
                 Container(
@@ -3324,7 +2431,7 @@ class _MyApplicationsTabState extends State<_MyApplicationsTab> {
                 ])),
                 if (app.status.isActive)
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.red, size: 20),
+                    icon: const Icon(Icons.close, color: AppColors.error, size: 20),
                     tooltip: 'Withdraw',
                     onPressed: () => _withdraw(app),
                   ),
@@ -3332,6 +2439,75 @@ class _MyApplicationsTabState extends State<_MyApplicationsTab> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+// ── Saved vacancies tab (APPLICANT) ───────────────────────────────────────────
+
+class _SavedVacanciesTab extends StatefulWidget {
+  final VacancyApiService vacancyApiService;
+  final String? userRole;
+
+  const _SavedVacanciesTab({required this.vacancyApiService, this.userRole});
+
+  @override
+  State<_SavedVacanciesTab> createState() => _SavedVacanciesTabState();
+}
+
+class _SavedVacanciesTabState extends State<_SavedVacanciesTab> {
+  List<Vacancy> _vacancies = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _isLoading = true);
+    final saved = await widget.vacancyApiService.getSavedVacancies();
+    if (mounted) setState(() { _vacancies = saved; _isLoading = false; });
+  }
+
+  void _showVacancyDetail(Vacancy v) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => VacancyDetailSheet(
+        vacancy: v,
+        vacancyApiService: widget.vacancyApiService,
+        userRole: widget.userRole,
+      ),
+    ).then((_) => _load());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_vacancies.isEmpty) {
+      return const EmptyState(
+        icon: Icons.bookmark_border,
+        title: 'No saved vacancies',
+        subtitle: 'Bookmark vacancies you like to find them here later',
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: _vacancies.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        itemBuilder: (_, i) => VacancyBrowseCard(
+          vacancy: _vacancies[i],
+          onTap: () => _showVacancyDetail(_vacancies[i]),
+          vacancyApiService: widget.vacancyApiService,
+          canSave: true,
+          initiallySaved: true,
+        ),
       ),
     );
   }
@@ -3387,18 +2563,18 @@ class _RecruiterPanelState extends State<_RecruiterPanel>
           padding: EdgeInsets.all(32),
           child: Text('You are not assigned to any company yet.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF888888))),
+              style: TextStyle(color: AppColors.textSecondary)),
         ),
       );
     }
     return Column(children: [
       Container(
-        color: Colors.white,
+        color: AppColors.surface,
         child: TabBar(
           controller: _tabController,
-          labelColor: Colors.indigo,
-          unselectedLabelColor: const Color(0xFF888888),
-          indicatorColor: Colors.indigo,
+          labelColor: AppColors.primary,
+          unselectedLabelColor: AppColors.textSecondary,
+          indicatorColor: AppColors.primary,
           tabs: const [
             Tab(icon: Icon(Icons.work_outline, size: 18), text: 'Vacancies'),
             Tab(icon: Icon(Icons.inbox_outlined, size: 18), text: 'Applications'),
@@ -3406,7 +2582,7 @@ class _RecruiterPanelState extends State<_RecruiterPanel>
           ],
         ),
       ),
-      const Divider(height: 1, color: Color(0xFFE0E0E0)),
+      const Divider(height: 1, color: AppColors.border),
       Expanded(
         child: TabBarView(
           controller: _tabController,
@@ -3487,10 +2663,10 @@ class _RecruiterApplicationsTabState extends State<_RecruiterApplicationsTab> {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_vacancies.isEmpty) {
       return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(Icons.inbox_outlined, size: 48, color: Colors.indigo.shade200),
+        Icon(Icons.inbox_outlined, size: 48, color: AppColors.border),
         const SizedBox(height: 12),
         const Text('No vacancies yet',
-            style: TextStyle(fontSize: 15, color: Color(0xFF444444))),
+            style: TextStyle(fontSize: 15, color: AppColors.text)),
       ]));
     }
     return ListView.separated(
@@ -3500,7 +2676,7 @@ class _RecruiterApplicationsTabState extends State<_RecruiterApplicationsTab> {
       itemBuilder: (_, i) {
         final v = _vacancies[i];
         return Material(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(10),
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -3508,13 +2684,13 @@ class _RecruiterApplicationsTabState extends State<_RecruiterApplicationsTab> {
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
             subtitle: Text(v.status.displayName,
                 style: TextStyle(fontSize: 12,
-                    color: v.status == VacancyStatus.ACTIVE ? Colors.green : Colors.grey)),
+                    color: v.status == VacancyStatus.ACTIVE ? AppColors.success : AppColors.textSecondary)),
             trailing: FilledButton.icon(
               onPressed: () => _showApplications(v),
               icon: const Icon(Icons.people_outline, size: 16),
               label: const Text('Applications'),
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.indigo,
+                backgroundColor: AppColors.accent,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
@@ -3581,7 +2757,7 @@ class _VacancyApplicationsSheetState
       maxChildSize: 0.95,
       builder: (_, ctrl) => Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(children: [
@@ -3592,7 +2768,7 @@ class _VacancyApplicationsSheetState
               const Text('Applications',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               Text(widget.vacancy.title,
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF666666))),
+                  style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
             ]),
           ),
           const Divider(height: 1),
@@ -3617,7 +2793,7 @@ class _VacancyApplicationsSheetState
                               app.status != ApplicationStatus.REJECTED &&
                               app.status != ApplicationStatus.ACCEPTED;
                           return Material(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             borderRadius: BorderRadius.circular(10),
                             elevation: 0.5,
                             child: Padding(
@@ -3628,7 +2804,7 @@ class _VacancyApplicationsSheetState
                                 Row(children: [
                                   InitialsAvatar(
                                     name: user?.firstName ?? '?',
-                                    color: Colors.indigo.shade100,
+                                    color: AppColors.tagBg,
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -3643,7 +2819,7 @@ class _VacancyApplicationsSheetState
                                         Text('@${user?.login ?? '…'}',
                                             style: const TextStyle(
                                                 fontSize: 12,
-                                                color: Color(0xFF666666))),
+                                                color: AppColors.textSecondary)),
                                       ])),
                                   StatusBadge(app.status),
                                 ]),
@@ -3654,9 +2830,9 @@ class _VacancyApplicationsSheetState
                                       onPressed: () => _changeStatus(
                                           app, ApplicationStatus.REVIEWED),
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: Colors.orange,
+                                        foregroundColor: AppColors.warning,
                                         side: const BorderSide(
-                                            color: Colors.orange),
+                                            color: AppColors.warning),
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 6),
                                       ),
@@ -3668,9 +2844,9 @@ class _VacancyApplicationsSheetState
                                       onPressed: () => _changeStatus(
                                           app, ApplicationStatus.ACCEPTED),
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: Colors.green,
+                                        foregroundColor: AppColors.success,
                                         side: const BorderSide(
-                                            color: Colors.green),
+                                            color: AppColors.success),
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 6),
                                       ),
@@ -3682,8 +2858,8 @@ class _VacancyApplicationsSheetState
                                       onPressed: () => _changeStatus(
                                           app, ApplicationStatus.REJECTED),
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: Colors.red,
-                                        side: const BorderSide(color: Colors.red),
+                                        foregroundColor: AppColors.error,
+                                        side: const BorderSide(color: AppColors.error),
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 6),
                                       ),
@@ -3738,13 +2914,13 @@ class _ApplicantSearchTabState extends State<_ApplicantSearchTab> {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
-        color: Colors.white,
+        color: AppColors.surface,
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: TextField(
           controller: _searchCtrl,
           decoration: InputDecoration(
             hintText: 'Search by name or login...',
-            prefixIcon: const Icon(Icons.search, color: Color(0xFF888888)),
+            prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
             suffixIcon: _searchCtrl.text.isNotEmpty
                 ? IconButton(
                     icon: const Icon(Icons.clear, size: 18),
@@ -3755,19 +2931,19 @@ class _ApplicantSearchTabState extends State<_ApplicantSearchTab> {
                 : null,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
+                borderSide: const BorderSide(color: AppColors.border)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
+                borderSide: const BorderSide(color: AppColors.border)),
             contentPadding: const EdgeInsets.symmetric(vertical: 10),
             filled: true,
-            fillColor: const Color(0xFFF5F5F5),
+            fillColor: AppColors.bg,
           ),
           onSubmitted: (_) => _search(),
           onChanged: (_) => setState(() {}),
         ),
       ),
-      const Divider(height: 1, color: Color(0xFFE0E0E0)),
+      const Divider(height: 1, color: AppColors.border),
       Expanded(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -3776,11 +2952,11 @@ class _ApplicantSearchTabState extends State<_ApplicantSearchTab> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.person_search_outlined,
-                          size: 48, color: Colors.indigo.shade200),
+                          size: 48, color: AppColors.border),
                       const SizedBox(height: 12),
                       const Text('Search for applicants by name or login',
                           style: TextStyle(
-                              fontSize: 14, color: Color(0xFF888888))),
+                              fontSize: 14, color: AppColors.textSecondary)),
                     ]))
                 : ListView.separated(
                     padding: const EdgeInsets.all(16),
@@ -3789,17 +2965,17 @@ class _ApplicantSearchTabState extends State<_ApplicantSearchTab> {
                     itemBuilder: (_, i) {
                       final u = _results[i];
                       return Material(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(10),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 4),
                           leading: CircleAvatar(
-                            backgroundColor: Colors.indigo.shade50,
+                            backgroundColor: AppColors.tagBg,
                             child: Text(
                               u.firstName[0].toUpperCase(),
                               style: TextStyle(
-                                  color: Colors.indigo.shade600,
+                                  color: AppColors.primary,
                                   fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -3808,7 +2984,7 @@ class _ApplicantSearchTabState extends State<_ApplicantSearchTab> {
                                   fontWeight: FontWeight.w600, fontSize: 14)),
                           subtitle: Text('@${u.login}',
                               style: const TextStyle(
-                                  fontSize: 12, color: Color(0xFF666666))),
+                                  fontSize: 12, color: AppColors.textSecondary)),
                         ),
                       );
                     },

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../model/resume.dart';
 import '../../service/resume_api_service.dart';
 import '../../service/user_api_service.dart';
+import '../../theme/app_theme.dart';
 import '../../util/formatters.dart';
 
 class ResumeFormScreen extends StatefulWidget {
@@ -212,19 +213,19 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF232F3E),
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.text,
         elevation: 0,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: AppColors.surface,
         title: Text(
           _isEditing ? 'Edit Resume' : 'New Resume',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, thickness: 1, color: Color(0xFFE0E0E0)),
+          child: Divider(height: 1, thickness: 1, color: AppColors.border),
         ),
       ),
       body: Form(
@@ -313,12 +314,12 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        color: Colors.white,
+        color: AppColors.surface,
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
         child: FilledButton(
           onPressed: _isSaving ? null : _save,
           style: FilledButton.styleFrom(
-            backgroundColor: Colors.indigo,
+            backgroundColor: AppColors.accent,
             minimumSize: const Size.fromHeight(52),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -328,7 +329,7 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.white),
+                      strokeWidth: 2, color: AppColors.surface),
                 )
               : Text(
                   _isEditing ? 'Save changes' : 'Create resume',
@@ -355,14 +356,14 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
             children: [
               CircleAvatar(
                 radius: 48,
-                backgroundColor: const Color(0xFFEEF2FF),
+                backgroundColor: AppColors.tagBg,
                 backgroundImage: _photoBytes != null
                     ? MemoryImage(_photoBytes!)
                     : (existingPhotoUrl != null
                         ? NetworkImage(existingPhotoUrl)
                         : null),
                 child: !hasPreview
-                    ? Icon(Icons.person, size: 48, color: Colors.indigo.shade200)
+                    ? Icon(Icons.person, size: 48, color: AppColors.border)
                     : null,
               ),
               Positioned(
@@ -372,11 +373,11 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: Colors.indigo,
+                    color: AppColors.primary,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: AppColors.surface, width: 2),
                   ),
-                  child: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
+                  child: const Icon(Icons.camera_alt, size: 14, color: AppColors.surface),
                 ),
               ),
             ],
@@ -416,20 +417,20 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
         decoration: InputDecoration(
           labelText: required ? '$label *' : label,
           hintText: hint,
-          hintStyle: const TextStyle(color: Color(0xFFBBBBBB)),
+          hintStyle: const TextStyle(color: AppColors.textSecondary),
           filled: true,
-          fillColor: const Color(0xFFFAFAFA),
+          fillColor: AppColors.bg,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
+            borderSide: const BorderSide(color: AppColors.border),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
+            borderSide: const BorderSide(color: AppColors.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.indigo, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
           isDense: true,
           counterText: '',
@@ -454,22 +455,22 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: const Color(0xFFFAFAFA),
+          fillColor: AppColors.bg,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
+            borderSide: const BorderSide(color: AppColors.border),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
+            borderSide: const BorderSide(color: AppColors.border),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.indigo, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
           isDense: true,
           suffixIcon: const Icon(Icons.calendar_month_outlined,
-              size: 16, color: Color(0xFF999999)),
+              size: 16, color: AppColors.textSecondary),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         ),
@@ -492,21 +493,21 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
                 controller: _skillInput,
                 decoration: InputDecoration(
                   hintText: 'e.g. Java, Spring Boot, PostgreSQL',
-                  hintStyle: const TextStyle(color: Color(0xFFBBBBBB)),
+                  hintStyle: const TextStyle(color: AppColors.textSecondary),
                   filled: true,
-                  fillColor: const Color(0xFFFAFAFA),
+                  fillColor: AppColors.bg,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
+                    borderSide: const BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide:
-                        const BorderSide(color: Colors.indigo, width: 1.5),
+                        const BorderSide(color: AppColors.primary, width: 1.5),
                   ),
                   isDense: true,
                   contentPadding:
@@ -521,7 +522,7 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
               child: FilledButton(
                 onPressed: _addSkill,
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.indigo,
+                  backgroundColor: AppColors.accent,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),
@@ -540,7 +541,7 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEEF2FF),
+                        color: AppColors.tagBg,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -549,13 +550,13 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
                           Text(s,
                               style: TextStyle(
                                   fontSize: 13,
-                                  color: Colors.indigo.shade700,
+                                  color: AppColors.tagText,
                                   fontWeight: FontWeight.w500)),
                           const SizedBox(width: 6),
                           GestureDetector(
                             onTap: () => setState(() => _skills.remove(s)),
                             child: Icon(Icons.close,
-                                size: 14, color: Colors.indigo.shade400),
+                                size: 14, color: AppColors.primary),
                           ),
                         ],
                       ),
@@ -623,23 +624,23 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
                       decoration: InputDecoration(
                         hintText: 'https://linkedin.com/in/...',
                         hintStyle:
-                            const TextStyle(color: Color(0xFFBBBBBB)),
+                            const TextStyle(color: AppColors.textSecondary),
                         prefixIcon: const Icon(Icons.link,
-                            size: 18, color: Color(0xFF999999)),
+                            size: 18, color: AppColors.textSecondary),
                         filled: true,
-                        fillColor: const Color(0xFFFAFAFA),
+                        fillColor: AppColors.bg,
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide:
-                                const BorderSide(color: Color(0xFFDDDDDD))),
+                                const BorderSide(color: AppColors.border)),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide:
-                                const BorderSide(color: Color(0xFFDDDDDD))),
+                                const BorderSide(color: AppColors.border)),
                         focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: const BorderSide(
-                                color: Colors.indigo, width: 1.5)),
+                                color: AppColors.primary, width: 1.5)),
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 14),
@@ -653,7 +654,7 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
                       _links.removeAt(e.key);
                     }),
                     child: const Icon(Icons.remove_circle_outline,
-                        color: Colors.red, size: 22),
+                        color: AppColors.error, size: 22),
                   ),
                 ],
               ),
@@ -673,17 +674,17 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           border: Border.all(
-              color: Colors.indigo.withValues(alpha: 0.4), style: BorderStyle.solid),
+              color: AppColors.primary.withOpacity(0.4), style: BorderStyle.solid),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, size: 18, color: Colors.indigo.shade600),
+            Icon(Icons.add, size: 18, color: AppColors.primary),
             const SizedBox(width: 6),
             Text(label,
                 style: TextStyle(
-                    color: Colors.indigo.shade600,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w500)),
           ],
         ),
@@ -709,7 +710,7 @@ class _FormSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -719,17 +720,17 @@ class _FormSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: Row(
               children: [
-                Icon(icon, size: 18, color: Colors.indigo),
+                Icon(icon, size: 18, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Text(title,
                     style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF232F3E))),
+                        color: AppColors.text)),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          const Divider(height: 1, color: AppColors.bg),
           Padding(
             padding: const EdgeInsets.all(16),
             child: child,
@@ -862,9 +863,9 @@ class _ExpCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),
+        color: AppColors.bg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE8E8E8)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -875,7 +876,7 @@ class _ExpCard extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
+                  color: AppColors.tagBg,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -883,17 +884,17 @@ class _ExpCard extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: Colors.indigo.shade700)),
+                        color: AppColors.tagText)),
               ),
               const SizedBox(width: 8),
               Text('Experience ${index + 1}',
                   style: const TextStyle(
                       fontWeight: FontWeight.w600, fontSize: 14,
-                      color: Color(0xFF444444))),
+                      color: AppColors.text)),
               const Spacer(),
               GestureDetector(
                 onTap: onRemove,
-                child: const Icon(Icons.close, size: 18, color: Colors.red),
+                child: const Icon(Icons.close, size: 18, color: AppColors.error),
               ),
             ],
           ),
@@ -906,7 +907,7 @@ class _ExpCard extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Text('—',
-                    style: TextStyle(color: Color(0xFF999999), fontSize: 18)),
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 18)),
               ),
               Expanded(child: _dateF(entry.endDate, 'End date')),
             ],
@@ -928,16 +929,16 @@ class _ExpCard extends StatelessWidget {
         decoration: InputDecoration(
           labelText: required ? '$label *' : label,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: AppColors.surface,
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+              borderSide: const BorderSide(color: AppColors.border)),
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+              borderSide: const BorderSide(color: AppColors.border)),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.indigo, width: 1.5)),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
           isDense: true,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -958,19 +959,19 @@ class _ExpCard extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: AppColors.surface,
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+              borderSide: const BorderSide(color: AppColors.border)),
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+              borderSide: const BorderSide(color: AppColors.border)),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.indigo, width: 1.5)),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
           isDense: true,
           suffixIcon:
-              const Icon(Icons.calendar_month_outlined, size: 16, color: Color(0xFF999999)),
+              const Icon(Icons.calendar_month_outlined, size: 16, color: AppColors.textSecondary),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         ),
@@ -1001,9 +1002,9 @@ class _EduCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFA),
+        color: AppColors.bg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE8E8E8)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1014,7 +1015,7 @@ class _EduCard extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
+                  color: AppColors.tagBg,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -1022,18 +1023,18 @@ class _EduCard extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: Colors.indigo.shade700)),
+                        color: AppColors.tagText)),
               ),
               const SizedBox(width: 8),
               Text('Education ${index + 1}',
                   style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      color: Color(0xFF444444))),
+                      color: AppColors.text)),
               const Spacer(),
               GestureDetector(
                 onTap: onRemove,
-                child: const Icon(Icons.close, size: 18, color: Colors.red),
+                child: const Icon(Icons.close, size: 18, color: AppColors.error),
               ),
             ],
           ),
@@ -1048,7 +1049,7 @@ class _EduCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Text('—',
                     style:
-                        TextStyle(color: Color(0xFF999999), fontSize: 18)),
+                        TextStyle(color: AppColors.textSecondary, fontSize: 18)),
               ),
               Expanded(child: _dateF(entry.endDate, 'End date')),
             ],
@@ -1066,16 +1067,16 @@ class _EduCard extends StatelessWidget {
         decoration: InputDecoration(
           labelText: required ? '$label *' : label,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: AppColors.surface,
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+              borderSide: const BorderSide(color: AppColors.border)),
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+              borderSide: const BorderSide(color: AppColors.border)),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.indigo, width: 1.5)),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
           isDense: true,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -1096,19 +1097,19 @@ class _EduCard extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: AppColors.surface,
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+              borderSide: const BorderSide(color: AppColors.border)),
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+              borderSide: const BorderSide(color: AppColors.border)),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.indigo, width: 1.5)),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
           isDense: true,
           suffixIcon: const Icon(Icons.calendar_month_outlined,
-              size: 16, color: Color(0xFF999999)),
+              size: 16, color: AppColors.textSecondary),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         ),

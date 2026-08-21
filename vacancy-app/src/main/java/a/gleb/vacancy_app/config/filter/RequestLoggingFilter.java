@@ -1,7 +1,7 @@
 package a.gleb.vacancy_app.config.filter;
 
+import a.gleb.vacancy_app.adapter.out.security.AccountAdapter;
 import a.gleb.vacancy_app.config.properties.VacancyAppConfigurationProperties;
-import a.gleb.vacancy_app.security.AccountContext;
 import io.micrometer.tracing.Tracer;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,16 +30,16 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     private final Tracer tracer;
-    private final AccountContext accountContext;
+    private final AccountAdapter accountAdapter;
     private final List<String> excludedEndpoints;
 
     public RequestLoggingFilter(
             Tracer tracer,
-            AccountContext accountContext,
+            AccountAdapter accountAdapter,
             VacancyAppConfigurationProperties properties
     ) {
         this.tracer = tracer;
-        this.accountContext = accountContext;
+        this.accountAdapter = accountAdapter;
         this.excludedEndpoints = properties.observability().excludedPatterns();
     }
 
@@ -50,7 +50,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         var startTime = System.currentTimeMillis();
-        var requestor = accountContext.getAccountLogin();
+        var requestor = accountAdapter.getAccountLogin();
 
         try {
             MDC.put(REQUESTOR, requestor);

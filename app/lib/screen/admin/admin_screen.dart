@@ -8,6 +8,7 @@ import 'admin_resumes_tab.dart';
 import 'admin_roles_tab.dart';
 import 'admin_users_tab.dart';
 import 'admin_vacancies_tab.dart';
+import '../../theme/app_theme.dart';
 
 class AdminScreen extends StatelessWidget {
   final AdminApiService adminApiService;
@@ -28,12 +29,12 @@ class AdminScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Admin panel'),
-          backgroundColor: Colors.indigo,
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.accent,
+          foregroundColor: AppColors.surface,
           bottom: const TabBar(
-            labelColor: Colors.white,
+            labelColor: AppColors.surface,
             unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
+            indicatorColor: AppColors.surface,
             isScrollable: true,
             tabs: [
               Tab(icon: Icon(Icons.people_outline), text: 'Users'),

@@ -13,7 +13,7 @@ class UserApiService extends AuthenticatedHttpClient {
 
   Future<UserProfile?> getMyProfile() async {
     final response = await get(AppConfig.userInfoEndpoint);
-    if (response == null || response.statusCode != 200) return null;
+    if (response.statusCode != 200) return null;
     return UserProfile.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -61,12 +61,12 @@ class UserApiService extends AuthenticatedHttpClient {
     String? birthDate,
   }) async {
     final body = <String, dynamic>{
-      ?'firstName': firstName,
-      ?'lastName': lastName,
-      ?'birthDate': birthDate,
+      if (firstName != null) 'firstName': firstName,
+      if (lastName != null) 'lastName': lastName,
+      if (birthDate != null) 'birthDate': birthDate,
     };
     final response = await put(AppConfig.userInfoEndpoint, body);
-    if (response == null || response.statusCode != 200) return null;
+    if (response.statusCode != 200) return null;
     return UserProfile.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -81,7 +81,6 @@ class UserApiService extends AuthenticatedHttpClient {
       'newPassword': newPassword,
       'confirmPassword': confirmPassword,
     });
-    if (response == null) return 'Not authenticated';
     if (response.statusCode == 204) return null;
     try {
       final decoded = jsonDecode(response.body);
@@ -114,14 +113,14 @@ class UserApiService extends AuthenticatedHttpClient {
     final url = Uri.parse(AppConfig.userSearchEndpoint)
         .replace(queryParameters: {'query': query, 'size': '20'});
     final response = await get(url.toString());
-    if (response == null || response.statusCode != 200) return [];
+    if (response.statusCode != 200) return [];
     final list = jsonDecode(response.body) as List<dynamic>;
     return list.map((e) => UserShort.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   Future<UserShort?> getUserById(String id) async {
     final response = await get('${AppConfig.usersEndpoint}/$id');
-    if (response == null || response.statusCode != 200) return null;
+    if (response.statusCode != 200) return null;
     return UserShort.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 }

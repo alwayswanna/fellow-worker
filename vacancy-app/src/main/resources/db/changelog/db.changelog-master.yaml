@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/changes/001-init-vacancy-schema.sql
   - include:
       file: db/changelog/changes/002-contact-fields-and-applications.sql
+  - include:
+      file: db/changelog/changes/003-saved-vacancy.sql

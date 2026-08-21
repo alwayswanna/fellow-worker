@@ -1,8 +1,8 @@
 package a.gleb.user_app.config;
 
-import a.gleb.user_app.auth.UserServiceAuthToken;
+import a.gleb.user_app.adapter.in.security.auth.UserServiceAuthToken;
+import a.gleb.user_app.application.port.out.UserRepositoryPort;
 import a.gleb.user_app.config.properties.UserAppConfigurationProperties;
-import a.gleb.user_app.db.repository.UserEntityRepository;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -13,9 +13,11 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -31,8 +33,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -59,6 +61,9 @@ import static a.gleb.user_app.constant.UserAppConstant.LOCK_TABLE;
 )
 @EnableWebSecurity
 @EnableMethodSecurity
+@EnableRetry
+@EnableScheduling
+@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 @RequiredArgsConstructor
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(UserAppConfigurationProperties.class)
@@ -67,7 +72,7 @@ public class UserAppConfiguration {
     public static final String OAUTH_SECURITY_SCHEME = "authorizationServerSecurityScheme";
 
     private final UserAppConfigurationProperties properties;
-    private final UserEntityRepository userEntityRepository;
+    private final UserRepositoryPort userRepositoryPort;
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(
@@ -117,11 +122,11 @@ public class UserAppConfiguration {
 
     private AbstractAuthenticationToken jwtAuthConverter(Jwt jwt) {
         var subject = jwt.getSubject();
-        var authorities = userEntityRepository.findRoleCodeByLogin(subject)
-                .map(projection -> {
+        var authorities = userRepositoryPort.findRoleCodeByLogin(subject)
+                .map(roleCode -> {
                     List<GrantedAuthority> list = new ArrayList<>();
                     list.add(new SimpleGrantedAuthority("ROLE_AUTHORIZED"));
-                    list.add(new SimpleGrantedAuthority("ROLE_%s".formatted(projection.getRoleCode())));
+                    list.add(new SimpleGrantedAuthority("ROLE_%s".formatted(roleCode)));
                     return list;
                 })
                 .orElseGet(() -> List.of(new SimpleGrantedAuthority("AUTHORIZED")));
