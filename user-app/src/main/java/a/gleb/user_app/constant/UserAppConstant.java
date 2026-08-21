@@ -2,7 +2,7 @@ package a.gleb.user_app.constant;
 
 public final class UserAppConstant {
 
-    public static final String LOCK_TABLE = "user.shedlock";
+    public static final String LOCK_TABLE = "\"user\".shedlock";
 
     public static final String AUTHORIZATION_PARTITION_PATTERN = "authorization_%s_%s";
 

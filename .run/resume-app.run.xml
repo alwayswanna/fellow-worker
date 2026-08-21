@@ -2,8 +2,8 @@
   <configuration default="false" name="resume-app" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="dev" />
     <envs>
-      <env name="VAULT_RID" value="c29bfb5f-77a1-a28d-646b-37bfb2074e6e" />
-      <env name="VAULT_SID" value="55afb07d-8822-4b37-5950-9d7d14955523" />
+      <env name="VAULT_RID" value="d939cd42-e749-f0af-5bbc-34890565a6b1" />
+      <env name="VAULT_SID" value="ced22d72-9999-9af1-9c45-d498a36208bc" />
     </envs>
     <module name="resume-app" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="a.gleb.resume_app.ResumeApp" />

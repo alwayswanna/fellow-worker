@@ -99,6 +99,9 @@ public class RegisteredClientMapper extends AbstractOAuthMapper {
                         .requireAuthorizationConsent(client.isRequireAuthorizationConsent())
                         .requireProofKey(client.isRequireProofKey())
                         .build())
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(properties.registeredClientDefaultOptions().accessTokenTimeToLive())
+                        .build())
                 .build();
     }
 

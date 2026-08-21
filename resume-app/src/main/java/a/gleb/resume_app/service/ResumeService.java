@@ -7,6 +7,7 @@ import a.gleb.resume_app.model.request.ResumeRequest;
 import a.gleb.resume_app.model.response.ResumeResponse;
 import a.gleb.resume_app.security.AccountContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ResumeService {
@@ -111,5 +113,15 @@ public class ResumeService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found");
         }
         resumeRepository.deleteByIdAndAccountId(id, accountId);
+    }
+
+    /**
+     * Called when user-app reports the owning account was deleted (`USER_DELETED` event).
+     * DB-level `ON DELETE CASCADE` takes care of work experience/education/skill/link rows.
+     */
+    @Transactional
+    public void deleteAllForAccount(UUID accountId) {
+        resumeRepository.deleteAllByAccountId(accountId);
+        log.info("ResumeService: deleted resumes for removed account [userId={}]", accountId);
     }
 }

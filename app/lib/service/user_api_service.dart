@@ -61,9 +61,9 @@ class UserApiService extends AuthenticatedHttpClient {
     String? birthDate,
   }) async {
     final body = <String, dynamic>{
-      ?'firstName': firstName,
-      ?'lastName': lastName,
-      ?'birthDate': birthDate,
+      if (firstName != null) 'firstName': firstName,
+      if (lastName != null) 'lastName': lastName,
+      if (birthDate != null) 'birthDate': birthDate,
     };
     final response = await put(AppConfig.userInfoEndpoint, body);
     if (response == null || response.statusCode != 200) return null;

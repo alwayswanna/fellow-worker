@@ -8,7 +8,9 @@ import a.gleb.company_app.model.enums.CompanySize;
 import a.gleb.company_app.model.request.CompanyRequest;
 import a.gleb.company_app.model.response.CompanyResponse;
 import a.gleb.company_app.security.AccountContext;
+import a.gleb.fellow_worker.kafka.event.CompanyEventType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
@@ -27,6 +30,7 @@ public class CompanyService {
     private final CompanyRecruiterRepository recruiterRepository;
     private final CompanyMapper mapper;
     private final AccountContext accountContext;
+    private final OutboxEventService outboxEventService;
 
     @Transactional
     public CompanyResponse create(CompanyRequest request) {
@@ -98,5 +102,21 @@ public class CompanyService {
         // TODO: check that company has no active vacancies in vacancy-app (cross-service call)
 
         companyRepository.deleteById(id);
+    }
+
+    /**
+     * Called when user-app reports the account was deleted (`USER_DELETED` event).
+     * If the account owns a company, it's deleted (DB `ON DELETE CASCADE` removes its remaining
+     * recruiters/reviews) and a `COMPANY_DELETED` outbox event is emitted so vacancy-app can drop
+     * the company's vacancies/applications in turn.
+     */
+    @Transactional
+    public void deleteOwnedByAccount(UUID accountId) {
+        companyRepository.findByOwnerAccountId(accountId).ifPresent(company -> {
+            outboxEventService.saveEvent(company, CompanyEventType.COMPANY_DELETED);
+            companyRepository.delete(company);
+            log.info("CompanyService: deleted company owned by removed account [companyId={}, userId={}]",
+                    company.getId(), accountId);
+        });
     }
 }

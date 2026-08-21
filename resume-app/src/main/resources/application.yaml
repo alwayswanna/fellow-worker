@@ -64,6 +64,17 @@ spring:
         initial-interval: 300
         max-attempts: 10
         max-interval: 3000
+    function:
+      definition: userEventConsumer
+    stream:
+      bindings:
+        userEventConsumer-in-0:
+          destination: user.event
+          group: resume-app
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
 
 management:
   server:

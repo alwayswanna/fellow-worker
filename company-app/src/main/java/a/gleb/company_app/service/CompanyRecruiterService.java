@@ -90,4 +90,12 @@ public class CompanyRecruiterService {
 
         recruiterRepository.deleteById(recruiter.getId());
     }
+
+    /**
+     * Called when user-app reports the account was deleted (`USER_DELETED` event).
+     */
+    @Transactional
+    public void deleteByAccountId(UUID accountId) {
+        recruiterRepository.deleteByAccountId(accountId);
+    }
 }

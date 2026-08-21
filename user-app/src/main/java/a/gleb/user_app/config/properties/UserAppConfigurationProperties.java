@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.time.Duration;
 import java.time.Period;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +49,8 @@ public record UserAppConfigurationProperties(
     }
 
     public record RegisteredClientDefaultOptions(
-            @NotNull Period clientSecretExpiresAt
+            @NotNull Period clientSecretExpiresAt,
+            @NotNull Duration accessTokenTimeToLive
     ) {
     }
 

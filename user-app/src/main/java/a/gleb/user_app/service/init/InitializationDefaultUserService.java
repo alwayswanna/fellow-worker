@@ -3,6 +3,8 @@ package a.gleb.user_app.service.init;
 import a.gleb.user_app.config.properties.UserAppConfigurationProperties;
 import a.gleb.user_app.db.entity.RoleEntity;
 import a.gleb.user_app.db.entity.UserEntity;
+import a.gleb.user_app.db.repository.RoleEntityRepository;
+import a.gleb.user_app.db.repository.UserEntityRepository;
 import a.gleb.user_app.service.RoleService;
 import a.gleb.user_app.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,8 @@ public class InitializationDefaultUserService implements ApplicationRunner {
 
     private final UserService userService;
     private final RoleService roleService;
+    private final RoleEntityRepository roleEntityRepository;
+    private final UserEntityRepository userEntityRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserAppConfigurationProperties properties;
 
@@ -32,18 +36,35 @@ public class InitializationDefaultUserService implements ApplicationRunner {
     public void run(@NonNull ApplicationArguments args) {
         var role = properties.role();
         if (role != null) {
-            var entity = RoleEntity.builder()
-                    .code(role.roleCode())
-                    .displayName(role.roleName())
-                    .createdBy("system")
-                    .createdAt(LocalDateTime.now())
-                    .build();
+            var entity = roleEntityRepository.findRoleEntityByCode(role.roleCode())
+                    .orElse(null);
 
-            entity = roleService.save(entity);
+            if (entity == null) {
+                if (roleEntityRepository.existsRoleEntityByDisplayName(role.roleName())) {
+                    log.info("InitializationDefaultUserService: role with display name already exists, skipping creation, [role_name={}]", role.roleName());
+                    return;
+                }
+
+                entity = RoleEntity.builder()
+                        .code(role.roleCode())
+                        .displayName(role.roleName())
+                        .createdBy("system")
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+                entity = roleService.save(entity);
+                log.info("InitializationDefaultUserService: default role was created, [role_code={}]", role.roleCode());
+            } else {
+                log.info("InitializationDefaultUserService: default role already exists, [role_code={}]", role.roleCode());
+            }
+
             var admin = properties.admin();
-            log.info("InitializationDefaultUserService: default role was created, [role_code={}]", role.roleCode());
-
             if (admin != null) {
+                if (userEntityRepository.existsUserEntityByLogin(admin.username())) {
+                    log.info("InitializationDefaultUserService: default user already exists, [username={}]", admin.username());
+                    return;
+                }
+
                 var adminEntity = UserEntity.builder()
                         .login(admin.username())
                         .role(entity)

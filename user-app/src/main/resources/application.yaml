@@ -63,9 +63,10 @@ app:
       - openid
   init:
     registered-client: true
-    default-user: false
+    default-user: true
   registered-client-default-options:
     client-secret-expires-at: P3M
+    access-token-time-to-live: PT30M
   security-constraints:
     - roles:
         - ADMIN

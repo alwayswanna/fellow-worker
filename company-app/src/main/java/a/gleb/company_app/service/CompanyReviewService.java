@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +63,23 @@ public class CompanyReviewService {
 
         reviewRepository.deleteById(reviewId);
         companyRepository.recalculateRating(companyId);
+    }
+
+    /**
+     * Called when user-app reports the account was deleted (`USER_DELETED` event).
+     * Recalculates the rating of every company affected by a removed review.
+     */
+    @Transactional
+    public void deleteAllByAccountId(UUID accountId) {
+        var reviews = reviewRepository.findAllByAccountId(accountId);
+        if (reviews.isEmpty()) {
+            return;
+        }
+
+        var affectedCompanyIds = reviews.stream()
+                .map(review -> review.getCompany().getId())
+                .collect(Collectors.toSet());
+        reviewRepository.deleteAll(reviews);
+        affectedCompanyIds.forEach(companyRepository::recalculateRating);
     }
 }

@@ -11,6 +11,14 @@ app:
     - /actuator/**
     - /v3/api-docs/**
     - /swagger-ui/**
+  outbox:
+    scheduler:
+      cron: "*/10 * * * * *"
+    lock:
+      at-most-for: PT15S
+      at-least-for: PT5S
+    batch-size: 100
+    max-retries: 5
 
 spring:
   application:
@@ -43,6 +51,25 @@ spring:
         initial-interval: 300
         max-attempts: 10
         max-interval: 3000
+    function:
+      definition: userEventConsumer
+    stream:
+      bindings:
+        userEventConsumer-in-0:
+          destination: user.event
+          group: company-app
+          content-type: application/json
+        company-events-out-0:
+          destination: company.event
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+          producer-properties:
+            acks: all
+            enable.idempotence: true
+            retries: 3
+            delivery.timeout.ms: 30000
 
 management:
   server:

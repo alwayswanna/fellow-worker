@@ -19,4 +19,6 @@ public interface CompanyRecruiterRepository extends JpaRepository<CompanyRecruit
     boolean existsByAccountId(UUID accountId);
 
     Optional<CompanyRecruiterEntity> findByAccountId(UUID accountId);
+
+    void deleteByAccountId(UUID accountId);
 }

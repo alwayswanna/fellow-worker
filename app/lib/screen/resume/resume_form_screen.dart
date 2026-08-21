@@ -673,7 +673,7 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           border: Border.all(
-              color: Colors.indigo.withValues(alpha: 0.4), style: BorderStyle.solid),
+              color: Colors.indigo.withOpacity(0.4), style: BorderStyle.solid),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(

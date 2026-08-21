@@ -7,6 +7,7 @@ import a.gleb.vacancy_app.model.enums.ApplicationStatus;
 import a.gleb.vacancy_app.model.response.ApplicationResponse;
 import a.gleb.vacancy_app.security.AccountContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ApplicationService {
@@ -107,6 +109,15 @@ public class ApplicationService {
 
         app.setStatus(newStatus);
         return toResponse(applicationRepository.save(app));
+    }
+
+    /**
+     * Called when user-app reports the applicant account was deleted (`USER_DELETED` event).
+     */
+    @Transactional
+    public void deleteAllForAccount(UUID accountId) {
+        applicationRepository.deleteAllByApplicantAccountId(accountId);
+        log.info("ApplicationService: deleted applications for removed account [userId={}]", accountId);
     }
 
     private ApplicationResponse toResponse(ApplicationEntity e) {
