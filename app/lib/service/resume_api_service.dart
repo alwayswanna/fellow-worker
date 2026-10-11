@@ -17,6 +17,20 @@ class ResumeApiService extends AuthenticatedHttpClient {
     return list.map((e) => Resume.fromJson(e as Map<String, dynamic>)).toList();
   }
 
+  /// Recruiter/company-founder only — resumes belonging to another account
+  /// (e.g. an applicant found via user search). Returns an empty list on
+  /// 403 (caller isn't a recruiter/company founder) as well as on any other
+  /// failure, since the caller only needs to distinguish "has a resume" from
+  /// "doesn't".
+  Future<List<Resume>> findAllByAccountId(String accountId) async {
+    final url = Uri.parse(AppConfig.resumesEndpoint)
+        .replace(queryParameters: {'accountId': accountId});
+    final response = await get(url.toString());
+    if (response.statusCode != 200) return [];
+    final list = jsonDecode(response.body) as List<dynamic>;
+    return list.map((e) => Resume.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
   Future<List<Resume>> search({
     String? firstName,
     String? lastName,

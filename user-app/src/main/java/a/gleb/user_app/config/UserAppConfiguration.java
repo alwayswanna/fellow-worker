@@ -1,7 +1,6 @@
 package a.gleb.user_app.config;
 
 import a.gleb.user_app.adapter.in.security.auth.UserServiceAuthToken;
-import a.gleb.user_app.application.port.out.UserRepositoryPort;
 import a.gleb.user_app.config.properties.UserAppConfigurationProperties;
 import io.minio.MinioClient;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -37,7 +36,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.util.CollectionUtils;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
 import java.util.List;
 
 import static a.gleb.user_app.constant.UserAppConstant.LOCK_TABLE;
@@ -72,7 +70,6 @@ public class UserAppConfiguration {
     public static final String OAUTH_SECURITY_SCHEME = "authorizationServerSecurityScheme";
 
     private final UserAppConfigurationProperties properties;
-    private final UserRepositoryPort userRepositoryPort;
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(
@@ -120,16 +117,21 @@ public class UserAppConfiguration {
                 .build();
     }
 
+    /**
+     * Role comes straight from the JWT's {@code role} claim (minted by
+     * {@link OAuth2ServerConfiguration#tokenCustomizer}), not a per-request DB lookup — this is
+     * the authorization server's own resource-server filter, so every token it issues to itself
+     * already carries the role. A role change takes effect on the user's next token refresh
+     * (access tokens are short-lived — see {@code registered-client-default-options}), not
+     * instantly; that trade-off replaces a DB round trip on every authenticated request here with
+     * a bounded staleness window instead.
+     */
     private AbstractAuthenticationToken jwtAuthConverter(Jwt jwt) {
         var subject = jwt.getSubject();
-        var authorities = userRepositoryPort.findRoleCodeByLogin(subject)
-                .map(roleCode -> {
-                    List<GrantedAuthority> list = new ArrayList<>();
-                    list.add(new SimpleGrantedAuthority("ROLE_AUTHORIZED"));
-                    list.add(new SimpleGrantedAuthority("ROLE_%s".formatted(roleCode)));
-                    return list;
-                })
-                .orElseGet(() -> List.of(new SimpleGrantedAuthority("AUTHORIZED")));
+        var roleCode = jwt.getClaimAsString("role");
+        List<GrantedAuthority> authorities = roleCode != null
+                ? List.of(new SimpleGrantedAuthority("ROLE_AUTHORIZED"), new SimpleGrantedAuthority("ROLE_%s".formatted(roleCode)))
+                : List.of(new SimpleGrantedAuthority("AUTHORIZED"));
         var token = new UserServiceAuthToken(authorities);
         token.setLogin(subject);
         token.setJwt(jwt);

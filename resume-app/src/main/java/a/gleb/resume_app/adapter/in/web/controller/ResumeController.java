@@ -55,6 +55,12 @@ public class ResumeController implements ResumeSwagger {
     }
 
     @Override
+    @GetMapping(params = "accountId")
+    public List<ResumeResponse> findAllByAccountId(@RequestParam UUID accountId) {
+        return resumeService.findAllByAccountId(accountId).stream().map(resumeWebMapper::toResponse).toList();
+    }
+
+    @Override
     @PutMapping("/{id}")
     public ResumeResponse update(@PathVariable UUID id, @Valid @RequestBody ResumeRequest request) {
         return resumeWebMapper.toResponse(resumeService.update(id, resumeWebMapper.toDomain(request)));

@@ -9,17 +9,24 @@ import a.gleb.resume_app.domain.model.PageResult;
 import a.gleb.resume_app.domain.model.Resume;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ResumeService {
+
+    /** Roles allowed to look up another account's resumes (e.g. a recruiter
+     * reviewing an applicant found via user search). */
+    private static final Set<String> RESUME_LOOKUP_ROLES = Set.of("RECRUITER", "COMPANY_FOUNDER");
 
     private final ResumeRepositoryPort resumeRepositoryPort;
     private final CurrentAccountPort currentAccountPort;
@@ -46,6 +53,21 @@ public class ResumeService {
     @Transactional(readOnly = true)
     public List<Resume> findMy() {
         var accountId = currentAccountPort.requiredAccountId();
+        return resumeRepositoryPort.findAllByAccountId(accountId);
+    }
+
+    /**
+     * Looks up another account's resumes by id — e.g. a recruiter reviewing
+     * an applicant found via user search.
+     *
+     * @throws ResponseStatusException 403 if the caller isn't a recruiter or company founder.
+     */
+    @Transactional(readOnly = true)
+    public List<Resume> findAllByAccountId(UUID accountId) {
+        if (!RESUME_LOOKUP_ROLES.contains(currentAccountPort.requiredRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only recruiters or company founders can look up another account's resumes");
+        }
         return resumeRepositoryPort.findAllByAccountId(accountId);
     }
 

@@ -14,8 +14,6 @@ public interface UserRepositoryPort {
 
     Optional<User> findByLogin(String login);
 
-    Optional<String> findRoleCodeByLogin(String login);
-
     User save(User user);
 
     Optional<User> findById(UUID id);

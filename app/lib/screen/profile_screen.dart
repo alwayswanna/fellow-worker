@@ -472,12 +472,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return CompanyOwnerPanel(
           vacancyApiService: widget.vacancyApiService,
           userApiService: widget.userApiService,
+          resumeApiService: widget.resumeApiService,
         );
       }
       if (isRecruiter) {
         return RecruiterPanel(
           vacancyApiService: widget.vacancyApiService,
           userApiService: widget.userApiService,
+          resumeApiService: widget.resumeApiService,
         );
       }
       return ResumesPanel(

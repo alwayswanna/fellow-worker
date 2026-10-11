@@ -1,7 +1,6 @@
 package a.gleb.user_app.adapter.out.persistence;
 
 import a.gleb.user_app.adapter.out.persistence.mapper.UserPersistenceMapper;
-import a.gleb.user_app.adapter.out.persistence.projection.UserRoleCodeProjection;
 import a.gleb.user_app.adapter.out.persistence.repository.UserEntityRepository;
 import a.gleb.user_app.application.port.out.UserRepositoryPort;
 import a.gleb.user_app.domain.model.PageQuery;
@@ -29,11 +28,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public Optional<User> findByLogin(String login) {
         return userEntityRepository.findUserEntityByLogin(login).map(userPersistenceMapper::toDomain);
-    }
-
-    @Override
-    public Optional<String> findRoleCodeByLogin(String login) {
-        return userEntityRepository.findRoleCodeByLogin(login).map(UserRoleCodeProjection::getRoleCode);
     }
 
     @Override

@@ -49,6 +49,16 @@ public interface ResumeSwagger {
     })
     List<ResumeResponse> findMy();
 
+    @Operation(summary = "List resumes belonging to another account (recruiter/company founder only)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of resumes"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Caller is not a recruiter or company founder")
+    })
+    List<ResumeResponse> findAllByAccountId(
+            @Parameter(description = "Owning account's id", required = true) UUID accountId
+    );
+
     @Operation(summary = "Update a resume")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Resume updated"),

@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 
+import '../../model/application.dart';
 import '../../model/user_profile.dart';
 import '../../model/vacancy.dart';
+import '../../service/resume_api_service.dart';
 import '../../service/user_api_service.dart';
 import '../../service/vacancy_api_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/widgets.dart';
+import '../resume/applicant_resume_screen.dart';
 import 'shared_tabs.dart';
 
 /// RECRUITER role's main tab bar: Vacancies | Applications | Applicants.
 class RecruiterPanel extends StatefulWidget {
   final VacancyApiService vacancyApiService;
   final UserApiService userApiService;
+  final ResumeApiService resumeApiService;
 
   const RecruiterPanel({
     super.key,
     required this.vacancyApiService,
     required this.userApiService,
+    required this.resumeApiService,
   });
 
   @override
@@ -89,9 +95,13 @@ class _RecruiterPanelState extends State<RecruiterPanel>
               company: _company!,
               vacancyApiService: widget.vacancyApiService,
               userApiService: widget.userApiService,
+              resumeApiService: widget.resumeApiService,
             ),
             _ApplicantSearchTab(
               userApiService: widget.userApiService,
+              vacancyApiService: widget.vacancyApiService,
+              resumeApiService: widget.resumeApiService,
+              company: _company!,
             ),
           ],
         ),
@@ -104,8 +114,16 @@ class _RecruiterPanelState extends State<RecruiterPanel>
 
 class _ApplicantSearchTab extends StatefulWidget {
   final UserApiService userApiService;
+  final VacancyApiService vacancyApiService;
+  final ResumeApiService resumeApiService;
+  final Company company;
 
-  const _ApplicantSearchTab({required this.userApiService});
+  const _ApplicantSearchTab({
+    required this.userApiService,
+    required this.vacancyApiService,
+    required this.resumeApiService,
+    required this.company,
+  });
 
   @override
   State<_ApplicantSearchTab> createState() => _ApplicantSearchTabState();
@@ -188,6 +206,17 @@ class _ApplicantSearchTabState extends State<_ApplicantSearchTab> {
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(10),
                         child: ListTile(
+                          onTap: () => showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) => _ApplicantApplicationsSheet(
+                              user: u,
+                              company: widget.company,
+                              vacancyApiService: widget.vacancyApiService,
+                              resumeApiService: widget.resumeApiService,
+                            ),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 4),
                           leading: CircleAvatar(
@@ -205,11 +234,194 @@ class _ApplicantSearchTabState extends State<_ApplicantSearchTab> {
                           subtitle: Text('@${u.login}',
                               style: TextStyle(
                                   fontSize: 12, color: AppColors.textSecondary)),
+                          trailing: Icon(Icons.chevron_right,
+                              color: AppColors.textSecondary),
                         ),
                       );
                     },
                   ),
       ),
     ]);
+  }
+}
+
+// ── Applicant applications sheet ──────────────────────────────────────────────
+
+/// Shows which of the company's vacancies [user] has applied to, and lets
+/// the recruiter view their resume.
+///
+/// There's no backend endpoint to look applications up by applicant id (only
+/// by vacancy, or "my own") — so the applications list aggregates
+/// client-side: fetch every vacancy for the company, fetch its applications,
+/// and filter to this user. Fine at small/medium vacancy counts; would need
+/// a real backend endpoint to scale. The resume lookup, unlike applications,
+/// does have a real backend endpoint (`GET /resumes?accountId=`,
+/// recruiter/company-founder only).
+class _ApplicantApplicationsSheet extends StatefulWidget {
+  final UserShort user;
+  final Company company;
+  final VacancyApiService vacancyApiService;
+  final ResumeApiService resumeApiService;
+
+  const _ApplicantApplicationsSheet({
+    required this.user,
+    required this.company,
+    required this.vacancyApiService,
+    required this.resumeApiService,
+  });
+
+  @override
+  State<_ApplicantApplicationsSheet> createState() =>
+      _ApplicantApplicationsSheetState();
+}
+
+class _ApplicantApplicationsSheetState
+    extends State<_ApplicantApplicationsSheet> {
+  List<({Vacancy vacancy, Application application})> _entries = [];
+  bool _isLoading = true;
+  bool _isLoadingResume = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _viewResume() async {
+    setState(() => _isLoadingResume = true);
+    final resumes = await widget.resumeApiService.findAllByAccountId(widget.user.id);
+    if (!mounted) return;
+    setState(() => _isLoadingResume = false);
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => ApplicantResumeScreen(
+        applicantName: widget.user.fullName,
+        resumes: resumes,
+      ),
+    ));
+  }
+
+  Future<void> _load() async {
+    final byStatus = await Future.wait([
+      widget.vacancyApiService.searchVacancies(
+          companyId: widget.company.id, status: VacancyStatus.ACTIVE),
+      widget.vacancyApiService.searchVacancies(
+          companyId: widget.company.id, status: VacancyStatus.DRAFT),
+      widget.vacancyApiService.searchVacancies(
+          companyId: widget.company.id, status: VacancyStatus.CLOSED),
+    ]);
+    final vacancies = [...byStatus[0], ...byStatus[1], ...byStatus[2]];
+    final applicationsPerVacancy = await Future.wait(
+      vacancies.map((v) => widget.vacancyApiService.getVacancyApplications(v.id)),
+    );
+
+    final entries = <({Vacancy vacancy, Application application})>[];
+    for (var i = 0; i < vacancies.length; i++) {
+      for (final app in applicationsPerVacancy[i]) {
+        if (app.applicantAccountId == widget.user.id) {
+          entries.add((vacancy: vacancies[i], application: app));
+        }
+      }
+    }
+    if (mounted) setState(() { _entries = entries; _isLoading = false; });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.3,
+      maxChildSize: 0.9,
+      builder: (_, ctrl) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(children: [
+          const BottomSheetHandle(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+            child: Row(children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: AppColors.tagBg,
+                child: Text(
+                  widget.user.firstName.isNotEmpty
+                      ? widget.user.firstName[0].toUpperCase()
+                      : '?',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppColors.primary),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(widget.user.fullName,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text('@${widget.user.login}',
+                      style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                ]),
+              ),
+              OutlinedButton.icon(
+                onPressed: _isLoadingResume ? null : _viewResume,
+                icon: _isLoadingResume
+                    ? SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: AppColors.primary),
+                      )
+                    : const Icon(Icons.description_outlined, size: 16),
+                label: const Text('Resume'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ]),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _entries.isEmpty
+                    ? const EmptyState(
+                        icon: Icons.inbox_outlined,
+                        title: 'No applications to your vacancies',
+                        subtitle:
+                            "This applicant hasn't applied to any of your company's vacancies.",
+                      )
+                    : ListView.separated(
+                        controller: ctrl,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _entries.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (_, i) {
+                          final e = _entries[i];
+                          return Material(
+                            color: AppColors.bg,
+                            borderRadius: BorderRadius.circular(10),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              child: Row(children: [
+                                Expanded(
+                                  child: Text(e.vacancy.title,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w600, fontSize: 14)),
+                                ),
+                                StatusBadge(e.application.status),
+                              ]),
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ]),
+      ),
+    );
   }
 }
