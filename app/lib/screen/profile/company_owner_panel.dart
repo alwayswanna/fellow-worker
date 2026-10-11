@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../model/vacancy.dart';
+import '../../service/resume_api_service.dart';
 import '../../service/user_api_service.dart';
 import '../../service/vacancy_api_service.dart';
 import '../../theme/app_theme.dart';
@@ -13,11 +14,13 @@ import 'shared_tabs.dart';
 class CompanyOwnerPanel extends StatefulWidget {
   final VacancyApiService vacancyApiService;
   final UserApiService userApiService;
+  final ResumeApiService resumeApiService;
 
   const CompanyOwnerPanel({
     super.key,
     required this.vacancyApiService,
     required this.userApiService,
+    required this.resumeApiService,
   });
 
   @override
@@ -94,6 +97,7 @@ class _CompanyOwnerPanelState extends State<CompanyOwnerPanel>
                 company: _company,
                 vacancyApiService: widget.vacancyApiService,
                 userApiService: widget.userApiService,
+                resumeApiService: widget.resumeApiService,
               ),
             ],
           ),

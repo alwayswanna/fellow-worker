@@ -8,4 +8,9 @@ public interface CurrentAccountPort {
      * @throws org.springframework.web.server.ResponseStatusException 401 if missing/unauthenticated.
      */
     UUID requiredAccountId();
+
+    /**
+     * @throws org.springframework.web.server.ResponseStatusException 401 if missing/unauthenticated.
+     */
+    String requiredRole();
 }

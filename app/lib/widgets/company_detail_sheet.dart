@@ -27,8 +27,7 @@ class _CompanyDetailSheetState extends State<CompanyDetailSheet> {
   List<CompanyReview> _reviews = [];
   bool _isLoadingReviews = true;
 
-  bool get _canReview =>
-      widget.userRole == 'APPLICANT' || widget.userRole == 'EMPLOYER';
+  bool get _canReview => widget.userRole == 'APPLICANT';
 
   @override
   void initState() {

@@ -32,16 +32,4 @@ public class EducationEntity extends BaseEntity {
 
     @Column(name = "end_date")
     private LocalDate endDate;
-
-    @PrePersist
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
-    @PreUpdate
-    @Override
-    public void onUpdate() {
-        super.onUpdate();
-    }
 }

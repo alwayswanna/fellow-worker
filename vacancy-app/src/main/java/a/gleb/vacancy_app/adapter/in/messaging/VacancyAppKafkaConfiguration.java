@@ -42,7 +42,8 @@ public class VacancyAppKafkaConfiguration {
         return this::handleCompanyEvent;
     }
 
-    private void handleUserEvent(UserEventPayload payload) {
+    @Transactional
+    public void handleUserEvent(UserEventPayload payload) {
         UserEventType eventType;
         try {
             eventType = UserEventType.valueOf(payload.eventType());

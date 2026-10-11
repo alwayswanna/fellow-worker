@@ -29,6 +29,7 @@ public class ApplicationService {
     private final ApplicationRepositoryPort applicationRepositoryPort;
     private final VacancyRepositoryPort vacancyRepositoryPort;
     private final CurrentAccountPort currentAccountPort;
+    private final CompanyAccessGuard companyAccessGuard;
 
     @Transactional
     public Application apply(UUID vacancyId) {
@@ -85,9 +86,9 @@ public class ApplicationService {
 
     @Transactional(readOnly = true)
     public PageResult<Application> getVacancyApplications(UUID vacancyId, PageQuery pageQuery) {
-        if (!vacancyRepositoryPort.existsById(vacancyId)) {
-            throw new VacancyNotFoundException("Vacancy not found");
-        }
+        var vacancy = vacancyRepositoryPort.findById(vacancyId)
+                .orElseThrow(() -> new VacancyNotFoundException("Vacancy not found"));
+        companyAccessGuard.assertCanManage(vacancy.getCompanyId(), "applications");
         return applicationRepositoryPort.findAllByVacancyId(vacancyId, pageQuery);
     }
 
@@ -97,6 +98,10 @@ public class ApplicationService {
             throw new InvalidApplicationStatusException(
                     "Recruiter can only set status to REVIEWED, ACCEPTED, or REJECTED");
         }
+
+        var vacancy = vacancyRepositoryPort.findById(vacancyId)
+                .orElseThrow(() -> new VacancyNotFoundException("Vacancy not found"));
+        companyAccessGuard.assertCanManage(vacancy.getCompanyId(), "applications");
 
         var app = applicationRepositoryPort.findById(applicationId)
                 .orElseThrow(() -> new ApplicationNotFoundException("Application not found"));

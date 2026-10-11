@@ -12,7 +12,6 @@ import '../service/resume_api_service.dart';
 import '../service/user_api_service.dart';
 import '../service/vacancy_api_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/widgets.dart';
 import 'profile/applicant_tab_panel.dart';
 import 'profile/company_owner_panel.dart';
 import 'profile/profile_panel.dart';
@@ -423,40 +422,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildLeftPanel(UserProfile profile) {
-    final isEmployer = profile.role?.code == 'EMPLOYER';
-    final resume = _resumes.firstOrNull;
-
-    final resumeSection = ResumeSection(
-      resume: resume,
-      isLoading: _isResumesLoading,
-      onCreate: _openCreateResume,
-      onView: resume != null ? () => _openResumeDetail(resume) : null,
-      onEdit: resume != null ? () => _openEditResume(resume) : null,
-    );
-
     return ProfilePanel(
       profile: profile,
       isUploadingPhoto: _isUploadingPhoto,
       onPickPhoto: _pickAndUploadPhoto,
       onEdit: _showEditDialog,
       onChangePassword: _showChangePasswordDialog,
-      extra: isEmployer ? resumeSection : null,
     );
   }
 
   Widget _buildContent(UserProfile profile, bool isWide) {
-    final isEmployer = profile.role?.code == 'EMPLOYER';
     final isApplicant = profile.role?.code == 'APPLICANT';
     final isCompany = profile.role?.code == 'COMPANY_FOUNDER';
     final isRecruiter = profile.role?.code == 'RECRUITER';
 
     Widget buildRightPanel() {
-      if (isEmployer) {
-        return JobSearchPanel(
-          vacancyApiService: widget.vacancyApiService,
-          userRole: profile.role?.code,
-        );
-      }
       if (isApplicant) {
         return ApplicantTabPanel(
           vacancyApiService: widget.vacancyApiService,
@@ -472,12 +452,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return CompanyOwnerPanel(
           vacancyApiService: widget.vacancyApiService,
           userApiService: widget.userApiService,
+          resumeApiService: widget.resumeApiService,
         );
       }
       if (isRecruiter) {
         return RecruiterPanel(
           vacancyApiService: widget.vacancyApiService,
           userApiService: widget.userApiService,
+          resumeApiService: widget.resumeApiService,
         );
       }
       return ResumesPanel(

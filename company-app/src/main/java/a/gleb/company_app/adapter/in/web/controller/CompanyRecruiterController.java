@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -43,6 +44,18 @@ public class CompanyRecruiterController implements CompanyRecruiterSwagger {
     ) {
         var page = recruiterService.findByCompany(companyId, PageQueryWebMapper.from(pageable));
         return PageResponseMapper.from(page, companyRecruiterWebMapper::toResponse);
+    }
+
+    /**
+     * Internal, service-to-service existence check — public like the single-company GET on
+     * CompanyController, since services don't forward end-user auth to each other yet. Used by
+     * vacancy-app to verify a caller is a recruiter at the vacancy's owning company.
+     */
+    @GetMapping("/{accountId}")
+    public ResponseEntity<Void> existsRecruiter(@PathVariable UUID companyId, @PathVariable UUID accountId) {
+        return recruiterService.exists(companyId, accountId)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
     }
 
     @Override

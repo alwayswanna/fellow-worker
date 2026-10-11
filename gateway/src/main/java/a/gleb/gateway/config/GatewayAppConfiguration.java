@@ -2,6 +2,8 @@ package a.gleb.gateway.config;
 
 import a.gleb.gateway.config.properties.GatewayAppConfigurationProperties;
 import a.gleb.gateway.config.properties.GatewayAppConfigurationProperties.RouteDefinition;
+import a.gleb.gateway.filter.BulkheadGatewayFilterFactory;
+import a.gleb.gateway.filter.RateLimiterGatewayFilterFactory;
 import a.gleb.gateway.filter.SwaggerGatewayFilterFactory;
 import a.gleb.gateway.model.FilterConfig;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,11 @@ import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus.Series;
 
+import java.io.IOException;
+import java.net.ConnectException;
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
 @Configuration
@@ -33,11 +39,20 @@ public class GatewayAppConfiguration {
     private static final String FALLBACK_PATH = "/fallback/";
     private static final int RETRY_ATTEMPTS = 2;
 
+    // Экспоненциальный backoff между ретраями: 100ms -> 200ms, плюс джиттер,
+    // чтобы одновременный всплеск ретраев с разных клиентов не превращался в retry storm.
+    private static final Duration RETRY_FIRST_BACKOFF = Duration.ofMillis(100);
+    private static final Duration RETRY_MAX_BACKOFF = Duration.ofMillis(500);
+    private static final int RETRY_BACKOFF_FACTOR = 2;
+    private static final double RETRY_JITTER_FACTOR = 0.5;
+
     private static final Profiles NOT_PROD_PROFILES_EXPR = Profiles.of("!prod");
 
     private final Environment env;
     private final GatewayAppConfigurationProperties properties;
     private final SwaggerGatewayFilterFactory openApiServerFilterFactory;
+    private final BulkheadGatewayFilterFactory bulkheadGatewayFilterFactory;
+    private final RateLimiterGatewayFilterFactory rateLimiterGatewayFilterFactory;
 
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
@@ -60,17 +75,27 @@ public class GatewayAppConfiguration {
     }
 
     private Function<PredicateSpec, Buildable<Route>> getRoute(RouteDefinition crmRouteDefinition) {
+        var routeId = crmRouteDefinition.id();
         return r -> r
-                .path("/" + crmRouteDefinition.id() + MATCH_ALL_PATTERN)
+                .path("/" + routeId + MATCH_ALL_PATTERN)
                 .filters(f -> f
                         .stripPrefix(1)
+                        // Rate limiter стоит первым (снаружи), чтобы отклонённые по лимиту запросы
+                        // не попадали в circuit breaker/retry/bulkhead и не искажали их статистику.
+                        .filter(rateLimiterGatewayFilterFactory.apply(new RateLimiterGatewayFilterFactory.Config(routeId)))
                         .circuitBreaker(c -> c
-                                .setName(crmRouteDefinition.id())
-                                .setFallbackUri(FALLBACK_PATH + crmRouteDefinition.id()))
+                                .setName(routeId)
+                                .setFallbackUri(FALLBACK_PATH + routeId))
                         .retry(retryConfig -> retryConfig
                                 .setRetries(RETRY_ATTEMPTS)
-                                .setMethods(HttpMethod.GET)
-                                .setSeries(Series.SERVER_ERROR)))
+                                .setMethods(HttpMethod.GET, HttpMethod.PUT, HttpMethod.DELETE)
+                                .setSeries(Series.SERVER_ERROR)
+                                .setExceptions(IOException.class, ConnectException.class, TimeoutException.class)
+                                .setBackoff(RETRY_FIRST_BACKOFF, RETRY_MAX_BACKOFF, RETRY_BACKOFF_FACTOR, true)
+                                .setJitter(RETRY_JITTER_FACTOR))
+                        // Bulkhead стоит последним (ближе к реальному вызову), ограничивая число
+                        // одновременных запросов к конкретному downstream-сервису.
+                        .filter(bulkheadGatewayFilterFactory.apply(new BulkheadGatewayFilterFactory.Config(routeId))))
                 .uri(crmRouteDefinition.uri());
     }
 

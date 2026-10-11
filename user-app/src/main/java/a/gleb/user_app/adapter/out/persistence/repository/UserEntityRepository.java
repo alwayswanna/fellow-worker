@@ -1,7 +1,6 @@
 package a.gleb.user_app.adapter.out.persistence.repository;
 
 import a.gleb.user_app.adapter.out.persistence.entity.UserEntity;
-import a.gleb.user_app.adapter.out.persistence.projection.UserRoleCodeProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -18,9 +17,6 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, UUID> {
 
     @EntityGraph(attributePaths = "role")
     Optional<UserEntity> findUserEntityByLogin(String login);
-
-    @Query("SELECT r.code AS roleCode FROM UserEntity u JOIN u.role r WHERE u.login = :login")
-    Optional<UserRoleCodeProjection> findRoleCodeByLogin(@Param("login") String login);
 
     /**
      * Not annotated with @EntityGraph: results are mapped via {@code UserPersistenceMapper.toShortDomain}-style

@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,8 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class ResumeRepositoryAdapter implements ResumeRepositoryPort {
+
+    private static final int MAX_PAGE_SIZE = 100;
 
     private final ResumeEntityRepository resumeEntityRepository;
     private final SkillEntityRepository skillEntityRepository;
@@ -48,27 +51,42 @@ public class ResumeRepositoryAdapter implements ResumeRepositoryPort {
         return resumePersistenceMapper.toDomain(saved, skills, experiences, educations, links);
     }
 
+    /**
+     * Loads the managed entity and mutates it in place (rather than building a new detached entity
+     * and merging it) so Hibernate dirty-checks the actual loaded {@code @Version} — a merge of a
+     * freshly-built entity would otherwise always carry the Java-default version, turning every
+     * optimistic-lock check into a guaranteed (false) conflict after the first real update.
+     */
     @Override
     public Resume update(Resume resume) {
-        skillEntityRepository.deleteAllByResumeId(resume.getId());
-        workExperienceEntityRepository.deleteAllByResumeId(resume.getId());
-        educationEntityRepository.deleteAllByResumeId(resume.getId());
-        resumeExternalLinkEntityRepository.deleteAllByResumeId(resume.getId());
+        var entity = resumeEntityRepository.findById(resume.getId())
+                .orElseThrow(() -> new ResumeNotFoundException("Resume not found"));
 
-        var updated = resumeEntityRepository.save(resumePersistenceMapper.toEntity(resume));
+        resumePersistenceMapper.updateEntity(entity, resume);
 
-        var skills = skillEntityRepository.saveAll(resumePersistenceMapper.toSkillEntities(resume.getSkills(), updated));
+        skillEntityRepository.deleteAllByResumeId(entity.getId());
+        workExperienceEntityRepository.deleteAllByResumeId(entity.getId());
+        educationEntityRepository.deleteAllByResumeId(entity.getId());
+        resumeExternalLinkEntityRepository.deleteAllByResumeId(entity.getId());
+
+        var skills = skillEntityRepository.saveAll(resumePersistenceMapper.toSkillEntities(resume.getSkills(), entity));
         var experiences = workExperienceEntityRepository.saveAll(
-                resumePersistenceMapper.toWorkExperienceEntities(resume.getExperience(), updated));
+                resumePersistenceMapper.toWorkExperienceEntities(resume.getExperience(), entity));
         var educations = educationEntityRepository.saveAll(
-                resumePersistenceMapper.toEducationEntities(resume.getEducation(), updated));
+                resumePersistenceMapper.toEducationEntities(resume.getEducation(), entity));
         var links = resumeExternalLinkEntityRepository.saveAll(
-                resumePersistenceMapper.toLinkEntities(resume.getLinks(), updated));
+                resumePersistenceMapper.toLinkEntities(resume.getLinks(), entity));
 
-        return resumePersistenceMapper.toDomain(updated, skills, experiences, educations, links);
+        return resumePersistenceMapper.toDomain(entity, skills, experiences, educations, links);
     }
 
+    /**
+     * Transactional on its own (rather than relying on the caller) — {@code ResumeService.uploadPhoto}
+     * deliberately isn't {@code @Transactional}, since the MinIO upload it does between the
+     * ownership lookup and this write shouldn't hold a DB transaction open.
+     */
     @Override
+    @Transactional
     public Resume updatePhotoUrl(UUID id, String photoUrl) {
         var entity = resumeEntityRepository.findById(id)
                 .orElseThrow(() -> new ResumeNotFoundException("Resume not found"));
@@ -77,7 +95,12 @@ public class ResumeRepositoryAdapter implements ResumeRepositoryPort {
         return loadFullDomain(saved);
     }
 
+    /**
+     * Transactional on its own for the same reason as {@link #updatePhotoUrl} — it's used by
+     * {@code ResumeService.uploadPhoto}, which isn't itself wrapped in a transaction.
+     */
     @Override
+    @Transactional(readOnly = true)
     public Optional<Resume> findByIdAndAccountId(UUID id, UUID accountId) {
         return resumeEntityRepository.findByIdAndAccountId(id, accountId).map(this::loadFullDomain);
     }
@@ -99,7 +122,7 @@ public class ResumeRepositoryAdapter implements ResumeRepositoryPort {
 
     @Override
     public List<Resume> findAllByAccountId(UUID accountId) {
-        return resumeEntityRepository.findAllByAccountId(accountId).stream().map(this::loadFullDomain).toList();
+        return resumeEntityRepository.findTop100ByAccountId(accountId).stream().map(this::loadFullDomain).toList();
     }
 
     @Override
@@ -108,12 +131,15 @@ public class ResumeRepositoryAdapter implements ResumeRepositoryPort {
         return new PageResult<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages());
     }
 
+    /**
+     * Reads the 4 collections off the (lazy, {@code @BatchSize}-backed) entity associations rather
+     * than issuing a dedicated {@code findAllByResumeId} per collection — for a page/list of N
+     * resumes, Hibernate batches each collection into one "IN (...)" query for the whole page
+     * instead of N queries, so this only works called within an active transaction.
+     */
     private Resume loadFullDomain(ResumeEntity entity) {
-        var skills = skillEntityRepository.findAllByResumeId(entity.getId());
-        var experiences = workExperienceEntityRepository.findAllByResumeId(entity.getId());
-        var educations = educationEntityRepository.findAllByResumeId(entity.getId());
-        var links = resumeExternalLinkEntityRepository.findAllByResumeId(entity.getId());
-        return resumePersistenceMapper.toDomain(entity, skills, experiences, educations, links);
+        return resumePersistenceMapper.toDomain(
+                entity, entity.getSkills(), entity.getWorkExperiences(), entity.getEducations(), entity.getLinks());
     }
 
     private Pageable toPageable(PageQuery query) {
@@ -124,6 +150,6 @@ public class ResumeRepositoryAdapter implements ResumeRepositoryPort {
                     .toList();
             sort = Sort.by(orders);
         }
-        return PageRequest.of(query.page(), query.size(), sort);
+        return PageRequest.of(query.page(), Math.min(query.size(), MAX_PAGE_SIZE), sort);
     }
 }

@@ -1,12 +1,4 @@
 app:
-  cors:
-    max-age: 3600
-    allowed-origins:
-      - "*"
-    allowed-methods:
-      - "*"
-    allowed-headers:
-      - "*"
   unprotected-patterns:
     - /actuator/**
     - /v3/api-docs/**
@@ -31,6 +23,8 @@ spring:
       maximum-pool-size: 15
       minimum-idle: 5
       connection-timeout: 10000
+      idle-timeout: 300000
+      max-lifetime: 1800000
       leak-detection-threshold: 30000
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
@@ -41,6 +35,13 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        # create/update each write resume + skills + experience + education + links in one
+        # transaction (ResumeRepositoryAdapter) — batching coalesces those into fewer round trips
+        # instead of one statement per row.
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
     open-in-view: false
   lifecycle:
     timeout-per-shutdown-phase: 30s
@@ -71,6 +72,21 @@ spring:
             consumer:
               enableDlq: true
               dlqName: user.event.resume-app.dlq
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      minio:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 15s
+        permitted-number-of-calls-in-half-open-state: 3
+  bulkhead:
+    instances:
+      minio:
+        max-concurrent-calls: 10
+        max-wait-duration: 0ms
 
 server:
   shutdown: graceful
@@ -118,7 +134,10 @@ management:
         enabled: true
   tracing:
     sampling:
-      probability: 1.0 # 100% all request receive traceID/spandId inside MDC;
+      # 100% by default (dev/local) — easiest to debug when every request has a trace.
+      # Overridden down for prod below; at real traffic volumes 100% sampling is needless tracing
+      # backend load for traces nobody will look at.
+      probability: 1.0
     export:
       enabled: false
     propagation:
@@ -127,3 +146,14 @@ management:
   observations:
     annotations:
       enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+management:
+  tracing:
+    sampling:
+      probability: 0.1

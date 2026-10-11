@@ -62,8 +62,14 @@ public class CompanyAppConfiguration {
                         // "/my" must stay authenticated even though it matches the
                         // public pattern below, so it's declared first (first match wins).
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies/my").authenticated()
-                        // Guest browsing: company search/detail is public; create/update/delete stay behind auth.
+                        // Guest browsing: company search/detail (and the batch lookup used by other
+                        // services) is public; create/update/delete stay behind auth.
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies", "/api/v1/companies/*").permitAll()
+                        // Internal service-to-service check (e.g. vacancy-app verifying a caller is
+                        // a recruiter at a company); public for the same reason as the company GETs
+                        // above — services don't forward end-user auth to each other yet. DELETE on
+                        // the same path (owner-only removal) is unaffected, it's matched by method.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/companies/*/recruiters/*").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
+import org.springframework.boot.http.client.HttpClientSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,6 +21,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestClient;
+
+import java.time.Duration;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -45,13 +49,17 @@ public class VacancyAppConfiguration {
     private final VacancyAppConfigurationProperties properties;
 
     /**
-     * Used by {@link a.gleb.vacancy_app.adapter.out.client.CompanyRestClientAdapter}
-     * to enrich vacancy responses with company name/logo/city/rating.
+     * Used by {@link a.gleb.vacancy_app.adapter.out.client.CompanyRestClientAdapter} to enrich
+     * vacancy responses with company display data and to authorize vacancy/application
+     * management. Explicit timeouts so a slow/unreachable company-app fails fast instead of
+     * hanging the calling request indefinitely (the JDK HTTP client has no default timeout).
      */
     @Bean
     public RestClient companyServiceRestClient() {
+        var settings = HttpClientSettings.defaults().withTimeouts(Duration.ofSeconds(2), Duration.ofSeconds(3));
         return RestClient.builder()
                 .baseUrl(properties.companyService().baseUrl())
+                .requestFactory(ClientHttpRequestFactoryBuilder.detect().build(settings))
                 .build();
     }
 

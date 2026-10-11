@@ -1,6 +1,8 @@
 package a.gleb.gateway.filter;
 
 import a.gleb.gateway.model.FilterConfig;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -27,14 +29,19 @@ public class SwaggerGatewayFilterFactory extends AbstractGatewayFilterFactory<Fi
 
     private final JsonMapper jsonMapper;
     private final ModifyResponseBodyGatewayFilterFactory modifyResponseBody;
+    private final Counter serverRewriteErrorCounter;
 
     public SwaggerGatewayFilterFactory(
             JsonMapper jsonMapper,
-            ModifyResponseBodyGatewayFilterFactory modifyResponseBody
+            ModifyResponseBodyGatewayFilterFactory modifyResponseBody,
+            MeterRegistry meterRegistry
     ) {
         super(FilterConfig.class);
         this.jsonMapper = jsonMapper;
         this.modifyResponseBody = modifyResponseBody;
+        this.serverRewriteErrorCounter = Counter.builder("gateway.swagger.server_rewrite_errors")
+                .description("Number of failures rewriting the 'servers' block of a proxied OpenAPI document")
+                .register(meterRegistry);
     }
 
     @Override
@@ -72,6 +79,7 @@ public class SwaggerGatewayFilterFactory extends AbstractGatewayFilterFactory<Fi
 
             return replaceServers(root, urls);
         } catch (Exception e) {
+            serverRewriteErrorCounter.increment();
             log.error("OpenApiServer: не удалось переписать servers", e);
             return Mono.just(body);
         }

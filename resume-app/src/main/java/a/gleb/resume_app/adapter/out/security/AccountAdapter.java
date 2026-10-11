@@ -27,6 +27,19 @@ public class AccountAdapter implements CurrentAccountPort {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
     }
 
+    @Override
+    public String requiredRole() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth instanceof JwtAuthenticationToken jwtAuth) {
+            String role = jwtAuth.getToken().getClaimAsString("role");
+            if (role == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing `role` claim in JWT");
+            }
+            return role;
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+    }
+
     /**
      * Used directly by {@link a.gleb.resume_app.config.filter.RequestLoggingFilter} — a pure web
      * infrastructure concern, so it bypasses the {@link CurrentAccountPort} abstraction.

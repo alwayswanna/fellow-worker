@@ -12,7 +12,12 @@ import java.util.UUID;
 
 public interface ResumeEntityRepository extends JpaRepository<ResumeEntity, UUID> {
 
-    List<ResumeEntity> findAllByAccountId(UUID accountId);
+    /**
+     * Capped rather than a true {@code findAllByAccountId} — this backs {@code /my} and
+     * {@code ?accountId=} lookups, which return a plain, unpaginated list; the cap is a safety net
+     * against an account somehow accumulating an unbounded number of resumes, not an expected limit.
+     */
+    List<ResumeEntity> findTop100ByAccountId(UUID accountId);
 
     Optional<ResumeEntity> findByIdAndAccountId(UUID id, UUID accountId);
 

@@ -64,32 +64,7 @@ class ResumeDetailScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _HeaderCard(resume: resume),
-            if (resume.summary?.isNotEmpty == true) ...[
-              const SizedBox(height: 12),
-              _SummaryCard(summary: resume.summary!),
-            ],
-            if (resume.skills.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              _SkillsCard(skills: resume.skills),
-            ],
-            if (resume.experience.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              _ExperienceCard(experience: resume.experience),
-            ],
-            if (resume.education.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              _EducationCard(education: resume.education),
-            ],
-            if (resume.links.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              _LinksCard(links: resume.links),
-            ],
-            const SizedBox(height: 24),
-          ],
-        ),
+        child: ResumeDetailBody(resume: resume),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -106,6 +81,47 @@ class ResumeDetailScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ── Reusable body (shared with read-only recruiter view) ───────────────────
+
+/// The scrollable content of a resume — header, summary, skills, experience,
+/// education, links — without the owner-only AppBar actions or edit button,
+/// so it can be reused for a recruiter's read-only view of someone else's
+/// resume.
+class ResumeDetailBody extends StatelessWidget {
+  final Resume resume;
+
+  const ResumeDetailBody({super.key, required this.resume});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _HeaderCard(resume: resume),
+        if (resume.summary?.isNotEmpty == true) ...[
+          const SizedBox(height: 12),
+          _SummaryCard(summary: resume.summary!),
+        ],
+        if (resume.skills.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          _SkillsCard(skills: resume.skills),
+        ],
+        if (resume.experience.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          _ExperienceCard(experience: resume.experience),
+        ],
+        if (resume.education.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          _EducationCard(education: resume.education),
+        ],
+        if (resume.links.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          _LinksCard(links: resume.links),
+        ],
+      ],
     );
   }
 }

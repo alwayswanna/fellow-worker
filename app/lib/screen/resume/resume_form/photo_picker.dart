@@ -24,8 +24,12 @@ class PhotoPicker extends StatelessWidget {
     required this.onPicked,
   });
 
+  // Kept in sync with the backend allowlist (resume-app's
+  // ResumeAppConstant.ALLOWED_PHOTO_EXTENSIONS) — anything else is rejected
+  // server-side with a 400, so there's no point offering it here.
   void _pick() {
-    final input = html.FileUploadInputElement()..accept = 'image/*';
+    final input = html.FileUploadInputElement()
+      ..accept = '.jpg,.jpeg,.png,.webp';
     input.click();
     input.onChange.listen((event) {
       final file = input.files?.first;

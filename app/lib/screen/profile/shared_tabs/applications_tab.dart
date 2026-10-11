@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../model/application.dart';
 import '../../../model/user_profile.dart';
 import '../../../model/vacancy.dart';
+import '../../../service/resume_api_service.dart';
 import '../../../service/user_api_service.dart';
 import '../../../service/vacancy_api_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/widgets.dart';
+import '../../resume/applicant_resume_screen.dart';
 
 /// Per-vacancy application counts/list for a company — shared by
 /// [CompanyOwnerPanel] and [RecruiterPanel].
@@ -14,12 +16,14 @@ class RecruiterApplicationsTab extends StatefulWidget {
   final Company? company;
   final VacancyApiService vacancyApiService;
   final UserApiService userApiService;
+  final ResumeApiService resumeApiService;
 
   const RecruiterApplicationsTab({
     super.key,
     required this.company,
     required this.vacancyApiService,
     required this.userApiService,
+    required this.resumeApiService,
   });
 
   @override
@@ -64,6 +68,7 @@ class _RecruiterApplicationsTabState extends State<RecruiterApplicationsTab> {
         vacancy: vacancy,
         vacancyApiService: widget.vacancyApiService,
         userApiService: widget.userApiService,
+        resumeApiService: widget.resumeApiService,
       ),
     );
   }
@@ -115,12 +120,14 @@ class VacancyApplicationsSheet extends StatefulWidget {
   final Vacancy vacancy;
   final VacancyApiService vacancyApiService;
   final UserApiService userApiService;
+  final ResumeApiService resumeApiService;
 
   const VacancyApplicationsSheet({
     super.key,
     required this.vacancy,
     required this.vacancyApiService,
     required this.userApiService,
+    required this.resumeApiService,
   });
 
   @override
@@ -132,6 +139,7 @@ class _VacancyApplicationsSheetState
     extends State<VacancyApplicationsSheet> {
   List<({Application app, UserShort? user})> _entries = [];
   bool _isLoading = false;
+  String? _loadingResumeForAppId;
 
   @override
   void initState() {
@@ -155,6 +163,20 @@ class _VacancyApplicationsSheetState
     await widget.vacancyApiService
         .updateApplicationStatus(widget.vacancy.id, app.id, newStatus);
     _load();
+  }
+
+  Future<void> _viewResume(Application app, UserShort? user) async {
+    setState(() => _loadingResumeForAppId = app.id);
+    final resumes =
+        await widget.resumeApiService.findAllByAccountId(app.applicantAccountId);
+    if (!mounted) return;
+    setState(() => _loadingResumeForAppId = null);
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => ApplicantResumeScreen(
+        applicantName: user?.fullName ?? 'Applicant',
+        resumes: resumes,
+      ),
+    ));
   }
 
   @override
@@ -229,6 +251,22 @@ class _VacancyApplicationsSheetState
                                                 fontSize: 12,
                                                 color: AppColors.textSecondary)),
                                       ])),
+                                  IconButton(
+                                    icon: _loadingResumeForAppId == app.id
+                                        ? SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: AppColors.primary),
+                                          )
+                                        : Icon(Icons.description_outlined,
+                                            size: 20, color: AppColors.primary),
+                                    tooltip: 'View resume',
+                                    onPressed: _loadingResumeForAppId != null
+                                        ? null
+                                        : () => _viewResume(app, user),
+                                  ),
                                   StatusBadge(app.status),
                                 ]),
                                 if (canAct) ...[

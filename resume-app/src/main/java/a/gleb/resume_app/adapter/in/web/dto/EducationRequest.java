@@ -1,6 +1,7 @@
 package a.gleb.resume_app.adapter.in.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
@@ -32,4 +33,9 @@ public record EducationRequest(
         @Schema(description = "End date of study. Null means currently studying.", example = "2020-06-30", nullable = true)
         LocalDate endDate
 ) {
+    @AssertTrue(message = "endDate must not be before startDate")
+    @Schema(hidden = true)
+    public boolean isDateRangeValid() {
+        return startDate == null || endDate == null || !endDate.isBefore(startDate);
+    }
 }

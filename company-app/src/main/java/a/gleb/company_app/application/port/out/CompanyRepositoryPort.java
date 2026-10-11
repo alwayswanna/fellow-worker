@@ -5,6 +5,8 @@ import a.gleb.company_app.domain.model.CompanySearchFilter;
 import a.gleb.company_app.domain.model.PageQuery;
 import a.gleb.company_app.domain.model.PageResult;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,6 +17,8 @@ public interface CompanyRepositoryPort {
     Company update(Company company);
 
     Optional<Company> findById(UUID id);
+
+    List<Company> findAllById(Collection<UUID> ids);
 
     boolean existsById(UUID id);
 

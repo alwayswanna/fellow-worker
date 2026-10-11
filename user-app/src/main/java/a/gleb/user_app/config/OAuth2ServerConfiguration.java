@@ -99,7 +99,8 @@ public class OAuth2ServerConfiguration {
                 userRepositoryPort.findByLogin(context.getPrincipal().getName())
                         .ifPresent(user -> context.getClaims()
                                 .claim("account_id", user.getId().toString())
-                                .claim("login", user.getLogin()));
+                                .claim("login", user.getLogin())
+                                .claim("role", user.getRole().getCode()));
             }
         };
     }

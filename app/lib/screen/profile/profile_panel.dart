@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../../config/app_config.dart';
-import '../../model/resume.dart';
 import '../../model/user_profile.dart';
 import '../../theme/app_theme.dart';
 import '../../util/formatters.dart';
-import '../../widgets/widgets.dart';
 
 /// Left sidebar (wide layout) / drawer content (narrow layout) on
-/// [ProfileScreen]: avatar, name, account info, edit/change-password
-/// actions, plus an optional [extra] widget appended below (the EMPLOYER
-/// role's compact resume section).
+/// [ProfileScreen]: avatar, name, account info, edit/change-password actions.
 class ProfilePanel extends StatelessWidget {
   final UserProfile profile;
   final bool isUploadingPhoto;
   final VoidCallback onPickPhoto;
   final VoidCallback onEdit;
   final VoidCallback onChangePassword;
-  final Widget? extra;
 
   const ProfilePanel({
     super.key,
@@ -26,7 +21,6 @@ class ProfilePanel extends StatelessWidget {
     required this.onPickPhoto,
     required this.onEdit,
     required this.onChangePassword,
-    this.extra,
   });
 
   @override
@@ -149,12 +143,6 @@ class ProfilePanel extends StatelessWidget {
               ),
             ),
           ),
-          if (extra != null) ...[
-            const SizedBox(height: 24),
-            Divider(color: AppColors.border),
-            const SizedBox(height: 4),
-            extra!,
-          ],
         ],
       ),
     );
@@ -192,195 +180,6 @@ class _InfoRow extends StatelessWidget {
                 overflow: TextOverflow.ellipsis),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Compact "My resume" block appended to [ProfilePanel] for the EMPLOYER
-/// role — create-hint when empty, otherwise a single summary card.
-class ResumeSection extends StatelessWidget {
-  final Resume? resume;
-  final bool isLoading;
-  final VoidCallback onCreate;
-  final VoidCallback? onView;
-  final VoidCallback? onEdit;
-
-  const ResumeSection({
-    super.key,
-    required this.resume,
-    required this.isLoading,
-    required this.onCreate,
-    this.onView,
-    this.onEdit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Text('My resume',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-            const Spacer(),
-            if (resume == null && !isLoading)
-              TextButton.icon(
-                onPressed: onCreate,
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text('Create'),
-                style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(0, 0),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-              ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        if (isLoading)
-          const Center(
-              child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2)))
-        else if (resume == null)
-          _EmptyResumeHint(onCreate: onCreate)
-        else
-          _CompactResumeCard(resume: resume!, onView: onView!, onEdit: onEdit!),
-      ],
-    );
-  }
-}
-
-class _EmptyResumeHint extends StatelessWidget {
-  final VoidCallback onCreate;
-
-  const _EmptyResumeHint({required this.onCreate});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      decoration: BoxDecoration(
-        color: AppColors.bg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-            color: AppColors.border, style: BorderStyle.solid),
-      ),
-      child: Column(
-        children: [
-          Icon(Icons.description_outlined,
-              size: 36, color: AppColors.border),
-          const SizedBox(height: 8),
-          Text('No resume yet',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-          const SizedBox(height: 10),
-          FilledButton.icon(
-            onPressed: onCreate,
-            icon: const Icon(Icons.add, size: 16),
-            label: const Text('Create resume'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accent,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              textStyle: const TextStyle(fontSize: 13),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CompactResumeCard extends StatelessWidget {
-  final Resume resume;
-  final VoidCallback onView;
-  final VoidCallback onEdit;
-
-  const _CompactResumeCard({
-    required this.resume,
-    required this.onView,
-    required this.onEdit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final title = resume.desiredPosition?.isNotEmpty == true
-        ? resume.desiredPosition!
-        : 'Resume';
-
-    return Material(
-      color: AppColors.tagBg,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onView,
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  InitialsAvatar(
-                    name: resume.firstName,
-                    radius: 18,
-                    borderRadius: 8,
-                    color: AppColors.avatarColor(resume.fullName).withAlpha(38),
-                    textColor: AppColors.avatarColor(resume.fullName),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 13),
-                            overflow: TextOverflow.ellipsis),
-                        Text(resume.fullName,
-                            style: TextStyle(
-                                fontSize: 12, color: AppColors.textSecondary)),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.edit_outlined,
-                        size: 16, color: AppColors.textSecondary),
-                    tooltip: 'Edit',
-                    onPressed: onEdit,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-              if (resume.skills.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
-                  children: resume.skills.take(4).map((s) => Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.tagBg,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(s,
-                            style: TextStyle(
-                                fontSize: 11,
-                                color: AppColors.tagText)),
-                      )).toList(),
-                ),
-              ],
-            ],
-          ),
-        ),
       ),
     );
   }

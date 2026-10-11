@@ -39,8 +39,7 @@ class _VacancyDetailSheetState extends State<VacancyDetailSheet> {
   bool _isSaved = false;
   bool _isSaving = false;
 
-  bool get _isApplicant =>
-      widget.userRole == 'APPLICANT' || widget.userRole == 'EMPLOYER';
+  bool get _isApplicant => widget.userRole == 'APPLICANT';
 
   @override
   void initState() {

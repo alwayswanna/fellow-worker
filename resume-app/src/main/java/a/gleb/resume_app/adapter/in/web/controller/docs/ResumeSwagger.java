@@ -35,10 +35,11 @@ public interface ResumeSwagger {
             @Parameter(description = "Resume ID", required = true) UUID id
     );
 
-    @Operation(summary = "List all resumes (paginated)")
+    @Operation(summary = "List all resumes (paginated, admin only)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Page of resumes"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Caller is not an admin")
     })
     PageResponse<ResumeResponse> findAll(Pageable pageable);
 
@@ -49,12 +50,27 @@ public interface ResumeSwagger {
     })
     List<ResumeResponse> findMy();
 
-    @Operation(summary = "Update a resume")
+    @Operation(summary = "List resumes belonging to another account (recruiter/company founder only)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of resumes"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Caller is not a recruiter or company founder")
+    })
+    List<ResumeResponse> findAllByAccountId(
+            @Parameter(description = "Owning account's id", required = true) UUID accountId
+    );
+
+    @Operation(
+            summary = "Update a resume",
+            description = "Full replace, not a merge/patch: experience/education/links must be "
+                    + "provided explicitly on every call (empty array clears existing entries)."
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Resume updated"),
             @ApiResponse(responseCode = "400", description = "Invalid request body"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Resume not found")
+            @ApiResponse(responseCode = "404", description = "Resume not found"),
+            @ApiResponse(responseCode = "409", description = "Resume was modified concurrently, please retry")
     })
     ResumeResponse update(
             @Parameter(description = "Resume ID", required = true) UUID id,
@@ -65,7 +81,8 @@ public interface ResumeSwagger {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Photo uploaded, resume returned with updated photoUrl"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Resume not found")
+            @ApiResponse(responseCode = "404", description = "Resume not found"),
+            @ApiResponse(responseCode = "503", description = "Photo storage temporarily unavailable, please retry later")
     })
     ResumeResponse uploadPhoto(
             @Parameter(description = "Resume ID", required = true) UUID id,
