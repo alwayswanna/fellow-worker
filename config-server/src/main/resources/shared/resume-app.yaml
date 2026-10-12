@@ -1,12 +1,4 @@
 app:
-  cors:
-    max-age: 3600
-    allowed-origins:
-      - "*"
-    allowed-methods:
-      - "*"
-    allowed-headers:
-      - "*"
   unprotected-patterns:
     - /actuator/**
     - /v3/api-docs/**

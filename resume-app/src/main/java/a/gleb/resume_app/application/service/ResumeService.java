@@ -3,12 +3,15 @@ package a.gleb.resume_app.application.service;
 import a.gleb.resume_app.application.port.out.CurrentAccountPort;
 import a.gleb.resume_app.application.port.out.PhotoStoragePort;
 import a.gleb.resume_app.application.port.out.ResumeRepositoryPort;
+import a.gleb.resume_app.constant.ResumeAppConstant;
+import a.gleb.resume_app.domain.exception.InvalidPhotoException;
 import a.gleb.resume_app.domain.exception.ResumeNotFoundException;
 import a.gleb.resume_app.domain.model.PageQuery;
 import a.gleb.resume_app.domain.model.PageResult;
 import a.gleb.resume_app.domain.model.Resume;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,8 +49,18 @@ public class ResumeService {
                 .orElseThrow(() -> new ResumeNotFoundException("Resume not found"));
     }
 
+    /**
+     * Browses every resume in the system (used by the admin resume search) — unlike
+     * {@link #findAllByAccountId}, which looks up one specific account, this is a bulk listing
+     * with full PII (email, phone, birth date, work history), so it's restricted to admins.
+     *
+     * @throws ResponseStatusException 403 if the caller isn't an admin.
+     */
     @Transactional(readOnly = true)
     public PageResult<Resume> findAll(PageQuery pageQuery) {
+        if (!ResumeAppConstant.ADMIN_ROLE_CODE.equals(currentAccountPort.requiredRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can browse all resumes");
+        }
         return resumeRepositoryPort.findAll(pageQuery);
     }
 
@@ -86,8 +100,15 @@ public class ResumeService {
         return resumeRepositoryPort.update(incoming);
     }
 
-    @Transactional
+    /**
+     * Not wrapped in {@code @Transactional}: the actual file transfer to MinIO happens here, and
+     * it can take seconds (including retry backoff) — holding a DB transaction/connection open for
+     * that whole span would needlessly tie up the pool. The two DB round trips this makes
+     * ({@link ResumeRepositoryPort#findByIdAndAccountId} and {@link ResumeRepositoryPort#updatePhotoUrl})
+     * are each transactional on their own at the adapter level.
+     */
     public Resume uploadPhoto(UUID resumeId, MultipartFile file) {
+        validatePhoto(file);
         var accountId = currentAccountPort.requiredAccountId();
         var resume = resumeRepositoryPort.findByIdAndAccountId(resumeId, accountId)
                 .orElseThrow(() -> new ResumeNotFoundException("Resume not found"));
@@ -98,6 +119,26 @@ public class ResumeService {
 
         String photoUrl = photoStoragePort.upload(resumeId, file);
         return resumeRepositoryPort.updatePhotoUrl(resumeId, photoUrl);
+    }
+
+    private void validatePhoto(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new InvalidPhotoException("Photo file is required");
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !ResumeAppConstant.ALLOWED_PHOTO_CONTENT_TYPES.contains(contentType.toLowerCase(Locale.ROOT))) {
+            throw new InvalidPhotoException(
+                    "Unsupported content type '%s', expected one of %s"
+                            .formatted(contentType, ResumeAppConstant.ALLOWED_PHOTO_CONTENT_TYPES));
+        }
+
+        String extension = StringUtils.substringAfterLast(
+                StringUtils.defaultString(file.getOriginalFilename()), ".").toLowerCase(Locale.ROOT);
+        if (extension.isEmpty() || !ResumeAppConstant.ALLOWED_PHOTO_EXTENSIONS.contains(extension)) {
+            throw new InvalidPhotoException(
+                    "Unsupported file extension, expected one of %s".formatted(ResumeAppConstant.ALLOWED_PHOTO_EXTENSIONS));
+        }
     }
 
     @Transactional

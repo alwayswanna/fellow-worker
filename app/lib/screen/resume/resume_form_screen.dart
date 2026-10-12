@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../../model/resume.dart';
+import '../../service/http_client.dart';
 import '../../service/resume_api_service.dart';
 import '../../service/user_api_service.dart';
 import '../../theme/app_theme.dart';
@@ -157,18 +158,28 @@ class _ResumeFormScreenState extends State<ResumeFormScreen> {
 
     if (!mounted) return;
 
+    String? photoError;
     if (result != null && _photoBytes != null) {
-      await widget.resumeApiService.uploadPhoto(
-        result.id,
-        _photoBytes!,
-        _photoFilename ?? 'photo.jpg',
-      );
+      try {
+        await widget.resumeApiService.uploadPhoto(
+          result.id,
+          _photoBytes!,
+          _photoFilename ?? 'photo.jpg',
+        );
+      } on ApiException catch (e) {
+        photoError = e.message;
+      }
     }
 
     setState(() => _isSaving = false);
     if (!mounted) return;
 
     if (result != null) {
+      if (photoError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Resume saved, but photo upload failed: $photoError')),
+        );
+      }
       Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

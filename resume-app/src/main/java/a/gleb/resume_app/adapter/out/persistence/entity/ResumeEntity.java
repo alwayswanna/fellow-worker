@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,15 +47,22 @@ public class ResumeEntity extends BaseEntity {
     @Column(name = "photo_url", length = 1000)
     private String photoUrl;
 
+    // Lazy collections are read per-row when mapping a list (findAll/findAllByAccountId) to the
+    // domain model; @BatchSize turns that into one extra "IN (...)" query per collection for the
+    // whole page/list instead of one per resume per collection.
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<WorkExperienceEntity> workExperiences = new ArrayList<>();
 
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<EducationEntity> educations = new ArrayList<>();
 
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<SkillEntity> skills = new ArrayList<>();
 
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ResumeExternalLinkEntity> links = new ArrayList<>();
 

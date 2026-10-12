@@ -35,10 +35,11 @@ public interface ResumeSwagger {
             @Parameter(description = "Resume ID", required = true) UUID id
     );
 
-    @Operation(summary = "List all resumes (paginated)")
+    @Operation(summary = "List all resumes (paginated, admin only)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Page of resumes"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Caller is not an admin")
     })
     PageResponse<ResumeResponse> findAll(Pageable pageable);
 

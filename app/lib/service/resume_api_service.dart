@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import '../config/app_config.dart';
 import '../model/resume.dart';
@@ -85,21 +86,41 @@ class ResumeApiService extends AuthenticatedHttpClient {
     return Resume.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
-  Future<Resume?> uploadPhoto(String id, Uint8List bytes, String filename) async {
+  /// Throws [ApiException] with the server's message on failure (e.g. an
+  /// unsupported file extension/content type), so the caller can show the
+  /// real reason instead of silently dropping the photo.
+  Future<Resume> uploadPhoto(String id, Uint8List bytes, String filename) async {
     final token = await authService.getAccessToken();
-    if (token == null) return null;
+    if (token == null) throw const ApiException('Not authenticated');
     final request = http.MultipartRequest(
       'POST',
       Uri.parse('${AppConfig.resumesEndpoint}/$id/photo'),
     );
     request.headers['Authorization'] = 'Bearer $token';
-    request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: filename));
+    request.files.add(http.MultipartFile.fromBytes(
+      'file',
+      bytes,
+      filename: filename,
+      // package:http defaults to application/octet-stream when this is
+      // omitted, which the backend's content-type allowlist then rejects —
+      // must be inferred from the extension explicitly.
+      contentType: _photoMediaType(filename),
+    ));
     final streamed = await request.send();
-    if (streamed.statusCode == 200) {
-      final body = await streamed.stream.bytesToString();
-      return Resume.fromJson(jsonDecode(body) as Map<String, dynamic>);
-    }
-    return null;
+    final response = await http.Response.fromStream(streamed);
+    if (response.statusCode != 200) throw ApiException(errorDetailOf(response));
+    return Resume.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  }
+
+  /// Kept in sync with the backend allowlist (resume-app's
+  /// ResumeAppConstant.ALLOWED_PHOTO_CONTENT_TYPES).
+  MediaType _photoMediaType(String filename) {
+    final ext = filename.split('.').last.toLowerCase();
+    return switch (ext) {
+      'png' => MediaType('image', 'png'),
+      'webp' => MediaType('image', 'webp'),
+      _ => MediaType('image', 'jpeg'),
+    };
   }
 
   Future<bool> deleteResume(String id) async {
