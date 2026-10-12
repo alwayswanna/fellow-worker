@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,6 +54,15 @@ public class CompanyService {
     public Company findById(UUID id) {
         return companyRepositoryPort.findById(id)
                 .orElseThrow(() -> new CompanyNotFoundException("Company not found"));
+    }
+
+    /**
+     * Used by vacancy-app (and other services) to batch-enrich responses with company display
+     * data in a single call instead of one request per distinct company id.
+     */
+    @Transactional(readOnly = true)
+    public List<Company> findAllById(Collection<UUID> ids) {
+        return companyRepositoryPort.findAllById(ids);
     }
 
     @Transactional(readOnly = true)

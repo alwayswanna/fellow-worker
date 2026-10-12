@@ -19,9 +19,11 @@ import java.util.UUID;
 public class VacancyService {
 
     private final VacancyRepositoryPort vacancyRepositoryPort;
+    private final CompanyAccessGuard companyAccessGuard;
 
     @Transactional
     public Vacancy create(Vacancy vacancy) {
+        companyAccessGuard.assertCanManage(vacancy.getCompanyId(), "vacancies");
         return vacancyRepositoryPort.create(vacancy);
     }
 
@@ -40,8 +42,12 @@ public class VacancyService {
     public Vacancy update(UUID id, Vacancy incoming) {
         var existing = vacancyRepositoryPort.findById(id)
                 .orElseThrow(() -> new VacancyNotFoundException("Vacancy not found"));
+        companyAccessGuard.assertCanManage(existing.getCompanyId(), "vacancies");
 
         incoming.setId(existing.getId());
+        // Company ownership of a vacancy isn't transferable via update — always keep the
+        // original, regardless of what the request body sends.
+        incoming.setCompanyId(existing.getCompanyId());
         incoming.setCreatedAt(existing.getCreatedAt());
         incoming.setCreatedBy(existing.getCreatedBy());
 
@@ -50,9 +56,9 @@ public class VacancyService {
 
     @Transactional
     public void delete(UUID id) {
-        if (!vacancyRepositoryPort.existsById(id)) {
-            throw new VacancyNotFoundException("Vacancy not found");
-        }
+        var existing = vacancyRepositoryPort.findById(id)
+                .orElseThrow(() -> new VacancyNotFoundException("Vacancy not found"));
+        companyAccessGuard.assertCanManage(existing.getCompanyId(), "vacancies");
         vacancyRepositoryPort.deleteById(id);
     }
 

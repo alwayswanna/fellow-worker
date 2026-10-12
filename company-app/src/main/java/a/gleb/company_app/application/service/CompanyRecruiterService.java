@@ -53,6 +53,16 @@ public class CompanyRecruiterService {
         return companyRecruiterRepositoryPort.save(recruiter);
     }
 
+    /**
+     * Internal, service-to-service existence check (e.g. vacancy-app verifying that the caller
+     * managing a vacancy is a recruiter at its owning company) — no account-level details leak,
+     * just a boolean, so it doesn't need the current-account/owner checks the methods below have.
+     */
+    @Transactional(readOnly = true)
+    public boolean exists(UUID companyId, UUID accountId) {
+        return companyRecruiterRepositoryPort.findByCompanyIdAndAccountId(companyId, accountId).isPresent();
+    }
+
     @Transactional(readOnly = true)
     public PageResult<CompanyRecruiter> findByCompany(UUID companyId, PageQuery pageQuery) {
         if (!companyRepositoryPort.existsById(companyId)) {

@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,9 @@ public class VacancyEntity extends BaseEntity {
     @Column(name = "contact_phone", length = 50)
     private String contactPhone;
 
+    // Lazy skills are still read per-row when mapping a search page to the domain model; @BatchSize
+    // turns that into one extra "IN (...)" query for the whole page instead of one per vacancy.
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "vacancy", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VacancySkillEntity> skills = new ArrayList<>();
 

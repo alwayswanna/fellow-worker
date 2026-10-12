@@ -16,6 +16,8 @@ import java.util.function.Function;
  */
 final class PersistencePageSupport {
 
+    private static final int MAX_PAGE_SIZE = 100;
+
     private PersistencePageSupport() {
     }
 
@@ -27,7 +29,7 @@ final class PersistencePageSupport {
                     .toList();
             sort = Sort.by(orders);
         }
-        return PageRequest.of(query.page(), query.size(), sort);
+        return PageRequest.of(query.page(), Math.min(query.size(), MAX_PAGE_SIZE), sort);
     }
 
     static <T, R> PageResult<R> toPageResult(Page<T> page, Function<T, R> mapper) {

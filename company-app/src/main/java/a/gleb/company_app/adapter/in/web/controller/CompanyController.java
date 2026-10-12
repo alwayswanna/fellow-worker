@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -39,6 +40,16 @@ public class CompanyController implements CompanySwagger {
         return companyService.findMyCompany()
                 .map(company -> ResponseEntity.ok(companyWebMapper.toResponse(company)))
                 .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
+    /**
+     * Internal, service-to-service lookup (no auth forwarding between services yet, so this stays
+     * public like the single-company GET below) — lets callers like vacancy-app resolve display
+     * data for a whole page of companies in one round trip instead of one request per distinct id.
+     */
+    @GetMapping("/batch")
+    public List<CompanyResponse> findByIds(@RequestParam List<UUID> ids) {
+        return companyService.findAllById(ids).stream().map(companyWebMapper::toResponse).toList();
     }
 
     @Override

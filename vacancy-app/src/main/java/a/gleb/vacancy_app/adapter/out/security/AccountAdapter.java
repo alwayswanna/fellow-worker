@@ -1,6 +1,7 @@
 package a.gleb.vacancy_app.adapter.out.security;
 
 import a.gleb.vacancy_app.application.port.out.CurrentAccountPort;
+import a.gleb.vacancy_app.constant.VacancyAppConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,15 @@ public class AccountAdapter implements CurrentAccountPort {
             return UUID.fromString(accountId);
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+    }
+
+    @Override
+    public boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth instanceof JwtAuthenticationToken jwtAuth) {
+            return VacancyAppConstant.ADMIN_ROLE_CODE.equals(jwtAuth.getToken().getClaimAsString("role"));
+        }
+        return false;
     }
 
     /**

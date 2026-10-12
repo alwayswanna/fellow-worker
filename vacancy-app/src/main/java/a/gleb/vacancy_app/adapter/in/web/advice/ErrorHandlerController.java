@@ -78,6 +78,7 @@ public class ErrorHandlerController {
             case NOT_FOUND -> HttpStatus.NOT_FOUND;
             case CONFLICT -> HttpStatus.CONFLICT;
             case BAD_REQUEST -> HttpStatus.BAD_REQUEST;
+            case FORBIDDEN -> HttpStatus.FORBIDDEN;
             case UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
             case INTERNAL -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
