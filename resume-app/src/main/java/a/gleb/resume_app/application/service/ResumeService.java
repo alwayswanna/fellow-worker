@@ -9,6 +9,7 @@ import a.gleb.resume_app.domain.exception.ResumeNotFoundException;
 import a.gleb.resume_app.domain.model.PageQuery;
 import a.gleb.resume_app.domain.model.PageResult;
 import a.gleb.resume_app.domain.model.Resume;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,11 +36,14 @@ public class ResumeService {
     private final ResumeRepositoryPort resumeRepositoryPort;
     private final CurrentAccountPort currentAccountPort;
     private final PhotoStoragePort photoStoragePort;
+    private final MeterRegistry meterRegistry;
 
     @Transactional
     public Resume create(Resume resume) {
         resume.setAccountId(currentAccountPort.requiredAccountId());
-        return resumeRepositoryPort.create(resume);
+        var created = resumeRepositoryPort.create(resume);
+        meterRegistry.counter("resume.created").increment();
+        return created;
     }
 
     @Transactional(readOnly = true)
@@ -85,18 +89,21 @@ public class ResumeService {
         return resumeRepositoryPort.findAllByAccountId(accountId);
     }
 
+    /**
+     * Ownership is checked here, not relied upon in the adapter: {@link ResumeRepositoryPort#update}
+     * loads and mutates the entity by id alone (see {@code ResumeRepositoryAdapter.update} for why),
+     * so without this check a caller could otherwise update another account's resume by id.
+     * accountId/photoUrl/audit fields aren't touched by the update — they're preserved automatically
+     * since the adapter mutates the already-loaded managed entity rather than rebuilding it.
+     */
     @Transactional
     public Resume update(UUID id, Resume incoming) {
         var accountId = currentAccountPort.requiredAccountId();
-        var existing = resumeRepositoryPort.findByIdAndAccountId(id, accountId)
-                .orElseThrow(() -> new ResumeNotFoundException("Resume not found"));
+        if (!resumeRepositoryPort.existsByIdAndAccountId(id, accountId)) {
+            throw new ResumeNotFoundException("Resume not found");
+        }
 
-        incoming.setId(existing.getId());
-        incoming.setAccountId(existing.getAccountId());
-        incoming.setCreatedAt(existing.getCreatedAt());
-        incoming.setCreatedBy(existing.getCreatedBy());
-        incoming.setPhotoUrl(existing.getPhotoUrl());
-
+        incoming.setId(id);
         return resumeRepositoryPort.update(incoming);
     }
 
@@ -106,6 +113,12 @@ public class ResumeService {
      * that whole span would needlessly tie up the pool. The two DB round trips this makes
      * ({@link ResumeRepositoryPort#findByIdAndAccountId} and {@link ResumeRepositoryPort#updatePhotoUrl})
      * are each transactional on their own at the adapter level.
+     * <p>
+     * Uploads the new photo <em>before</em> touching the old one, and only deletes the old object
+     * once both the upload and the DB pointer update succeeded — and only if its key actually
+     * differs from the new one (same extension re-upload overwrites in place via the same object
+     * key). Deleting first would leave the resume pointing at a gone object the moment the new
+     * upload fails for any reason.
      */
     public Resume uploadPhoto(UUID resumeId, MultipartFile file) {
         validatePhoto(file);
@@ -113,12 +126,21 @@ public class ResumeService {
         var resume = resumeRepositoryPort.findByIdAndAccountId(resumeId, accountId)
                 .orElseThrow(() -> new ResumeNotFoundException("Resume not found"));
 
-        if (resume.getPhotoUrl() != null) {
-            photoStoragePort.delete(resume.getPhotoUrl());
+        String newPhotoUrl = photoStoragePort.upload(resumeId, file);
+        var updated = resumeRepositoryPort.updatePhotoUrl(resumeId, newPhotoUrl);
+
+        String oldPhotoUrl = resume.getPhotoUrl();
+        if (oldPhotoUrl != null && !oldPhotoUrl.equals(newPhotoUrl)) {
+            // Best-effort: the new photo is already uploaded and recorded above, so a leftover
+            // old object is a minor storage cleanup to retry later, not a reason to fail this call.
+            try {
+                photoStoragePort.delete(oldPhotoUrl);
+            } catch (Exception e) {
+                log.warn("Failed to delete superseded photo, will remain orphaned [photoUrl={}]", oldPhotoUrl, e);
+            }
         }
 
-        String photoUrl = photoStoragePort.upload(resumeId, file);
-        return resumeRepositoryPort.updatePhotoUrl(resumeId, photoUrl);
+        return updated;
     }
 
     private void validatePhoto(MultipartFile file) {
@@ -148,6 +170,7 @@ public class ResumeService {
             throw new ResumeNotFoundException("Resume not found");
         }
         resumeRepositoryPort.deleteByIdAndAccountId(id, accountId);
+        meterRegistry.counter("resume.deleted").increment();
     }
 
     /**

@@ -1,7 +1,10 @@
 package a.gleb.resume_app.adapter.in.web.advice;
 
+import a.gleb.resume_app.adapter.out.storage.PhotoStorageException;
 import a.gleb.resume_app.domain.exception.DomainException;
 import a.gleb.resume_app.domain.exception.ErrorCode;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -58,6 +61,28 @@ public class ErrorHandlerController {
     public ProblemDetail handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException ex) {
         log.warn("ObjectOptimisticLockingFailureException: {}", ex.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "The resource was modified concurrently, please retry");
+    }
+
+    /**
+     * Covers both a direct MinIO failure and retries exhausted on a transient one
+     * ({@link a.gleb.resume_app.adapter.out.storage.TransientPhotoStorageException} extends this).
+     */
+    @ExceptionHandler(PhotoStorageException.class)
+    public ProblemDetail handlePhotoStorageException(PhotoStorageException ex) {
+        log.error("PhotoStorageException", ex);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE,
+                "Photo storage is temporarily unavailable, please retry later");
+    }
+
+    /**
+     * Circuit breaker open (too many recent MinIO failures) or bulkhead full (too many concurrent
+     * uploads in flight) — both mean "don't bother hitting MinIO right now".
+     */
+    @ExceptionHandler({CallNotPermittedException.class, BulkheadFullException.class})
+    public ProblemDetail handleResilienceRejection(RuntimeException ex) {
+        log.warn("Photo storage call rejected: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE,
+                "Photo storage is temporarily unavailable, please retry later");
     }
 
     /**

@@ -47,15 +47,21 @@ public record ResumeRequest(
         @Schema(description = "List of professional skills.", example = "[\"Java\", \"Spring Boot\", \"PostgreSQL\"]")
         List<@NotBlank @Size(max = 100) String> skills,
 
+        @NotNull
         @Valid
-        @Schema(description = "Work experience entries.", nullable = true)
+        @Schema(description = "Work experience entries. Required — this is a full replace, not a " +
+                "merge; send an empty array to clear existing entries.")
         List<WorkExperienceRequest> experience,
 
+        @NotNull
         @Valid
-        @Schema(description = "Education entries.", nullable = true)
+        @Schema(description = "Education entries. Required — this is a full replace, not a merge; " +
+                "send an empty array to clear existing entries.")
         List<EducationRequest> education,
 
-        @Schema(description = "Links to external profiles (e.g. LinkedIn, GitHub).", nullable = true)
+        @NotNull
+        @Schema(description = "Links to external profiles (e.g. LinkedIn, GitHub). Required — this " +
+                "is a full replace, not a merge; send an empty array to clear existing entries.")
         List<@NotBlank @Size(max = 500) String> links
 ) {
 }

@@ -1,6 +1,7 @@
 package a.gleb.resume_app.adapter.in.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
@@ -31,4 +32,9 @@ public record WorkExperienceRequest(
         @Schema(description = "Description of responsibilities and achievements.", example = "Developed high-load microservices...")
         String description
 ) {
+    @AssertTrue(message = "endDate must not be before startDate")
+    @Schema(hidden = true)
+    public boolean isDateRangeValid() {
+        return startDate == null || endDate == null || !endDate.isBefore(startDate);
+    }
 }

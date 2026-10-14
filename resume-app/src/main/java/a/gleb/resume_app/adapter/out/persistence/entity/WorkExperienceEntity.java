@@ -32,16 +32,4 @@ public class WorkExperienceEntity extends BaseEntity {
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-
-    @PrePersist
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
-    @PreUpdate
-    @Override
-    public void onUpdate() {
-        super.onUpdate();
-    }
 }

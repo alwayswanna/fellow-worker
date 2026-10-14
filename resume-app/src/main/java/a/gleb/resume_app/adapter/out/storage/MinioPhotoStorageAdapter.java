@@ -3,6 +3,9 @@ package a.gleb.resume_app.adapter.out.storage;
 import a.gleb.resume_app.application.port.out.PhotoStoragePort;
 import a.gleb.resume_app.config.properties.ResumeAppConfigurationProperties;
 import a.gleb.resume_app.constant.ResumeAppConstant;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
@@ -42,8 +45,15 @@ public class MinioPhotoStorageAdapter implements PhotoStoragePort {
 
     private static final int MAX_ATTEMPTS = 3;
 
+    /**
+     * Shared resilience4j instance name for both methods — one circuit breaker/bulkhead per
+     * downstream (MinIO), not per operation, since both compete for the same connection pool.
+     */
+    private static final String MINIO_RESILIENCE_INSTANCE = "minio";
+
     private final MinioClient minioClient;
     private final ResumeAppConfigurationProperties properties;
+    private final MeterRegistry meterRegistry;
 
     /**
      * Best-effort: logged, not rethrown. A listener on {@link ApplicationReadyEvent} that throws
@@ -63,6 +73,8 @@ public class MinioPhotoStorageAdapter implements PhotoStoragePort {
     }
 
     @Override
+    @CircuitBreaker(name = MINIO_RESILIENCE_INSTANCE)
+    @Bulkhead(name = MINIO_RESILIENCE_INSTANCE)
     @Retryable(retryFor = TransientPhotoStorageException.class, maxAttempts = MAX_ATTEMPTS, backoff = @Backoff(delay = 500, multiplier = 2))
     public String upload(UUID resumeId, MultipartFile file) {
         var minio = properties.minio();
@@ -75,12 +87,14 @@ public class MinioPhotoStorageAdapter implements PhotoStoragePort {
                     .contentType(file.getContentType())
                     .build());
         } catch (Exception e) {
-            throw classify("Failed to upload photo to MinIO", e);
+            throw classify("Failed to upload photo to MinIO", "upload", e);
         }
         return minio.endpoint() + "/" + minio.bucket() + "/" + objectKey;
     }
 
     @Override
+    @CircuitBreaker(name = MINIO_RESILIENCE_INSTANCE)
+    @Bulkhead(name = MINIO_RESILIENCE_INSTANCE)
     @Retryable(retryFor = TransientPhotoStorageException.class, maxAttempts = MAX_ATTEMPTS, backoff = @Backoff(delay = 500, multiplier = 2))
     public void delete(String photoUrl) {
         var minio = properties.minio();
@@ -95,7 +109,7 @@ public class MinioPhotoStorageAdapter implements PhotoStoragePort {
                     .object(objectKey)
                     .build());
         } catch (Exception e) {
-            throw classify("Failed to delete photo from MinIO", e);
+            throw classify("Failed to delete photo from MinIO", "delete", e);
         }
     }
 
@@ -130,7 +144,8 @@ public class MinioPhotoStorageAdapter implements PhotoStoragePort {
         return extension;
     }
 
-    private RuntimeException classify(String message, Exception e) {
+    private RuntimeException classify(String message, String operation, Exception e) {
+        meterRegistry.counter("resume.photo.storage.failed", "operation", operation).increment();
         if (e instanceof ErrorResponseException || e instanceof InvalidResponseException
                 || e instanceof XmlParserException || e instanceof InvalidKeyException
                 || e instanceof NoSuchAlgorithmException) {

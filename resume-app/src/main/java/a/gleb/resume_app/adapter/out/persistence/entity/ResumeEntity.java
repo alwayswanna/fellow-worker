@@ -22,24 +22,31 @@ public class ResumeEntity extends BaseEntity {
     @Column(name = "account_id", nullable = false)
     private UUID accountId;
 
+    @Setter
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
+    @Setter
     @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
+    @Setter
     @Column(name = "email", nullable = false, length = 254)
     private String email;
 
+    @Setter
     @Column(name = "phone", length = 20)
     private String phone;
 
+    @Setter
     @Column(name = "desired_position", length = 100)
     private String desiredPosition;
 
+    @Setter
     @Column(name = "summary", columnDefinition = "TEXT")
     private String summary;
 
+    @Setter
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
@@ -65,16 +72,4 @@ public class ResumeEntity extends BaseEntity {
     @BatchSize(size = 50)
     @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ResumeExternalLinkEntity> links = new ArrayList<>();
-
-    @PrePersist
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
-    @PreUpdate
-    @Override
-    public void onUpdate() {
-        super.onUpdate();
-    }
 }

@@ -51,24 +51,33 @@ public class ResumeRepositoryAdapter implements ResumeRepositoryPort {
         return resumePersistenceMapper.toDomain(saved, skills, experiences, educations, links);
     }
 
+    /**
+     * Loads the managed entity and mutates it in place (rather than building a new detached entity
+     * and merging it) so Hibernate dirty-checks the actual loaded {@code @Version} — a merge of a
+     * freshly-built entity would otherwise always carry the Java-default version, turning every
+     * optimistic-lock check into a guaranteed (false) conflict after the first real update.
+     */
     @Override
     public Resume update(Resume resume) {
-        skillEntityRepository.deleteAllByResumeId(resume.getId());
-        workExperienceEntityRepository.deleteAllByResumeId(resume.getId());
-        educationEntityRepository.deleteAllByResumeId(resume.getId());
-        resumeExternalLinkEntityRepository.deleteAllByResumeId(resume.getId());
+        var entity = resumeEntityRepository.findById(resume.getId())
+                .orElseThrow(() -> new ResumeNotFoundException("Resume not found"));
 
-        var updated = resumeEntityRepository.save(resumePersistenceMapper.toEntity(resume));
+        resumePersistenceMapper.updateEntity(entity, resume);
 
-        var skills = skillEntityRepository.saveAll(resumePersistenceMapper.toSkillEntities(resume.getSkills(), updated));
+        skillEntityRepository.deleteAllByResumeId(entity.getId());
+        workExperienceEntityRepository.deleteAllByResumeId(entity.getId());
+        educationEntityRepository.deleteAllByResumeId(entity.getId());
+        resumeExternalLinkEntityRepository.deleteAllByResumeId(entity.getId());
+
+        var skills = skillEntityRepository.saveAll(resumePersistenceMapper.toSkillEntities(resume.getSkills(), entity));
         var experiences = workExperienceEntityRepository.saveAll(
-                resumePersistenceMapper.toWorkExperienceEntities(resume.getExperience(), updated));
+                resumePersistenceMapper.toWorkExperienceEntities(resume.getExperience(), entity));
         var educations = educationEntityRepository.saveAll(
-                resumePersistenceMapper.toEducationEntities(resume.getEducation(), updated));
+                resumePersistenceMapper.toEducationEntities(resume.getEducation(), entity));
         var links = resumeExternalLinkEntityRepository.saveAll(
-                resumePersistenceMapper.toLinkEntities(resume.getLinks(), updated));
+                resumePersistenceMapper.toLinkEntities(resume.getLinks(), entity));
 
-        return resumePersistenceMapper.toDomain(updated, skills, experiences, educations, links);
+        return resumePersistenceMapper.toDomain(entity, skills, experiences, educations, links);
     }
 
     /**
@@ -113,7 +122,7 @@ public class ResumeRepositoryAdapter implements ResumeRepositoryPort {
 
     @Override
     public List<Resume> findAllByAccountId(UUID accountId) {
-        return resumeEntityRepository.findAllByAccountId(accountId).stream().map(this::loadFullDomain).toList();
+        return resumeEntityRepository.findTop100ByAccountId(accountId).stream().map(this::loadFullDomain).toList();
     }
 
     @Override

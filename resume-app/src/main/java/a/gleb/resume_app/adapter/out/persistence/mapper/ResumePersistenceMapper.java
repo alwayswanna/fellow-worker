@@ -37,6 +37,24 @@ public class ResumePersistenceMapper {
                 .build();
     }
 
+    /**
+     * Applies the mutable business fields of {@code resume} onto an already-managed {@code entity}
+     * in place, so Hibernate's dirty checking (not a detached-entity merge) produces the UPDATE —
+     * that's what makes {@code @Version}-based optimistic locking actually take effect, since the
+     * managed instance carries the version it was actually loaded with. Deliberately leaves
+     * {@code accountId}/{@code photoUrl}/the audit fields untouched: ownership and the uploaded
+     * photo aren't part of this request, and audit fields are Spring Data JPA Auditing's job.
+     */
+    public void updateEntity(ResumeEntity entity, Resume resume) {
+        entity.setFirstName(resume.getFirstName());
+        entity.setLastName(resume.getLastName());
+        entity.setEmail(resume.getEmail());
+        entity.setPhone(resume.getPhone());
+        entity.setDesiredPosition(resume.getDesiredPosition());
+        entity.setSummary(resume.getSummary());
+        entity.setBirthDate(resume.getBirthDate());
+    }
+
     public List<SkillEntity> toSkillEntities(List<String> names, ResumeEntity resume) {
         if (names == null) {
             return List.of();
