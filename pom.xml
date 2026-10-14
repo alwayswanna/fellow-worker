@@ -34,11 +34,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Library version -->
         <minio.version>8.5.17</minio.version>
+        <okio.version>3.16.1</okio.version>
         <spring-cloud.version>2025.1.1</spring-cloud.version>
         <schedlock.version>7.7.0</schedlock.version>
         <springdoc-openapi.version>3.0.3</springdoc-openapi.version>
         <springdoc-openapi.annotations.version>2.2.52</springdoc-openapi.annotations.version>
         <opentelemetry-logback-mdc-1.0.version>2.18.1-alpha</opentelemetry-logback-mdc-1.0.version>
+        <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
     </properties>
 
     <dependencyManagement>
@@ -87,6 +89,31 @@
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.version}</version>
+            </dependency>
+
+            <!--
+            Forces a single okio version across the reactor. Without this, Maven mediation picks
+            okio(-jvm):3.6.0 (pulled in by minio's okhttp:4.12.0) over the okio-jvm:3.16.1 that
+            opentelemetry-exporter-sender-okhttp's okhttp-jvm:5.2.1 actually needs (both land on
+            the classpath since "okhttp" and "okhttp-jvm" are different artifactIds that Maven
+            won't dedupe, even though they're the same library). The mismatch surfaces at runtime
+            as `NoSuchMethodError: okio.Okio.socket(Socket)` the first time anything opens a real
+            OkHttp connection (e.g. resume-app talking to MinIO) — 3.16.1 satisfies both sides.
+            -->
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>${okio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio-jvm</artifactId>
+                <version>${okio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

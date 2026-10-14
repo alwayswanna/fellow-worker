@@ -39,6 +39,18 @@ spring:
       httpclient:
         connect-timeout: 3000
         response-timeout: 10s
+        pool:
+          # FIXED вместо ELASTIC: ограничиваем общее число соединений на downstream,
+          # чтобы сетевая деградация одного сервиса не привела к неограниченному росту
+          # коннектов и исчерпанию файловых дескрипторов гейтвея.
+          type: fixed
+          max-connections: 500
+          acquire-timeout: 5000
+          max-idle-time: 30s
+          max-life-time: 5m
+          eviction-interval: 60s
+          # Публикует метрики пула соединений (connections.active/idle/pending) в Micrometer.
+          metrics: true
       server:
         webflux:
           globalcors:
@@ -57,16 +69,48 @@ resilience4j:
         failure-rate-threshold: 50
         wait-duration-in-open-state: 10s
         permitted-number-of-calls-in-half-open-state: 5
+    instances:
+      # resume-app отдаёт/принимает файлы через MinIO — медленнее остальных сервисов,
+      # поэтому даём ему больше терпимости к единичным медленным вызовам и дольше окно наблюдения.
+      resume-app:
+        base-config: default
+        sliding-window-size: 30
+        minimum-number-of-calls: 15
+        wait-duration-in-open-state: 20s
   timelimiter:
     configs:
       default:
         timeout-duration: 10s
+    instances:
+      resume-app:
+        base-config: default
+        timeout-duration: 30s
+  bulkhead:
+    configs:
+      default:
+        max-concurrent-calls: 50
+        max-wait-duration: 0ms
+    instances:
+      resume-app:
+        base-config: default
+        max-concurrent-calls: 20
+  ratelimiter:
+    configs:
+      default:
+        limit-for-period: 100
+        limit-refresh-period: 1s
+        timeout-duration: 0ms
 
 management:
   tracing:
     enabled: true
     propagation:
       type: w3c,b3 # Поддержка двух стандартов: W3C - современный стандарт; B3 - legacy, на всякий случай
+  health:
+    liveness-state:
+      enabled: true
+    readiness-state:
+      enabled: true
   endpoints:
     access:
       default: none
@@ -80,8 +124,21 @@ management:
       access: unrestricted
     health:
       access: unrestricted
+      show-details: always
       probes:
         enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          # Готовность отражает только способность самого гейтвея принимать трафик,
+          # а НЕ здоровье downstream-сервисов: один упавший downstream обрабатывается
+          # circuit breaker/fallback, и не должен выводить из ротации весь гейтвей.
+          include: readinessState
+        dependencies:
+          # Отдельная группа для мониторинга/дашбордов: состояние circuit breaker'ов
+          # и rate limiter'ов по каждому downstream-сервису. Не используется для readiness-проб.
+          include: circuitBreakers, rateLimiters
     prometheus:
       access: unrestricted
     busrefresh:

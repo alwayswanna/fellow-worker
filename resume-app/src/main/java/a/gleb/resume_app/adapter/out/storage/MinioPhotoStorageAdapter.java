@@ -45,12 +45,20 @@ public class MinioPhotoStorageAdapter implements PhotoStoragePort {
     private final MinioClient minioClient;
     private final ResumeAppConfigurationProperties properties;
 
+    /**
+     * Best-effort: logged, not rethrown. A listener on {@link ApplicationReadyEvent} that throws
+     * fails the whole application (the app had already printed "Started" — Spring still reports
+     * startup failure and shuts everything down), which is a disproportionate blast radius for a
+     * MinIO hiccup at boot. If the bucket genuinely doesn't exist and this failed to create it,
+     * uploads will keep failing until an operator notices the warning below and fixes MinIO — but
+     * the rest of the application (everything that isn't photo upload) stays up in the meantime.
+     */
     @EventListener(ApplicationReadyEvent.class)
     public void ensureBucketExistsOnStartup() {
         try {
             ensureBucketExists();
         } catch (Exception e) {
-            throw new PhotoStorageException("Failed to ensure MinIO bucket exists on startup", e);
+            log.warn("Failed to ensure MinIO bucket exists on startup — will retry lazily on first upload", e);
         }
     }
 
