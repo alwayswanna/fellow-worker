@@ -41,6 +41,10 @@ class _VacancyDetailSheetState extends State<VacancyDetailSheet> {
 
   bool get _isApplicant => widget.userRole == 'APPLICANT';
 
+  bool get _canToggleSave =>
+      (widget.userRole != null && widget.vacancyApiService != null) ||
+      widget.onSignInToApply != null;
+
   @override
   void initState() {
     super.initState();
@@ -174,14 +178,15 @@ class _VacancyDetailSheetState extends State<VacancyDetailSheet> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        onPressed: _isSaving ? null : _toggleSave,
-                        tooltip: _isSaved ? 'Remove from saved' : 'Save vacancy',
-                        icon: Icon(
-                          _isSaved ? Icons.bookmark : Icons.bookmark_border,
-                          color: _isSaved ? AppColors.accent : AppColors.textSecondary,
+                      if (_canToggleSave)
+                        IconButton(
+                          onPressed: _isSaving ? null : _toggleSave,
+                          tooltip: _isSaved ? 'Remove from saved' : 'Save vacancy',
+                          icon: Icon(
+                            _isSaved ? Icons.bookmark : Icons.bookmark_border,
+                            color: _isSaved ? AppColors.accent : AppColors.textSecondary,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 20),

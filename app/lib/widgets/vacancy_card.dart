@@ -32,6 +32,10 @@ class _VacancyBrowseCardState extends State<VacancyBrowseCard> {
   late bool _isSaved = widget.initiallySaved;
   bool _isSaving = false;
 
+  bool get _canToggleSave =>
+      (widget.canSave && widget.vacancyApiService != null) ||
+      widget.onSignInToApply != null;
+
   Future<void> _toggleSave() async {
     if (!widget.canSave || widget.vacancyApiService == null) {
       widget.onSignInToApply?.call();
@@ -102,15 +106,16 @@ class _VacancyBrowseCardState extends State<VacancyBrowseCard> {
                       ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: _isSaving ? null : _toggleSave,
-                    tooltip: _isSaved ? 'Remove from saved' : 'Save vacancy',
-                    icon: Icon(
-                      _isSaved ? Icons.bookmark : Icons.bookmark_border,
-                      size: 20,
-                      color: _isSaved ? AppColors.accent : AppColors.textSecondary,
+                  if (_canToggleSave)
+                    IconButton(
+                      onPressed: _isSaving ? null : _toggleSave,
+                      tooltip: _isSaved ? 'Remove from saved' : 'Save vacancy',
+                      icon: Icon(
+                        _isSaved ? Icons.bookmark : Icons.bookmark_border,
+                        size: 20,
+                        color: _isSaved ? AppColors.accent : AppColors.textSecondary,
+                      ),
                     ),
-                  ),
                 ],
               ),
               const SizedBox(height: 10),
